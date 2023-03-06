@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Dashboard from './src/screens/dashboard';
+import DrawerContent from './src/screens/drawer';
 
 
 function HomeScreen({ navigation }) {
@@ -31,7 +32,7 @@ const Drawer = createDrawerNavigator();
 const App = () => {
   return (
     <NavigationContainer>
-      <Drawer.Navigator initialRouteName="Home">
+      <Drawer.Navigator initialRouteName="dashboard" drawerContent={props => <DrawerContent {...props}/>}>
         <Drawer.Screen name="Home" component={HomeScreen} />
         <Drawer.Screen name="Notifications" component={NotificationsScreen} />
         <Drawer.Screen name="dashboard" component={Dashboard} options={{title: 'Dashboard'}}/>

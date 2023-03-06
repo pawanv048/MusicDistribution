@@ -102,9 +102,24 @@ export const CustomText = ({
       </Text>
     </View>
   )
+};
+
+export const Separator = ({
+  lineContainer
+}) => {
+  return (
+    <View
+      style={{
+        borderBottomColor: COLORS.primary,
+        borderBottomWidth: 4,
+        borderRadius: 2,
+        //width: '40%',
+        ...lineContainer
+      }} />
+  );
 }
 
-const appComponent = { SearchComponent, TextButton }
+const appComponent = { SearchComponent, TextButton, Separator }
 
 export default appComponent
 

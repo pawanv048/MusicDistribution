@@ -58,7 +58,7 @@ export const COLORS = {
   light08: 'rgba(255, 255, 255, 0.08)',
 
   // Support 1
-  support1: 'rgba(110, 162, 255, 1)',
+  support1: 'rgba(17, 52, 85, 1)',
   support1_08: 'rgba(110, 162, 255, 0.08)',
 
   // Support 2

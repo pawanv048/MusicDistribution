@@ -10,8 +10,10 @@ import {
   Image,
 
 } from 'react-native';
+
 import { SearchComponent, TextButton, CustomText, Separator } from '../custom/component';
 import { COLORS, SIZES } from '../constants/theme';
+import * as String from '../constants/strings';
 
 
 const Data = [
@@ -117,6 +119,13 @@ const CategoryCardData = [
 
 ];
 
+const facebook = 'https://cdn-icons-png.flaticon.com/512/1051/1051309.png';
+const google = 'https://cdn-icons-png.flaticon.com/512/60/60818.png';
+const linkdin = 'https://cdn-icons-png.flaticon.com/512/61/61109.png';
+const twitter = 'https://cdn-icons-png.flaticon.com/512/25/25347.png';
+const exit = 'https://cdn-icons-png.flaticon.com/512/8983/8983815.png';
+
+
 
 
 // Main screen
@@ -178,39 +187,42 @@ const Dashboard = () => {
 
 
     return (
-      <View style={styles.card}>
-        <View style={{ margin: SIZES.padding * 2 }}>
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: 'bold',
-              marginBottom: SIZES.padding
-            }}>Best episodes of the week</Text>
-          <Separator
-            lineContainer={{
-              width: '45%',
-              height: 5
-            }} />
-          <Separator
-            lineContainer={{
-              width: '30%',
-              height: 5,
-              marginTop: 5
-            }} />
+      <>
+        <View style={styles.card}>
+          <View style={{ margin: SIZES.padding * 2 }}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                marginBottom: SIZES.padding
+              }}>Best episodes of the week</Text>
+            <Separator
+              lineContainer={{
+                width: '45%',
+                height: 5
+              }} />
+            <Separator
+              lineContainer={{
+                width: '30%',
+                height: 5,
+                marginTop: 5
+              }} />
+          </View>
+
+          {/* EPISODES CARD */}
+
+          <FlatList
+            data={Data}
+            renderItem={renderCard}
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
+            contentContainerStyle={{ paddingHorizontal: SIZES.padding * 2, marginBottom: SIZES.padding * 2 }}
+          // style={styles.card}
+          />
         </View>
-
-        {/* EPISODES CARD */}
-
-        <FlatList
-          data={Data}
-          renderItem={renderCard}
-          keyExtractor={(item) => item.id}
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
-          contentContainerStyle={{ paddingHorizontal: SIZES.padding * 2 }}
-        />
-      </View>
+      </>
     )
   };
 
@@ -309,20 +321,139 @@ const Dashboard = () => {
 
 
     return (
-      <View style={styles.card}>
+      <View
+        style={{
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 7,
+          },
+          shadowOpacity: 0.30,
+          shadowRadius: 8.0
+        }}>
         <FlatList
           data={CategoryCardData}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
-          //ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 2 }} />}
+          style={styles.card}
+        //ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 2 }} />}
         //contentContainerStyle={{ paddingVertical: SIZES.padding * 3 }}
         />
       </View>
     )
+  };
+
+  // FOOTER CONTENT
+
+  const renderFooter = () => {
+    return (
+      <>
+        <View
+          style={{
+            //marginHorizontal: SIZES.padding,
+            marginTop: 20,
+            //alignItems: 'center'
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}>
+          <View>
+            <Text style={styles.footerTxt}>TOP ARTISTS</Text>
+            <Text style={styles.artistTxt}>{String.neha}</Text>
+            <Text style={styles.artistTxt}>{String.arjit}</Text>
+            <Text style={styles.artistTxt}>{String.badh}</Text>
+            <Text style={styles.artistTxt}>{String.atif}</Text>
+            <Text style={styles.artistTxt}>{String.Justin}</Text>
+            <Text style={styles.artistTxt}>{String.himesh}</Text>
+            <Text style={styles.artistTxt}>{String.lata}</Text>
+            <Text style={styles.artistTxt}>{String.diljit}</Text>
+          </View>
+
+          <View>
+            <Text style={styles.footerTxt}>TOP ACTORS</Text>
+            <Text style={styles.artistTxt}>{String.neha}</Text>
+            <Text style={styles.artistTxt}>{String.arjit}</Text>
+            <Text style={styles.artistTxt}>{String.badh}</Text>
+            <Text style={styles.artistTxt}>{String.atif}</Text>
+            <Text style={styles.artistTxt}>{String.Justin}</Text>
+            <Text style={styles.artistTxt}>{String.himesh}</Text>
+            <Text style={styles.artistTxt}>{String.lata}</Text>
+            <Text style={styles.artistTxt}>{String.diljit}</Text>
+          </View>
+        </View>
+
+        <View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View>
+              <Text style={styles.footerTxt}>DEVOTIONAL SONGS</Text>
+              <Text style={styles.artistTxt}>{String.krishna}</Text>
+              <Text style={styles.artistTxt}>{String.mantra}</Text>
+              <Text style={styles.artistTxt}>{String.deva}</Text>
+              <Text style={styles.artistTxt}>{String.hanuman}</Text>
+              <Text style={styles.artistTxt}>{String.gayatri}</Text>
+              <Text style={styles.artistTxt}>{String.mata}</Text>
+              <Text style={styles.artistTxt}>{String.durga}</Text>
+              <Text style={styles.artistTxt}>{String.maiya}</Text>
+            </View>
+
+            <View>
+              <Text style={styles.footerTxt}>COMPANY</Text>
+              <Text style={styles.artistTxt}>{String.about}</Text>
+              <Text style={styles.artistTxt}>{String.culture}</Text>
+              <Text style={styles.artistTxt}>{String.blog}</Text>
+              <Text style={styles.artistTxt}>{String.jobs}</Text>
+              <Text style={styles.artistTxt}>{String.press}</Text>
+              <Text style={styles.artistTxt}>{String.advertise}</Text>
+              <Text style={styles.artistTxt}>{String.terms}</Text>
+              <Text style={styles.artistTxt}>{String.help}</Text>
+            </View>
+          </View>
+
+          <View>
+            <Text style={styles.footerTxt}>ARTISTS ORIGINALS</Text>
+            <Text style={styles.artistTxt}>{String.zaeden}</Text>
+            <Text style={styles.artistTxt}>{String.raghav}</Text>
+            <Text style={styles.artistTxt}>{String.SIXK}</Text>
+            <Text style={styles.artistTxt}>{String.siri}</Text>
+            <Text style={styles.artistTxt}>{String.lost}</Text>
+          </View>
+        </View>
+
+        <Separator
+          lineContainer={{
+            borderBottomWidth: 1,
+            marginTop: SIZES.padding2,
+            borderBottomColor: COLORS.support1
+          }} />
+
+        <View>
+          <Text style={[styles.artistTxt, { textAlign: 'left' }]}>{String.rights}</Text>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}>
+            <Text style={[styles.artistTxt, { textAlign: 'left' }]}>{String.social}</Text>
+            <Image
+              source={{ uri: facebook }}
+              style={styles.socialIcons}
+            />
+            <Image
+              source={{ uri: google }}
+              style={styles.socialIcons}
+            />
+            <Image
+              source={{ uri: linkdin }}
+              style={styles.socialIcons}
+            />
+            <Image
+              source={{ uri: twitter }}
+              style={styles.socialIcons}
+            />
+          </View>
+        </View>
+      </>
+    )
   }
-
-
 
 
 
@@ -337,13 +468,33 @@ const Dashboard = () => {
           label={'PREMIUM PLANS'}
         />
         <View style={{ flexDirection: 'row' }}>
-          <CustomText label={'LOG IN'} labelStyle={{ marginRight: 25 }} />
-          <CustomText label={'SING UP'} />
+          <View
+            style={{
+              alignItems: 'center',
+              flexDirection: 'row'
+            }}>
+            <Image source={{ uri: exit, height: 15, width: 15 }} style={{ tintColor: COLORS.support1, marginRight: 5 }} />
+            <CustomText
+              label={'LOG IN'}
+              labelStyle={{ marginRight: 25 }}
+            />
+          </View>
+          <View
+            style={{
+              alignItems: 'center',
+              flexDirection: 'row'
+            }}>
+            <Image source={{ uri: exit, height: 15, width: 15 }} style={{ tintColor: COLORS.support1, marginRight: 5 }} />
+            <CustomText
+              label={'SIGN IN'}
+            />
+          </View>
         </View>
       </View>
 
       {renderCardView()}
       {renderCategoryView()}
+      {renderFooter()}
     </ScrollView>
   )
 }
@@ -361,8 +512,8 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: COLORS.light,
-    height: SIZES.height / 2,
-    marginTop: SIZES.padding * 2,
+    //height: SIZES.height / 2, 
+    marginTop: SIZES.padding * 3,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -376,6 +527,25 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: SIZES.padding
+  },
+  footerTxt: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.support1,
+    marginVertical: SIZES.padding * 2
+  },
+  artistTxt: {
+    fontSize: 18,
+    fontWeight: '400',
+    color: COLORS.support1,
+    marginVertical: SIZES.padding,
+    //textAlign: 'center'
+  },
+  socialIcons: {
+    height: 15,
+    width: 15,
+    tintColor: COLORS.support1,
+    marginHorizontal: SIZES.padding
   }
 
 

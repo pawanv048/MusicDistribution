@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import {
   DrawerContentScrollView,
   DrawerItem
@@ -39,31 +39,35 @@ const Drawer = ({ navigation }) => {
 
   const [showDrawerItems, setShowDrawerItems] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const animation = useRef(new Animated.Value(40)).current;
 
-  const toggleDrawerItems = () => {
-    // setShowDrawerItems(!showDrawerItems);
-    // setIsExpanded(!isExpanded);
-    Animated.timing(animation, {
-      toValue: isExpanded ? 40 : showDrawerItems ? 40 : 4 + drawerItems.length * 50,
-      duration: 500,
-      useNativeDriver: false,
-    }).start();
-  };
+  // const toggleDrawerItems = () => {
+  //   // setShowDrawerItems(!showDrawerItems);
+  //   // setIsExpanded(!isExpanded);
+  //   Animated.timing(animation, {
+  //     toValue: isExpanded ? 40 : showDrawerItems ? 40 : 4 + drawerItems.length * 50,
+  //     duration: 500,
+  //     useNativeDriver: false,
+  //   }).start();
+  // };
 
   const browserPressed = () => {
     setIsExpanded(!isExpanded);
+    //toggleDrawerItems()
   };
 
   const libraryPressed = () => {
     setShowDrawerItems(!showDrawerItems);
+    //toggleDrawerItems()
     // code to handle button 2 press
   };
 
   return (
     <DrawerContentScrollView
       showsVerticalScrollIndicator={false}
+      style={{ height: SIZES.height, flex: 1 }}
+      contentContainerStyle={{ paddingBottom: 40 }}
     >
+
       <View>
 
         {/* Header */}
@@ -81,7 +85,8 @@ const Drawer = ({ navigation }) => {
             <Text
               style={{
                 fontSize: 25,
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                color: COLORS.support1
               }}>DOMPET</Text>
           </View>
           <TouchableOpacity onPress={() => navigation.closeDrawer()}>
@@ -98,11 +103,12 @@ const Drawer = ({ navigation }) => {
             marginHorizontal: SIZES.padding * 2,
             marginVertical: SIZES.padding * 3,
             borderWidth: 0.2,
-            borderColor: 'grey',
-            borderRadius: 5,
+            borderColor: 'rgba(200,200,200,1)',
+            borderRadius: 15,
             padding: SIZES.padding * 1.3,
             flexDirection: 'row',
-            alignItems: 'center'
+            alignItems: 'center',
+            backgroundColor: COLORS.light
           }}
         >
           <Image
@@ -116,7 +122,7 @@ const Drawer = ({ navigation }) => {
           />
           <View>
             <Text style={styles.profile_name}>HI, WILLIAM</Text>
-            <Text>william@gmail.com</Text>
+            <Text style={{fontWeight: '600'}}>william@gmail.com</Text>
           </View>
         </View>
 
@@ -149,7 +155,7 @@ const Drawer = ({ navigation }) => {
         {/* Drawer items */}
 
         {isExpanded && (
-          <Animated.View style={{ height: animation }}>
+          <View>
             {drawerItems.map((item, index) => (
               <TouchableOpacity
                 key={index}
@@ -180,7 +186,7 @@ const Drawer = ({ navigation }) => {
                 </Text>
               </TouchableOpacity>
             ))}
-          </Animated.View>
+          </View>
         )}
 
         {/* LIBRARY */}
@@ -211,7 +217,7 @@ const Drawer = ({ navigation }) => {
         {/* Library items */}
 
         {showDrawerItems && (
-          <Animated.View style={{ height: animation }}>
+          <View>
             {libraryItems.map((item, index) => (
               <TouchableOpacity
                 key={index}
@@ -242,7 +248,7 @@ const Drawer = ({ navigation }) => {
                 </Text>
               </TouchableOpacity>
             ))}
-          </Animated.View>
+          </View>
         )}
       </View>
 
@@ -277,14 +283,12 @@ const Drawer = ({ navigation }) => {
 
       {/* Download */}
 
-      <View
+      <TouchableOpacity
+        activeOpacity={0.5}
         style={{
           flexDirection: 'row',
-          position: 'absolute',
-          top: SIZES.width * 1.9,
+          marginTop: 150,
           alignSelf: 'center',
-          alignItems: 'center'
-          //backgroundColor: 'red'
         }}>
         <Image
           source={{ uri: download }}
@@ -301,7 +305,8 @@ const Drawer = ({ navigation }) => {
             fontWeight: '700',
             color: 'rgba(17,52,85,1)'
           }}>Install App</Text>
-      </View>
+      </TouchableOpacity>
+
     </DrawerContentScrollView>
   )
 };
@@ -317,7 +322,9 @@ const styles = StyleSheet.create({
   },
   profile_name: {
     fontSize: 15,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    lineHeight: 30,
+    color: COLORS.support1
   },
   browserBtn: {
     flexDirection: 'row',

@@ -27,19 +27,19 @@ const Data = [
     id: 2,
     title: 'S02-E01 - Virat Kohli',
     desc: 'Catch the hottest punjab song with Guru Randhawa',
-    img: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg'
+    img: 'https://cdn.pixabay.com/photo/2018/03/30/17/25/women-3275942_960_720.png'
   },
   {
     id: 3,
     title: 'S02-E01 - Virat Kohli',
     desc: 'Catch the hottest punjab song with Guru Randhawa',
-    img: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg'
+    img: 'https://cdn.pixabay.com/photo/2018/03/06/06/58/performance-3202707_960_720.jpg'
   },
   {
     id: 4,
     title: 'S02-E01 - Virat Kohli',
     desc: 'Catch the hottest punjab song with Guru Randhawa',
-    img: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg'
+    img: 'https://cdn.pixabay.com/photo/2015/04/23/18/07/abstract-736439_960_720.jpg'
   }
 ]
 
@@ -52,7 +52,7 @@ const CategoryCardData = [
         id: '1',
         title: 'S02-E01 - Virat Kohli',
         desc: 'This is the description for S02-E01 - Virat Kohli',
-        image: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
+        image: 'https://cdn.pixabay.com/photo/2017/08/02/13/00/lotte-2571479_960_720.jpg',
       },
       {
         id: '2',
@@ -76,7 +76,7 @@ const CategoryCardData = [
         id: '1',
         title: 'S02-E01 - Virat Kohli',
         desc: 'This is the description for Category 1 Detail 1',
-        image: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
+        image: 'https://cdn.pixabay.com/photo/2016/11/18/18/35/adult-1836322_960_720.jpg',
       },
       {
         id: '2',
@@ -100,7 +100,7 @@ const CategoryCardData = [
         id: '1',
         title: 'S02-E01 - Virat Kohli',
         desc: 'This is the description for Category 1 Detail 1',
-        image: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
+        image: 'https://cdn.pixabay.com/photo/2016/10/17/16/35/concert-1748102_960_720.jpg',
       },
       {
         id: '2',

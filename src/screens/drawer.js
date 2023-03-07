@@ -86,7 +86,8 @@ const Drawer = ({ navigation }) => {
               style={{
                 fontSize: 25,
                 fontWeight: 'bold',
-                color: COLORS.support1
+                color: COLORS.support1,
+                // fontFamily: 'Poppins-Bold'
               }}>DOMPET</Text>
           </View>
           <TouchableOpacity onPress={() => navigation.closeDrawer()}>

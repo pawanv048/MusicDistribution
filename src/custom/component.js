@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
 
 export const TextButton = ({
   contentContainerStyle,
-  disabled,
+  disabled=false,
   label,
   labelStyle,
   onPress
@@ -62,7 +62,7 @@ export const TextButton = ({
       style={{
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: COLORS.primary,
+        backgroundColor: !disabled? COLORS.primary : 'grey',
         padding: 15,
         //marginHorizontal: SIZES.padding * 1.5,
         marginVertical: SIZES.padding,

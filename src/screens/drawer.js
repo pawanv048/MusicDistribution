@@ -18,7 +18,7 @@ const download = 'https://cdn-icons-png.flaticon.com/512/2382/2382067.png';
 
 
 const drawerItems = [
-  { label: 'New Release', onPress: () => console.log('Home pressed') },
+  { label: 'New Release', onPress: () => console.log('Home') },
   { label: 'Top Charts', onPress: () => console.log('Profile pressed') },
   { label: 'Top Playlist', onPress: () => console.log('Settings pressed') },
   { label: 'Podcasts', onPress: () => console.log('Settings pressed') },
@@ -254,6 +254,7 @@ const Drawer = ({ navigation }) => {
       </View>
 
       <TouchableOpacity
+        onPress={() => navigation.navigate('Home')}
         style={{
           margin: SIZES.padding,
           backgroundColor: 'rgba(17,52,85,1)',

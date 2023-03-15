@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import { CardField, useStripe, createToken, paymentIndent, confirmPayment } from '@stripe/stripe-react-native';
 import { TextButton } from '../custom/component';
-import createPaymentIntent from '../api/stripeApis';
+import { createPaymentIntent } from '../api/stripeApis';
 
 
 const PaymentScreen = () => {
@@ -17,9 +17,9 @@ const PaymentScreen = () => {
     }
   }
 
-  const onPressDone = async() => {
+  const onPressDone = async () => {
 
-    let apiData ={
+    let apiData = {
       amount: 5010,
       currency: 'INR'
     }
@@ -28,15 +28,15 @@ const PaymentScreen = () => {
       const res = await createPaymentIntent(apiData)
       //console.log('Payment intent create successfully..!!',res)
 
-      if(res?.data?.paymentIntent){
-        let confirmPaymentIndent = await confirmPayment(res?.data?.paymentIntent, {paymentMethodType: 'Card'})
+      if (res?.data?.paymentIntent) {
+        let confirmPaymentIndent = await confirmPayment(res?.data?.paymentIntent, { paymentMethodType: 'Card' })
         console.log("Confirm payment indent+", confirmPaymentIndent)
         alert('Payment done Successfully!!')
       }
     } catch (error) {
       console.log("Error rasing during payment indent", error)
     }
-    
+
     // if(!!cardInfo){
     //   try {
     //     const respToken = await createToken({...cardInfo, type: 'Card'})
@@ -57,6 +57,9 @@ const PaymentScreen = () => {
         cardStyle={{
           backgroundColor: '#FFFFFF',
           textColor: '#000000',
+          borderWidth: 1,
+          borderColor: '#000000',
+          borderRadius: 10,
         }}
         style={{
           width: '100%',
@@ -72,7 +75,7 @@ const PaymentScreen = () => {
       />
       <TextButton
         label={'DONE'}
-        contentContainerStyle={{marginHorizontal: 20}}
+        contentContainerStyle={{ marginHorizontal: 20 }}
         onPress={onPressDone}
         disabled={!cardInfo}
       />

@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,12 +7,13 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-
+  ActivityIndicator
 } from 'react-native';
 
 import { SearchComponent, TextButton, CustomText, Separator } from '../custom/component';
 import { COLORS, SIZES } from '../constants/theme';
 import * as String from '../constants/strings';
+import { API } from '../api/stripeApis';
 
 
 const Data = [
@@ -126,30 +126,73 @@ const twitter = 'https://cdn-icons-png.flaticon.com/512/25/25347.png';
 const exit = 'https://cdn-icons-png.flaticon.com/512/8983/8983815.png';
 
 
-
+const API_ALLRELEASE_URL = 'http://84.16.239.66/api/Release/GetAllReleases';
 
 // Main screen
-const Dashboard = () => {
+const Dashboard = ({ navigation }) => {
 
-  const handleSearch = searchText => {
-    console.log(`Searching for "${searchText}"...`);
+  const [data, setData] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+  const [filteredData, setFilteredData] = useState(Data);
+
+
+  const handleSearch = (searchQuery) => {
+    let newData = Data;
+    if (searchQuery.trim() !== '') {
+      newData = Data.filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    }
+    setFilteredData(newData);
   };
+
+  const getAllReleases = () => {
+    //console.log('calling api')
+    API({
+      url: `${API_ALLRELEASE_URL}`,
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+
+      onSuccess: val => {
+        setData(val?.Data)
+        //console.log('Agreement data ==>', val?.Data)
+        setLoading(false)
+      },
+      onError: val => console.log('ERROR:', val),
+    });
+    //setLoading(true);
+  };
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size='large' />
+      </View>
+    );
+  };
+
+  useEffect(() => {
+    // console.log('Use-Effect call')
+    getAllReleases()
+  }, [])
+
 
   function renderCardView() {
 
     const renderCard = ({ item }) => (
+
       <TouchableOpacity
+
         activeOpacity={0.7}
         style={{
           //marginHorizontal: SIZES.padding,
           alignItems: 'center',
           width: SIZES.width - 100,
-          height: SIZES.height / 3,
+          height: SIZES.height / 2.7,
           //backgroundColor: 'red',
           borderRadius: 10
         }}>
         <Image
           source={{ uri: item.img }}
+          //source={item.Release_Artwork}
           style={{
             width: '100%',
             height: '65%',
@@ -161,7 +204,7 @@ const Dashboard = () => {
           style={{
             width: '100%',
             backgroundColor: 'rgba(243,243,243,1)',
-            height: 120,
+            //height: 160,
             position: 'absolute',
             bottom: 0,
             borderRadius: 10
@@ -180,7 +223,24 @@ const Dashboard = () => {
               lineHeight: 20,
               fontWeight: '400'
             }}>{item.desc}</Text>
+
+            <TouchableOpacity
+             // onPress={() => console.log('button pressed')}
+              onPress={() => navigation.navigate('Home')}
+              style={{
+                marginVertical: 10,
+                backgroundColor: COLORS.primary,
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '40%',
+                padding: 13,
+                borderRadius: 5
+              }}
+            >
+              <Text>Buy</Text>
+            </TouchableOpacity>
           </View>
+
         </View>
       </TouchableOpacity>
     );
@@ -212,9 +272,11 @@ const Dashboard = () => {
           {/* EPISODES CARD */}
 
           <FlatList
-            data={Data}
+            data={filteredData}
+            // data={data}
             renderItem={renderCard}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
+            // keyExtractor={item => item.Release_Id}
             showsHorizontalScrollIndicator={false}
             horizontal
             ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
@@ -383,7 +445,7 @@ const Dashboard = () => {
         </View>
 
         <View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <View>
               <Text style={styles.footerTxt}>DEVOTIONAL SONGS</Text>
               <Text style={styles.artistTxt}>{String.krishna}</Text>
@@ -462,9 +524,12 @@ const Dashboard = () => {
       style={styles.container}
       contentContainerStyle={{ margin: SIZES.padding * 2, paddingBottom: 100 }}
     >
-      <SearchComponent onSearch={handleSearch} />
+      <SearchComponent
+        onSearch={handleSearch}
+      />
       <View style={styles.subContainer}>
         <TextButton
+          // onPress={}
           label={'PREMIUM PLANS'}
         />
         <View style={{ flexDirection: 'row' }}>
@@ -474,10 +539,17 @@ const Dashboard = () => {
               flexDirection: 'row'
             }}>
             <Image source={{ uri: exit, height: 15, width: 15 }} style={{ tintColor: COLORS.support1, marginRight: 5 }} />
-            <CustomText
-              label={'LOG IN'}
-              labelStyle={{ marginRight: 25 }}
-            />
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Login')}
+            >
+              <Text 
+              style={{
+                 fontSize: 15,
+                 fontWeight: 'bold',
+                 color: 'rgba(17,52,85,1)',
+                  marginRight: 15
+              }}>LOG IN</Text>
+            </TouchableOpacity>
           </View>
           <View
             style={{

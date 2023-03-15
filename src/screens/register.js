@@ -1,12 +1,66 @@
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { SIZES, COLORS } from '../constants/theme';
 import { Input, DropdownPicker, CustomText, TextButton } from '../custom/component';
 import CheckBox from '@react-native-community/checkbox';
 
 
-const Register = ({navigation}) => {
+const Register = ({ navigation }) => {
+
   const [toggleCheckBox, setToggleCheckBox] = React.useState(false)
+  const [errors, setErrors] = useState({});
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedState, setSelectedState] = useState(null);
+  const [registerData, setregisterData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    password: "",
+    cnfpassword: ""
+  });
+
+  //console.log(registerData)
+
+  // handle login data change
+  const handleOnChange = (text, registerData) => {
+    setregisterData(prevState => ({ ...prevState, [registerData]: text }));
+    setErrors(prevState => ({ ...prevState, [registerData]: null }));
+  };
+  // Error Messages
+  const handleError = (errorMessage, registerData) => {
+    setErrors(prevState => ({ ...prevState, [registerData]: errorMessage }));
+  }
+
+  
+  const handleSubmit = () => {
+    // on click of submit button
+    // console.log('button click');
+    let isValid = true;
+    const fields = [
+      { name: 'firstName', error: 'Please Enter First Name' },
+      { name: 'lastName', error: 'Please Enter Last Name' },
+      { name: 'email', error: 'Please Enter Email' },
+      { name: 'phone', error: 'Please Enter Phone Number' },
+      { name: 'password', error: 'Please Enter Password' },
+      { name: 'cnfpassword', error: 'Please Enter Confirm Password' },
+    ];
+
+    fields.map((field) => {
+      if (!registerData[field.name]) {
+        handleError(field.error, field.name);
+        isValid = false;
+      }
+    })
+    if (isValid) {
+      navigation.navigate('Login')
+      // console.log(registerData)
+    }
+  };
+
+
+
+
 
   return (
     <View style={styles.container}>
@@ -15,18 +69,56 @@ const Register = ({navigation}) => {
           <Text style={styles.registerNow}>Register Now</Text>
         </View>
         <ScrollView
-          style={{flex: 1}}
+          style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
         >
-          <Input placeholder='First Name' />
-          <Input placeholder='Last Name' />
-          <Input placeholder='Email' />
-          <Input placeholder='Phone Number' />
+          {/* FIRST NAME */}
+          <Input
+            placeholder='First Name'
+            onChangeText={text => handleOnChange(text, 'firstName')}
+            error={errors.firstName}
+            onFocus={() => handleError(null, 'firstName')}
+          />
+          {/* LAST NAME */}
+          <Input
+            placeholder='Last Name'
+            onChangeText={text => handleOnChange(text, 'lastName')}
+            error={errors.lastName}
+            onFocus={() => handleError(null, 'lastName')}
+          />
+          {/* EMAIL */}
+          <Input
+            placeholder='Email'
+            onChangeText={text => handleOnChange(text, 'email')}
+            error={errors.email}
+            onFocus={() => handleError(null, 'email')}
+          />
+          {/* PHONE NUMBER */}
+          <Input
+            placeholder='Phone Number'
+            onChangeText={text => handleOnChange(text, 'phone')}
+            error={errors.phone}
+            onFocus={() => handleError(null, 'phone')}
+          />
           <DropdownPicker placeholder='Select Country' />
           <DropdownPicker placeholder='Select State' />
-          <Input placeholder='Password' />
-          <Input placeholder='Confirm Password' />
+
+          {/* PASSWORD */}
+          <Input
+            placeholder='Password'
+            onChangeText={text => handleOnChange(text, 'password')}
+            error={errors.password}
+            onFocus={() => handleError(null, 'password')}
+          />
+
+          {/* CONFIRM PASSWORD */}
+          <Input
+            placeholder='Confirm Password'
+            onChangeText={text => handleOnChange(text, 'cnfpassword')}
+            error={errors.cnfpassword}
+            onFocus={() => handleError(null, 'cnfpassword')}
+          />
 
           {/* TERMS */}
           <View
@@ -55,6 +147,7 @@ const Register = ({navigation}) => {
           </View>
 
           <TextButton
+            onPress={handleSubmit}
             label={'SIGN UP'}
             labelStyle={{
               fontSize: 16,

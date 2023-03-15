@@ -9,11 +9,21 @@ import {
   Image,
   ActivityIndicator
 } from 'react-native';
+import Slider from '@react-native-community/slider';
+//  import Slider from "react-native-slider";
+
 
 import { SearchComponent, TextButton, CustomText, Separator } from '../custom/component';
 import { COLORS, SIZES } from '../constants/theme';
 import * as String from '../constants/strings';
 import { API } from '../api/stripeApis';
+
+
+const PIC = 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg'
+const menu = 'https://cdn-icons-png.flaticon.com/512/2311/2311524.png'
+const play = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'
+const vol = 'https://cdn-icons-png.flaticon.com/512/727/727269.png'
+const pause = 'https://cdn-icons-png.flaticon.com/512/1214/1214679.png'
 
 
 const Data = [
@@ -134,6 +144,7 @@ const Dashboard = ({ navigation }) => {
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState(Data);
+  const [range, setRange] = useState(0)
 
 
   const handleSearch = (searchQuery) => {
@@ -225,7 +236,7 @@ const Dashboard = ({ navigation }) => {
             }}>{item.desc}</Text>
 
             <TouchableOpacity
-             // onPress={() => console.log('button pressed')}
+              // onPress={() => console.log('button pressed')}
               onPress={() => navigation.navigate('Home')}
               style={{
                 marginVertical: 10,
@@ -273,15 +284,12 @@ const Dashboard = ({ navigation }) => {
 
           <FlatList
             data={filteredData}
-            // data={data}
             renderItem={renderCard}
             keyExtractor={item => item.id}
-            // keyExtractor={item => item.Release_Id}
             showsHorizontalScrollIndicator={false}
             horizontal
             ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
             contentContainerStyle={{ paddingHorizontal: SIZES.padding * 2, marginBottom: SIZES.padding * 2 }}
-          // style={styles.card}
           />
         </View>
       </>
@@ -291,13 +299,10 @@ const Dashboard = ({ navigation }) => {
   // CATEGORIES CARD
 
   const renderCategoryView = () => {
-
     function renderItem({ item }) {
-
       const itemNameLength = item.name.length;
 
       return (
-
         <View
           style={{
             flex: 1,
@@ -306,7 +311,9 @@ const Dashboard = ({ navigation }) => {
           }}>
           <Text
             style={styles.categoryTitle}
-          >{item.name}</Text>
+          >
+            {item.name}
+          </Text>
           <Separator
             lineContainer={{
               width: `${(itemNameLength * 3)}%`,
@@ -371,10 +378,10 @@ const Dashboard = ({ navigation }) => {
                     }}>{detail.desc}</Text>
                   </View>
                 </View>
-
               </TouchableOpacity>
             ))}
           </ScrollView>
+
         </View>
 
       )
@@ -399,8 +406,6 @@ const Dashboard = ({ navigation }) => {
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           style={styles.card}
-        //ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 2 }} />}
-        //contentContainerStyle={{ paddingVertical: SIZES.padding * 3 }}
         />
       </View>
     )
@@ -517,57 +522,175 @@ const Dashboard = ({ navigation }) => {
     )
   }
 
-
+  // MAIN VIEW
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ margin: SIZES.padding * 2, paddingBottom: 100 }}
-    >
-      <SearchComponent
-        onSearch={handleSearch}
-      />
-      <View style={styles.subContainer}>
-        <TextButton
-          // onPress={}
-          label={'PREMIUM PLANS'}
+    <React.Fragment>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ margin: SIZES.padding * 2, paddingBottom: 100 }}
+      >
+        <SearchComponent
+          onSearch={handleSearch}
         />
-        <View style={{ flexDirection: 'row' }}>
-          <View
-            style={{
-              alignItems: 'center',
-              flexDirection: 'row'
-            }}>
-            <Image source={{ uri: exit, height: 15, width: 15 }} style={{ tintColor: COLORS.support1, marginRight: 5 }} />
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Login')}
-            >
-              <Text 
+        <View style={styles.subContainer}>
+          <TextButton
+            // onPress={}
+            label={'PREMIUM PLANS'}
+          />
+          <View style={{ flexDirection: 'row' }}>
+            <View
               style={{
-                 fontSize: 15,
-                 fontWeight: 'bold',
-                 color: 'rgba(17,52,85,1)',
-                  marginRight: 15
-              }}>LOG IN</Text>
-            </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              alignItems: 'center',
-              flexDirection: 'row'
-            }}>
-            <Image source={{ uri: exit, height: 15, width: 15 }} style={{ tintColor: COLORS.support1, marginRight: 5 }} />
-            <CustomText
-              label={'SIGN IN'}
-            />
+                alignItems: 'center',
+                flexDirection: 'row'
+              }}>
+              <Image source={{ uri: exit, height: 15, width: 15 }} style={{ tintColor: COLORS.support1, marginRight: 5 }} />
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Login')}
+              >
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 'bold',
+                    color: 'rgba(17,52,85,1)',
+                    marginRight: 15
+                  }}>LOG IN</Text>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                alignItems: 'center',
+                flexDirection: 'row'
+              }}>
+              <Image source={{ uri: exit, height: 15, width: 15 }} style={{ tintColor: COLORS.support1, marginRight: 5 }} />
+              <CustomText
+                label={'SIGN IN'}
+              />
+            </View>
           </View>
         </View>
-      </View>
 
-      {renderCardView()}
-      {renderCategoryView()}
-      {renderFooter()}
-    </ScrollView>
+        {renderCardView()}
+        {renderCategoryView()}
+        {renderFooter()}
+      </ScrollView>
+
+      {/* PLAY AND PAUSE PLAYER */}
+      <View
+        style={{
+          width: SIZES.width,
+          height: SIZES.height / 5,
+          backgroundColor: 'rgba(17,52,85,1)',
+          position: 'absolute',
+          bottom: 0,
+          padding: SIZES.padding
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            // margin: SIZES.padding
+          }}>
+          <Image
+            source={{ uri: PIC }}
+            style={{
+              width: 50,
+              height: 50,
+              marginRight: 10,
+              borderRadius: 8
+            }}
+          />
+          <View>
+            <Text
+              style={{
+                color: 'white',
+                lineHeight: 30,
+                fontSize: 20,
+                fontWeight: '700'
+              }}>Raksha Bhandan</Text>
+            <Text
+              style={{
+                color: 'white',
+                fontSize: 13,
+                fontWeight: '400'
+              }}>Himesh Reshammiya</Text>
+          </View>
+        </View>
+
+        <View
+          style={{
+            width: '100%',
+            height: 50,
+            backgroundColor: COLORS.light,
+            marginTop: 10,
+            borderRadius: 25,
+            justifyContent: 'center',
+            paddingHorizontal: SIZES.padding,
+          }}
+        >
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center'
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                marginHorizontal: 10,
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 20,
+                height: 20
+              }}>
+              <Image
+                source={{ uri: pause }}
+                style={{
+                  height: 10,
+                  width: 10,
+
+                }}
+              />
+            </TouchableOpacity>
+            <Text style={{ fontSize: 13 }}>{Math.floor(range * 60)}/10:00</Text>
+
+            <Slider
+              style={{ width: 150, height: 40, marginHorizontal: 15 }}
+              minimumValue={0}
+              maximumValue={1}
+              minimumTrackTintColor="blue"
+              maximumTrackTintColor="#000000"
+              //  thumbImage={require('../assets/icons/dot.png')}
+              // thumbTintColor="transparent" 
+            />
+
+            <TouchableOpacity>
+
+              <Image
+                source={{ uri: vol }}
+                style={{
+                  width: 20,
+                  height: 20,
+                  marginRight: 15
+                }}
+              />
+            </TouchableOpacity>
+
+
+            <TouchableOpacity>
+              <Image
+                source={{ uri: menu }}
+                style={{
+                  width: 20,
+                  height: 20
+                }}
+              />
+            </TouchableOpacity>
+          </View>
+
+        </View>
+      </View>
+    </React.Fragment>
   )
 }
 

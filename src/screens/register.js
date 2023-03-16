@@ -1,15 +1,16 @@
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SIZES, COLORS } from '../constants/theme';
 import { Input, DropdownPicker, CustomText, TextButton } from '../custom/component';
 import CheckBox from '@react-native-community/checkbox';
+import apiServers, { baseUrl, API } from '../api/stripeApis';
 
 
 const Register = ({ navigation }) => {
 
   const [toggleCheckBox, setToggleCheckBox] = React.useState(false)
   const [errors, setErrors] = useState({});
-  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedCountry, setSelectedCountry] = useState([]);
   const [selectedState, setSelectedState] = useState(null);
   const [registerData, setregisterData] = useState({
     firstName: "",
@@ -20,7 +21,34 @@ const Register = ({ navigation }) => {
     cnfpassword: ""
   });
 
-  //console.log(registerData)
+  //console.log('country',selectedCountry)
+
+  const getAllCountries = async () => {
+    try {
+      const response = await API({
+        url: `${baseUrl}Release/GetAllCountry`,
+        method: 'get',
+        onSuccess: (response) => {
+          //console.log(response.Data);
+          setSelectedCountry(response.Data);
+        },
+        onError: (error) => console.log(error),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getAllCountries()
+  }, [])
+
+
+  
+  const countryData = selectedCountry.map(item => {
+    return { key: item.Country_Id, value: item.Country_Name };
+  })
+  //  console.log('newcountry',countryData);
 
   // handle login data change
   const handleOnChange = (text, registerData) => {
@@ -32,7 +60,7 @@ const Register = ({ navigation }) => {
     setErrors(prevState => ({ ...prevState, [registerData]: errorMessage }));
   }
 
-  
+
   const handleSubmit = () => {
     // on click of submit button
     // console.log('button click');
@@ -101,8 +129,17 @@ const Register = ({ navigation }) => {
             error={errors.phone}
             onFocus={() => handleError(null, 'phone')}
           />
-          <DropdownPicker placeholder='Select Country' />
-          <DropdownPicker placeholder='Select State' />
+          <DropdownPicker
+            placeholder='Select Country'
+            data={countryData}
+            setSelected
+          // data={selectedState}
+          />
+          <DropdownPicker
+            placeholder='Select State'
+            data={countryData}
+            setSelected
+          />
 
           {/* PASSWORD */}
           <Input

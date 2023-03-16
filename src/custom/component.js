@@ -100,11 +100,13 @@ export const TextButton = ({
 
 export const CustomText = ({
   label,
-  labelStyle
+  labelStyle,
+  onPress
 }) => {
   return (
     <View>
       <Text
+        onPress={onPress}
         style={{
           fontSize: 15,
           fontWeight: 'bold',
@@ -185,15 +187,16 @@ export const DropdownPicker = ({
   label,
   defaultOption,
   placeholder,
+  data
   //setSelected = () => {}
 }) => {
 
   const [selected, setSelected] = React.useState("");
 
-  const data = [
-    { key: '1', value: 'Select Country' },
-    { key: '2', value: 'India' },
-  ]
+  // const data = [
+  //   { key: '1', value: 'Select Country' },
+  //   { key: '2', value: 'India' },
+  // ]
 
   return (
     <SelectList

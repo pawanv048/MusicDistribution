@@ -26,27 +26,27 @@ module.exports = async function() {
     TrackPlayer.skipToNext();
   });
 
-  TrackPlayer.addEventListener('remote-previous', () => {
-    TrackPlayer.skipToPrevious();
-  });
+  // TrackPlayer.addEventListener('remote-previous', () => {
+  //   TrackPlayer.skipToPrevious();
+  // });
 
-  TrackPlayer.addEventListener('remote-seek', (data) => {
-    TrackPlayer.seekTo(data.position);
-  });
+  // TrackPlayer.addEventListener('remote-seek', (data) => {
+  //   TrackPlayer.seekTo(data.position);
+  // });
 
-  TrackPlayer.addEventListener('remote-jump-forward', async () => {
-    const position = await TrackPlayer.getPosition();
-    await TrackPlayer.seekTo(position + 10);
-  });
+  // TrackPlayer.addEventListener('remote-jump-forward', async () => {
+  //   const position = await TrackPlayer.getPosition();
+  //   await TrackPlayer.seekTo(position + 10);
+  // });
 
-  TrackPlayer.addEventListener('remote-jump-backward', async () => {
-    const position = await TrackPlayer.getPosition();
-    await TrackPlayer.seekTo(position - 10);
-  });
+  // TrackPlayer.addEventListener('remote-jump-backward', async () => {
+  //   const position = await TrackPlayer.getPosition();
+  //   await TrackPlayer.seekTo(position - 10);
+  // });
 
-  TrackPlayer.addEventListener('playback-track-changed', async (data) => {
-    const track = await TrackPlayer.getTrack(data.nextTrack);
-    console.log('track', track);
-  });
+  // TrackPlayer.addEventListener('playback-track-changed', async (data) => {
+  //   const track = await TrackPlayer.getTrack(data.nextTrack);
+  //   console.log('track', track);
+  // });
 
 };

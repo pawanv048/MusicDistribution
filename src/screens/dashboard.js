@@ -7,10 +7,38 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
+  Modal
 } from 'react-native';
 import Slider from '@react-native-community/slider';
-//  import Slider from "react-native-slider";
+
+import TrackPlayer, {
+  Capability,
+  Event,
+  RepeatMode,
+  State,
+  usePlaybackState,
+  useProgress,
+  useTrackPlayerEvents,
+
+} from 'react-native-track-player';
+
+/*
+Capability: An enum that describes the various capabilities of a track player instance, such as play, pause, skip to next, skip to previous, and so on.
+
+Event: An enum that lists the various events that can be triggered by the track player instance, such as playback state changes, track changes, and so on.
+
+RepeatMode: An enum that defines the repeat modes available for the track player, such as "off", "track", and "queue".
+
+State: An enum that describes the possible states of the track player, such as "none", "loading", "playing", "paused", and so on.
+
+usePlaybackState: A hook that provides the current state of the track player, such as the playback state, the current track, and so on.
+
+useProgress: A hook that provides information about the current playback progress, such as the current position, the duration, and so on.
+
+useTrackPlayerEvents: A hook that allows you to subscribe to track player events and execute specific actions when those events are triggered.
+
+*/
 
 
 import { SearchComponent, TextButton, CustomText, Separator } from '../custom/component';
@@ -21,9 +49,13 @@ import { API } from '../api/stripeApis';
 
 const PIC = 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg'
 const menu = 'https://cdn-icons-png.flaticon.com/512/2311/2311524.png'
-const play = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'
+const playbtn = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'
 const vol = 'https://cdn-icons-png.flaticon.com/512/727/727269.png'
 const pause = 'https://cdn-icons-png.flaticon.com/512/1214/1214679.png'
+const mute = 'https://cdn-icons-png.flaticon.com/512/565/565295.png'
+const download = 'https://cdn-icons-png.flaticon.com/512/3031/3031707.png'
+const playbackspeed = 'https://static.thenounproject.com/png/3565593-200.png'
+const back = 'https://cdn-icons-png.flaticon.com/512/507/507257.png'
 
 
 const Data = [
@@ -126,7 +158,36 @@ const CategoryCardData = [
       },
     ],
   },
+];
 
+const songs = [
+  {
+    title: 'Avaritia',
+    artist: 'deadmau5',
+    artwork: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
+    url: require('../../tracks/blues.wav'),
+    id: '1',
+    duration: '311'
+  },
+  {
+    title: 'Raksha',
+    artist: 'Himesh',
+    artwork: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
+    url: require('../../tracks/tracks_country.mp3'),
+    id: '2',
+    duration: '211'
+  }
+];
+
+const playbackData = [
+  { label: '0.25', onPress: () => console.log('0.25') },
+  { label: '0.5', onPress: () => console.log('0.5') },
+  { label: '0.75', onPress: () => console.log('0.75') },
+  { label: 'Normal', onPress: () => console.log('Normal') },
+  { label: '1.25', onPress: () => console.log('1.25') },
+  { label: '1.5', onPress: () => console.log('1.5') },
+  { label: '1.75', onPress: () => console.log('1.75') },
+  { label: '2', onPress: () => console.log('2') },
 ];
 
 const facebook = 'https://cdn-icons-png.flaticon.com/512/1051/1051309.png';
@@ -138,13 +199,120 @@ const exit = 'https://cdn-icons-png.flaticon.com/512/8983/8983815.png';
 
 const API_ALLRELEASE_URL = 'http://84.16.239.66/api/Release/GetAllReleases';
 
+
+
+
 // Main screen
 const Dashboard = ({ navigation }) => {
+
+  //Get current playback state and subsequent updates  
+  // const playbackState = usePlaybackState();
 
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState(Data);
   const [range, setRange] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  //const [sliderValue, setSliderValue] = useState(0);
+  const [position, setPosition] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [pbspeedVisible, setPbSpeedVisible] = useState(false)
+
+
+  //modal
+
+  const togglePlayBack = () => {
+    if (pbspeedVisible) {
+      setPbSpeedVisible(false);
+      setModalVisible(true);
+    } else {
+      setPbSpeedVisible(true);
+      setModalVisible(false);
+    }
+  }
+
+  const toggleModal = () => {
+    setModalVisible(!modalVisible);
+  };
+
+
+  // volume
+  const handleVolToggle = () => {
+    if (volume === 0) {
+      TrackPlayer.setVolume(1); // set volume to max
+      setVolume(1);
+    } else {
+      TrackPlayer.setVolume(0); // mute volume
+      setVolume(0);
+    }
+  }
+
+
+  //
+
+  const handleSliderChange = async (value) => {
+    const newPosition = value * duration;
+    await TrackPlayer.seekTo(newPosition);
+  };
+
+  const updatePosition = async () => {
+    const newPosition = await TrackPlayer.getPosition();
+    setPosition(newPosition);
+  };
+
+  const updateDuration = async () => {
+    const newDuration = await TrackPlayer.getDuration();
+    setDuration(newDuration);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updatePosition();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    updateDuration();
+  }, [isPlaying]);
+
+  const sliderValue = duration ? position / duration : 0;
+
+  //end
+
+
+  useEffect(() => {
+    setupTrackPlayer();
+  }, [])
+
+  const setupTrackPlayer = async () => {
+    try {
+      await TrackPlayer.setupPlayer();
+      TrackPlayer.updateOptions({
+        capabilities: [Capability.Play, Capability.Pause]
+      });
+
+      await TrackPlayer.add(songs)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  // handle play and pause
+
+  const handlePlayPause = () => {
+    if (isPlaying == true) {
+      TrackPlayer.pause()
+      setIsPlaying(false)
+    } else {
+      TrackPlayer.play();
+      setIsPlaying(true);
+    }
+  }
+
 
 
   const handleSearch = (searchQuery) => {
@@ -181,8 +349,8 @@ const Dashboard = ({ navigation }) => {
   };
 
   useEffect(() => {
-    // console.log('Use-Effect call')
     getAllReleases()
+
   }, [])
 
 
@@ -562,9 +730,20 @@ const Dashboard = ({ navigation }) => {
                 alignItems: 'center',
                 flexDirection: 'row'
               }}>
-              <Image source={{ uri: exit, height: 15, width: 15 }} style={{ tintColor: COLORS.support1, marginRight: 5 }} />
+              <Image
+                source={{
+                  uri: exit
+                }}
+                style={{
+                  height: 15,
+                  width: 15,
+                  tintColor: COLORS.support1,
+                  marginRight: 5
+                }}
+              />
               <CustomText
                 label={'SIGN IN'}
+                onPress={() => navigation.navigate('Register')}
               />
             </View>
           </View>
@@ -617,13 +796,14 @@ const Dashboard = ({ navigation }) => {
           </View>
         </View>
 
+        {/* MUSIC PLAYER */}
         <View
           style={{
             width: '100%',
-            height: 50,
+            height: 60,
             backgroundColor: COLORS.light,
             marginTop: 10,
-            borderRadius: 25,
+            borderRadius: 30,
             justifyContent: 'center',
             paddingHorizontal: SIZES.padding,
           }}
@@ -636,6 +816,7 @@ const Dashboard = ({ navigation }) => {
             }}
           >
             <TouchableOpacity
+              onPress={() => handlePlayPause()}
               style={{
                 marginHorizontal: 10,
                 alignItems: 'center',
@@ -644,30 +825,35 @@ const Dashboard = ({ navigation }) => {
                 height: 20
               }}>
               <Image
-                source={{ uri: pause }}
+                source={isPlaying == true ? { uri: pause } : { uri: playbtn }}
+                //source={{uri: playbtn}}
                 style={{
                   height: 10,
                   width: 10,
-
                 }}
               />
             </TouchableOpacity>
-            <Text style={{ fontSize: 13 }}>{Math.floor(range * 60)}/10:00</Text>
+            <Text>
+              {`${Math.floor(position / 60)}:${Math.floor(position % 60)} / ${Math.floor(duration / 60)}:${Math.floor(duration % 60)}`}
+            </Text>
 
             <Slider
               style={{ width: 150, height: 40, marginHorizontal: 15 }}
               minimumValue={0}
               maximumValue={1}
-              minimumTrackTintColor="blue"
-              maximumTrackTintColor="#000000"
-              //  thumbImage={require('../assets/icons/dot.png')}
-              // thumbTintColor="transparent" 
+              minimumTrackTintColor="rgba(11,11,11,1)"
+              maximumTrackTintColor="rgba(89,89,89,1)"
+              value={sliderValue}
+              // onValueChange={setSliderValue}
+              onValueChange={handleSliderChange}
             />
 
-            <TouchableOpacity>
 
+            <TouchableOpacity
+              onPress={handleVolToggle}
+            >
               <Image
-                source={{ uri: vol }}
+                source={volume === 1 ? { uri: vol } : { uri: mute }}
                 style={{
                   width: 20,
                   height: 20,
@@ -677,7 +863,7 @@ const Dashboard = ({ navigation }) => {
             </TouchableOpacity>
 
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={toggleModal}>
               <Image
                 source={{ uri: menu }}
                 style={{
@@ -686,8 +872,82 @@ const Dashboard = ({ navigation }) => {
                 }}
               />
             </TouchableOpacity>
-          </View>
 
+
+            {/* download and playback speed */}
+            {modalVisible ? (
+              <View
+                style={styles.download}
+              >
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+                  <Image
+                    source={{ uri: download }}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      marginRight: 10
+                    }}
+                  />
+                  <Text style={{ fontSize: 15, fontWeight: '400' }}>Download</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={togglePlayBack}
+                  style={{ flexDirection: 'row', alignItems: 'center' }}
+                >
+                  <Image
+                    source={{ uri: playbackspeed }}
+                    style={{
+                      width: 25,
+                      height: 25,
+                      marginRight: 6
+                    }}
+                  />
+                  <Text style={{ fontSize: 15, fontWeight: '400' }}>Playback Speed</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
+
+            {/* Playbackspeed */}
+            {pbspeedVisible && (
+              <ScrollView
+                style={[styles.download, { height: 200 }]}
+                contentContainerStyle={{ paddingBottom: 25 }}
+              >
+                <TouchableOpacity
+                  onPress={togglePlayBack}
+                  style={{ flexDirection: 'row' }}
+                >
+                  <Image
+                    source={{ uri: back }}
+                    style={{
+                      width: 15,
+                      height: 15,
+                      marginRight: 20
+                    }}
+                  />
+                  <Text>Option</Text>
+                </TouchableOpacity>
+
+                {playbackData.map((item) => {
+                  return (
+                    <TouchableOpacity
+                      onPress={item.onPress}
+                      style={{
+                        marginHorizontal: 40,
+                        marginVertical: 10
+                      }}
+                    >
+                      <Text>{item.label}</Text>
+                    </TouchableOpacity>
+                  )
+                })}
+              </ScrollView>
+            )}
+
+
+
+          </View>
         </View>
       </View>
     </React.Fragment>
@@ -741,8 +1001,23 @@ const styles = StyleSheet.create({
     width: 15,
     tintColor: COLORS.support1,
     marginHorizontal: SIZES.padding
+  },
+  download: {
+    width: '60%',
+    height: 100,
+    backgroundColor: 'white',
+    position: 'absolute',
+    padding: 15,
+    //borderRadius: 20,
+    right: 10,
+    bottom: 60,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.7,
+    shadowRadius: 8.65,
   }
-
-
 
 })

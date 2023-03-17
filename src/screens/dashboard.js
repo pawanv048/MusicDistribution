@@ -180,14 +180,14 @@ const songs = [
 ];
 
 const playbackData = [
-  { label: '0.25', onPress: () => console.log('0.25') },
-  { label: '0.5', onPress: () => console.log('0.5') },
-  { label: '0.75', onPress: () => console.log('0.75') },
-  { label: 'Normal', onPress: () => console.log('Normal') },
-  { label: '1.25', onPress: () => console.log('1.25') },
-  { label: '1.5', onPress: () => console.log('1.5') },
-  { label: '1.75', onPress: () => console.log('1.75') },
-  { label: '2', onPress: () => console.log('2') },
+  { label: '0.25x', onPress: () => console.log('0.25'), rate: 0.25  },
+  { label: '0.5x', onPress: () => console.log('0.5'), rate: 0.5 },
+  { label: '0.75x', onPress: () => console.log('0.75'), rate: 0.75 },
+  { label: 'Normal', onPress: () => console.log('Normal'), rate: 1.0 },
+  { label: '1.25x', onPress: () => console.log('1.25'), rate: 1.25 },
+  { label: '1.5x', onPress: () => console.log('1.5'), rate: 1.5 },
+  { label: '1.75x', onPress: () => console.log('1.75'), rate: 1.75 },
+  { label: '2x', onPress: () => console.log('2'), rate: 2.0 },
 ];
 
 const facebook = 'https://cdn-icons-png.flaticon.com/512/1051/1051309.png';
@@ -218,7 +218,8 @@ const Dashboard = ({ navigation }) => {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
-  const [pbspeedVisible, setPbSpeedVisible] = useState(false)
+  const [pbspeedVisible, setPbSpeedVisible] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1.0);
 
 
   //modal
@@ -249,8 +250,18 @@ const Dashboard = ({ navigation }) => {
     }
   }
 
+  // Default playback rate
+const handleDefaultPlaybackRate = async () => {
+  await TrackPlayer.setRate(1.0);
+  setPlaybackRate(1.0);
+}
 
-  //
+// Change playback rate
+const handleChangePlaybackRate = async (rate) => {
+  await TrackPlayer.setRate(rate);
+  setPlaybackRate(rate);
+}
+
 
   const handleSliderChange = async (value) => {
     const newPosition = value * duration;
@@ -284,8 +295,10 @@ const Dashboard = ({ navigation }) => {
   //end
 
 
+
   useEffect(() => {
     setupTrackPlayer();
+
   }, [])
 
   const setupTrackPlayer = async () => {
@@ -307,6 +320,8 @@ const Dashboard = ({ navigation }) => {
     if (isPlaying == true) {
       TrackPlayer.pause()
       setIsPlaying(false)
+      // normal rate play
+      handleDefaultPlaybackRate()
     } else {
       TrackPlayer.play();
       setIsPlaying(true);
@@ -929,10 +944,14 @@ const Dashboard = ({ navigation }) => {
                   <Text>Option</Text>
                 </TouchableOpacity>
 
-                {playbackData.map((item) => {
+                {playbackData.map((item, index, speed) => {
+
                   return (
                     <TouchableOpacity
-                      onPress={item.onPress}
+                      key={index}
+                      //onPress={item.onPress}
+                      onPress={() => handleChangePlaybackRate(item.rate)}
+                      //onPress={() => handlePlaybackSpeedChange(speed.value)}
                       style={{
                         marginHorizontal: 40,
                         marginVertical: 10

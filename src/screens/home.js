@@ -3,7 +3,7 @@ import { StyleSheet, Text, View,Button } from 'react-native';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { S_KEY } from "@env";
 
-import PaymentScreen from './PaymentScreen';
+import Payment from './paymentScreen';
 
 const Home = ({navigation}) => {
 
@@ -15,7 +15,7 @@ const Home = ({navigation}) => {
         merchantIdentifier="merchant.identifier" // required for Apple Pay
         urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
       >
-        <PaymentScreen />        
+        <Payment />        
       </StripeProvider>
       <Button title='Dashboard' onPress={() => navigation.goBack()}/>
     </View>

@@ -3,12 +3,14 @@ import React, {useEffect} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import Dashboard from './src/screens/dashboard';
-import DrawerContent from './src/screens/drawer';
-import Home from './src/screens/home';
-import PaymentScreen from './src/screens/PaymentScreen';
-import Login from './src/screens/login';
-import Register from './src/screens/register';
+import {
+  Dashboard,
+  Home,
+  PaymentScreen,
+  Login,
+  Register,
+  DrawerContent
+} from './src/screens/index';
 
 
 
@@ -16,7 +18,6 @@ const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const App = () => {
-
   
   //alert(STRIP_KEY)
   return (

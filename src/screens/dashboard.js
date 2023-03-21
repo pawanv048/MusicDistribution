@@ -21,6 +21,7 @@ import TrackPlayer, {
   useProgress,
   useTrackPlayerEvents
 } from 'react-native-track-player';
+import FastImage from 'react-native-fast-image'
 
 /*
 Capability: An enum that describes the various capabilities of a track player instance, such as play, pause, skip to next, skip to previous, and so on.
@@ -222,10 +223,10 @@ const Dashboard = ({ navigation }) => {
   const [pbspeedVisible, setPbSpeedVisible] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [isImageAvail, setImageAvail] = useState(null)
+  const [imageSource, setImageSource] = useState(null);
 
 
   //modal
-
   const togglePlayBack = () => {
     if (pbspeedVisible) {
       setPbSpeedVisible(false);
@@ -357,6 +358,7 @@ const Dashboard = ({ navigation }) => {
     //setLoading(true);
   };
 
+
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -366,15 +368,16 @@ const Dashboard = ({ navigation }) => {
   };
 
   useEffect(() => {
+    
     getAllReleases()
   }, [])
 
-
+  // {uri: imageSource}
 
   function renderCardView() {
 
     const renderCard = ({ item }) => (
-     // console.log(item.Release_Id,'showing id')
+      // console.log(item.Release_Id,'showing id')
       <TouchableOpacity
         onPress={() => navigation.navigate('PaymentScreen', {
           item: item
@@ -390,8 +393,13 @@ const Dashboard = ({ navigation }) => {
           borderRadius: 10
         }}>
         <Image
-          //source={{ uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}` }}
-          source={isImageAvail ? {noImg} : {uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}`}}
+          // source={{}}
+          source={
+            isImageAvail ?
+              { noImg } :
+              {
+                uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}`
+              }}
           style={{
             width: '100%',
             height: '100%',
@@ -452,7 +460,7 @@ const Dashboard = ({ navigation }) => {
           </View>
 
           {/* EPISODES CARD */}
-            
+
           <FlatList
             data={data}
             renderItem={renderCard}
@@ -467,7 +475,7 @@ const Dashboard = ({ navigation }) => {
     )
   };
 
-  
+
 
   // CATEGORIES CARD
 

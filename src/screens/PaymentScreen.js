@@ -29,8 +29,10 @@ const PaymentScreen = ({ navigation, route }) => {
 
   // const releaseDatas = route.params
   const { item } = route.params;
-  
-   console.log(item);
+  const releaseId = item?.Release_Id;
+
+
+  //  console.log(releaseId);
   // alert(JSON.stringify(item))
 
   const [cardInfo, setCardInfo] = useState(null);
@@ -47,17 +49,18 @@ const PaymentScreen = ({ navigation, route }) => {
   }
 
   // http://84.16.239.66/api/Release/GetReleasesDetails?ReleaseId=80663
-  const releaseId = item?.Release?.Release_Id;
+
   // console.log(releaseId);
-  const getAllTrack = (releaseId) => {
-    
+  const getAllTrack = () => {
+
     //console.log('calling api')
     API({
       url: `http://84.16.239.66/api/Release/GetReleasesDetails?ReleaseId=${releaseId}`,
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       onSuccess: val => {
-        //console.log('Track data ==>', val?.Data[0]?.Tracks)
+        // console.log('Track data ==>', val?.Data)
+        setTrackData(val?.Data)
       },
       onError: err => console.log('Error fetching track data:', err),
     });
@@ -65,9 +68,9 @@ const PaymentScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    getAllTrack(releaseId);
+    getAllTrack();
     // console.log(releaseId);
-  }, [releaseId]);
+  }, []);
 
 
   const onPressDone = async () => {
@@ -147,25 +150,33 @@ const PaymentScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Showing Track of Release id */}
-
-        {/* <FlatList 
-          data={trackData}
-          //keyExtractor={}
-          renderItem={renderTrackList}
-        /> */}
-
-        {trackData && trackData.map(track => (
-          <Text key={track.Track_Id}>{track.Track_Disc}</Text>
-        ))}
-
       </View>
     )
-  }
+  };
+
+  // TRACKS
+  const renderTrackList = () => {
+    return (
+      <FlatList
+        data={trackData}
+        keyExtractor={item => item.Tracks.Track_Id.toString()}
+        renderItem={({ item, index }) => {
+          return (
+            <View>
+              <Text>{item?.Tracks?.Track_Id}</Text>
+            </View>
+          )
+        }}
+      />
+    )
+  };
+
+
 
   return (
     <View style={{ margin: SIZES.padding * 2 }}>
       {renderContent()}
+
       <CardField
         postalCodeEnabled={false}
         placeholders={{
@@ -204,6 +215,10 @@ const PaymentScreen = ({ navigation, route }) => {
       >
         <Text>Dashboard</Text>
       </TouchableOpacity>
+
+      {renderTrackList()}
+
+      {/* {trackData.map((track) => console.log(track?.Tracks?.Track_Id))} */}
     </View>
   )
 }

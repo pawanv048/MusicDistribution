@@ -1,13 +1,42 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
-import { CardField, useStripe, createToken, paymentIndent, confirmPayment } from '@stripe/stripe-react-native';
+
+import React, { useState, useEffect } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  FlatList
+} from 'react-native';
+import {
+  CardField,
+  useStripe,
+  createToken,
+  paymentIndent,
+  confirmPayment
+} from '@stripe/stripe-react-native';
+
 import { TextButton } from '../custom/component';
-import { createPaymentIntent } from '../api/stripeApis';
+import { API, createPaymentIntent } from '../api/stripeApis';
+import { COLORS, SIZES } from '../constants/theme';
+import { useDetailData } from '../context/useDetailData';
 
 
-const PaymentScreen = () => {
+
+const image = 'https://cdn.pixabay.com/photo/2016/11/18/18/35/adult-1836322_960_720.jpg'
+
+const PaymentScreen = ({ navigation, route }) => {
+
+  // const releaseDatas = route.params
+  const { item } = route.params;
+  
+   console.log(item);
+  // alert(JSON.stringify(item))
 
   const [cardInfo, setCardInfo] = useState(null);
+  const [trackData, setTrackData] = useState([])
+
+  // console.log(trackData, 'hello');
 
   const fetchCardDetails = (cardDetail) => {
     if (cardDetail.complete) {
@@ -16,6 +45,30 @@ const PaymentScreen = () => {
       setCardInfo(null)
     }
   }
+
+  // http://84.16.239.66/api/Release/GetReleasesDetails?ReleaseId=80663
+  const releaseId = item?.Release?.Release_Id;
+  // console.log(releaseId);
+  const getAllTrack = (releaseId) => {
+    
+    //console.log('calling api')
+    API({
+      url: `http://84.16.239.66/api/Release/GetReleasesDetails?ReleaseId=${releaseId}`,
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      onSuccess: val => {
+        //console.log('Track data ==>', val?.Data[0]?.Tracks)
+      },
+      onError: err => console.log('Error fetching track data:', err),
+    });
+    //setLoading(true);
+  };
+
+  useEffect(() => {
+    getAllTrack(releaseId);
+    // console.log(releaseId);
+  }, [releaseId]);
+
 
   const onPressDone = async () => {
 
@@ -36,19 +89,83 @@ const PaymentScreen = () => {
     } catch (error) {
       console.log("Error rasing during payment indent", error)
     }
+  };
 
-    // if(!!cardInfo){
-    //   try {
-    //     const respToken = await createToken({...cardInfo, type: 'Card'})
-    //     console.log(respToken);
-    //   } catch (error) {
-    //     alert('Error rasied during response Token')
-    //   }
+  const renderContent = () => {
+
+    // const renderTrackList = ({item}) => {
+    //   return(
+    //     <Text>{item?.Tracks?.Track_Disc}</Text>
+    //   )
     // }
+
+    return (
+      <View style={{ flexDirection: 'row' }}>
+        <Image
+          source={{ uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}` }}
+          style={{
+            width: 150,
+            height: 150,
+            borderRadius: 15
+          }}
+        />
+        <View
+          style={{
+            margin: SIZES.padding
+          }}>
+          <Text style={{
+            marginBottom: 10,
+            fontSize: 20,
+            fontWeight: '500'
+          }}>{item.Release_ReleaseTitle}</Text>
+          <Text
+            style={{
+              fontSize: 15,
+              fontWeight: '500',
+              //marginRight: 50,
+              lineHeight: 20,
+              flexWrap: 'wrap' // add flexWrap property to wrap the text to the next line
+            }}>
+            {item.Release_PrimaryArtist.length > 14 ?
+              `${item.Release_PrimaryArtist.slice(0, 14)}\n${item.Release_PrimaryArtist.slice(14)}` :
+              item.Release_PrimaryArtist
+            }
+          </Text>
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: COLORS.primary,
+              width: 100,
+              height: 50,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 20,
+              borderRadius: 5
+            }}
+          >
+            <Text>Buy</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Showing Track of Release id */}
+
+        {/* <FlatList 
+          data={trackData}
+          //keyExtractor={}
+          renderItem={renderTrackList}
+        /> */}
+
+        {trackData && trackData.map(track => (
+          <Text key={track.Track_Id}>{track.Track_Disc}</Text>
+        ))}
+
+      </View>
+    )
   }
 
   return (
-    <View>
+    <View style={{ margin: SIZES.padding * 2 }}>
+      {renderContent()}
       <CardField
         postalCodeEnabled={false}
         placeholders={{
@@ -79,12 +196,22 @@ const PaymentScreen = () => {
         onPress={onPressDone}
         disabled={!cardInfo}
       />
+      <TouchableOpacity
+        style={{
+          alignSelf: 'center'
+        }}
+        onPress={() => navigation.navigate('Dashboard')}
+      >
+        <Text>Dashboard</Text>
+      </TouchableOpacity>
     </View>
   )
 }
 
 export default PaymentScreen
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+
+})
 
 

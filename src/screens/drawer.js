@@ -283,32 +283,6 @@ const Drawer = ({ navigation }) => {
         > NEW PLAYLIST</Text>
       </TouchableOpacity>
 
-      {/* Download */}
-
-      <TouchableOpacity
-        activeOpacity={0.5}
-        style={{
-          flexDirection: 'row',
-          marginTop: 150,
-          alignSelf: 'center',
-        }}>
-        <Image
-          source={{ uri: download }}
-          style={{
-            width: 20,
-            height: 20,
-            tintColor: COLORS.primary,
-            marginRight: 10
-          }}
-        />
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: '700',
-            color: 'rgba(17,52,85,1)'
-          }}>Install App</Text>
-      </TouchableOpacity>
-
     </DrawerContentScrollView>
   )
 };

@@ -19,8 +19,7 @@ import TrackPlayer, {
   State,
   usePlaybackState,
   useProgress,
-  useTrackPlayerEvents,
-
+  useTrackPlayerEvents
 } from 'react-native-track-player';
 
 /*
@@ -56,6 +55,7 @@ const mute = 'https://cdn-icons-png.flaticon.com/512/565/565295.png'
 const download = 'https://cdn-icons-png.flaticon.com/512/3031/3031707.png'
 const playbackspeed = 'https://static.thenounproject.com/png/3565593-200.png'
 const back = 'https://cdn-icons-png.flaticon.com/512/507/507257.png'
+const noImg = 'https://filestore.community.support.microsoft.com/api/images/ext?url=https:%2f%2fanswersstaticfilecdnv2.azureedge.net%2fstatic%2fimages%2fimage-not-found.jpg'
 
 
 const Data = [
@@ -180,7 +180,7 @@ const songs = [
 ];
 
 const playbackData = [
-  { label: '0.25x', onPress: () => console.log('0.25'), rate: 0.25  },
+  { label: '0.25x', onPress: () => console.log('0.25'), rate: 0.25 },
   { label: '0.5x', onPress: () => console.log('0.5'), rate: 0.5 },
   { label: '0.75x', onPress: () => console.log('0.75'), rate: 0.75 },
   { label: 'Normal', onPress: () => console.log('Normal'), rate: 1.0 },
@@ -210,7 +210,8 @@ const Dashboard = ({ navigation }) => {
 
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [filteredData, setFilteredData] = useState(Data);
+  const [filteredData, setFilteredData] = useState(data);
+  // console.log(filteredData)
   const [range, setRange] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   //const [sliderValue, setSliderValue] = useState(0);
@@ -220,6 +221,7 @@ const Dashboard = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [pbspeedVisible, setPbSpeedVisible] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1.0);
+  const [isImageAvail, setImageAvail] = useState(null)
 
 
   //modal
@@ -251,16 +253,16 @@ const Dashboard = ({ navigation }) => {
   }
 
   // Default playback rate
-const handleDefaultPlaybackRate = async () => {
-  await TrackPlayer.setRate(1.0);
-  setPlaybackRate(1.0);
-}
+  const handleDefaultPlaybackRate = async () => {
+    await TrackPlayer.setRate(1.0);
+    setPlaybackRate(1.0);
+  }
 
-// Change playback rate
-const handleChangePlaybackRate = async (rate) => {
-  await TrackPlayer.setRate(rate);
-  setPlaybackRate(rate);
-}
+  // Change playback rate
+  const handleChangePlaybackRate = async (rate) => {
+    await TrackPlayer.setRate(rate);
+    setPlaybackRate(rate);
+  }
 
 
   const handleSliderChange = async (value) => {
@@ -331,9 +333,9 @@ const handleChangePlaybackRate = async (rate) => {
 
 
   const handleSearch = (searchQuery) => {
-    let newData = Data;
+    let newData = data;
     if (searchQuery.trim() !== '') {
-      newData = Data.filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase()));
+      newData = data.filter(item => item.Release_ReleaseTitle.toLowerCase().includes(searchQuery.toLowerCase()));
     }
     setFilteredData(newData);
   };
@@ -365,31 +367,34 @@ const handleChangePlaybackRate = async (rate) => {
 
   useEffect(() => {
     getAllReleases()
-
   }, [])
+
 
 
   function renderCardView() {
 
     const renderCard = ({ item }) => (
-
+     // console.log(item.Release_Id,'showing id')
       <TouchableOpacity
-
+        onPress={() => navigation.navigate('PaymentScreen', {
+          item: item
+        })}
         activeOpacity={0.7}
         style={{
           //marginHorizontal: SIZES.padding,
           alignItems: 'center',
           width: SIZES.width - 100,
           height: SIZES.height / 2.7,
+          marginVertical: SIZES.padding * 2,
           //backgroundColor: 'red',
           borderRadius: 10
         }}>
         <Image
-          source={{ uri: item.img }}
-          //source={item.Release_Artwork}
+          //source={{ uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}` }}
+          source={isImageAvail ? {noImg} : {uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}`}}
           style={{
             width: '100%',
-            height: '65%',
+            height: '100%',
             resizeMode: 'cover',
             borderRadius: 10
           }}
@@ -398,50 +403,33 @@ const handleChangePlaybackRate = async (rate) => {
           style={{
             width: '100%',
             backgroundColor: 'rgba(243,243,243,1)',
-            //height: 160,
+            height: 120,
             position: 'absolute',
             bottom: 0,
             borderRadius: 10
           }}
         >
-          <View style={{ margin: SIZES.padding * 2 }}>
+          <View style={{ marginHorizontal: SIZES.padding * 2, marginVertical: SIZES.padding * 1.5 }}>
             <Text
               style={{
                 fontSize: 15,
                 fontWeight: 'bold',
                 marginBottom: 15
               }}
-            >{item.title}</Text>
+            >{item.Release_ReleaseTitle}</Text>
             <Text style={{
               fontSize: 15,
-              lineHeight: 20,
+              lineHeight: 18,
               fontWeight: '400'
-            }}>{item.desc}</Text>
-
-            <TouchableOpacity
-              // onPress={() => console.log('button pressed')}
-              onPress={() => navigation.navigate('Home')}
-              style={{
-                marginVertical: 10,
-                backgroundColor: COLORS.primary,
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '40%',
-                padding: 13,
-                borderRadius: 5
-              }}
-            >
-              <Text>Buy</Text>
-            </TouchableOpacity>
+            }}>{item.Release_PrimaryArtist}</Text>
           </View>
-
         </View>
       </TouchableOpacity>
     );
 
 
     return (
-      <>
+      <React.Fragment>
         <View style={styles.card}>
           <View style={{ margin: SIZES.padding * 2 }}>
             <Text
@@ -452,32 +440,34 @@ const handleChangePlaybackRate = async (rate) => {
               }}>Best episodes of the week</Text>
             <Separator
               lineContainer={{
-                width: '45%',
+                width: '50%',
                 height: 5
               }} />
             <Separator
               lineContainer={{
-                width: '30%',
+                width: '38%',
                 height: 5,
                 marginTop: 5
               }} />
           </View>
 
           {/* EPISODES CARD */}
-
+            
           <FlatList
-            data={filteredData}
+            data={data}
             renderItem={renderCard}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.Release_Id.toString()}
             showsHorizontalScrollIndicator={false}
             horizontal
             ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
-            contentContainerStyle={{ paddingHorizontal: SIZES.padding * 2, marginBottom: SIZES.padding * 2 }}
+            contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
           />
         </View>
-      </>
+      </React.Fragment>
     )
   };
+
+  
 
   // CATEGORIES CARD
 
@@ -863,7 +853,7 @@ const handleChangePlaybackRate = async (rate) => {
               onValueChange={handleSliderChange}
             />
 
-
+            {/* VOLUME BUTTON */}
             <TouchableOpacity
               onPress={handleVolToggle}
             >
@@ -888,13 +878,17 @@ const handleChangePlaybackRate = async (rate) => {
               />
             </TouchableOpacity>
 
-
             {/* download and playback speed */}
             {modalVisible ? (
               <View
                 style={styles.download}
               >
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginVertical: 10
+                  }}>
                   <Image
                     source={{ uri: download }}
                     style={{
@@ -944,14 +938,12 @@ const handleChangePlaybackRate = async (rate) => {
                   <Text>Option</Text>
                 </TouchableOpacity>
 
-                {playbackData.map((item, index, speed) => {
+                {playbackData.map((item, index) => {
 
                   return (
                     <TouchableOpacity
                       key={index}
-                      //onPress={item.onPress}
                       onPress={() => handleChangePlaybackRate(item.rate)}
-                      //onPress={() => handlePlaybackSpeedChange(speed.value)}
                       style={{
                         marginHorizontal: 40,
                         marginVertical: 10
@@ -963,8 +955,6 @@ const handleChangePlaybackRate = async (rate) => {
                 })}
               </ScrollView>
             )}
-
-
 
           </View>
         </View>

@@ -2,7 +2,8 @@ import axios from "axios";
 
 export const createPaymentIntent = (data) => {
   return new Promise((resolve, reject) => {
-    axios.post('http://localhost:4002/payment-sheet', data).then(function(res){
+    axios.post('http://localhost:4002/payment-sheet', data)
+    .then(function(res){
       resolve(res)
     }).catch(function(error){
       reject(error)
@@ -11,6 +12,7 @@ export const createPaymentIntent = (data) => {
 }
 
 export const baseUrl = 'http://84.16.239.66/api/';
+export const trackUrl = 'https://musicdistributionsystem.com/tracks/';
 
 export const API = async ({url, params, method, headers, onSuccess, onError}) => {
     let defaultHeaders = {

@@ -21,7 +21,7 @@ import TrackPlayer, {
   useProgress,
   useTrackPlayerEvents
 } from 'react-native-track-player';
-import FastImage from 'react-native-fast-image'
+import FastImage from 'react-native-fast-image';
 
 /*
 Capability: An enum that describes the various capabilities of a track player instance, such as play, pause, skip to next, skip to previous, and so on.
@@ -368,7 +368,7 @@ const Dashboard = ({ navigation }) => {
   };
 
   useEffect(() => {
-    
+
     getAllReleases()
   }, [])
 
@@ -392,18 +392,19 @@ const Dashboard = ({ navigation }) => {
           //backgroundColor: 'red',
           borderRadius: 10
         }}>
-        <Image
-          // source={{}}
+        <FastImage
           source={
             isImageAvail ?
-              { noImg } :
+              { uri: noImg } :
               {
-                uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}`
+                uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}`,
+                priority: FastImage.priority.high,
+                cache: FastImage.cacheControl.immutable,
               }}
           style={{
             width: '100%',
             height: '100%',
-            resizeMode: 'cover',
+            resizeMode: FastImage.resizeMode.cover,
             borderRadius: 10
           }}
         />
@@ -586,7 +587,18 @@ const Dashboard = ({ navigation }) => {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
-          style={styles.card}
+          style={{
+            backgroundColor: COLORS.light,
+            marginTop: SIZES.padding * 3,
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 4,
+            },
+            shadowOpacity: 0.30,
+            shadowRadius: 8.65,
+            borderRadius: 10,
+          }}
         />
       </View>
     )
@@ -984,7 +996,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: COLORS.light,
-    //height: SIZES.height / 2, 
+    height: SIZES.height / 1.8,
     marginTop: SIZES.padding * 3,
     shadowColor: "#000",
     shadowOffset: {

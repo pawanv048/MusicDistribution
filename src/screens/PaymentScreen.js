@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
@@ -23,6 +22,9 @@ import { API, createPaymentIntent } from '../api/stripeApis';
 import { COLORS, SIZES } from '../constants/theme';
 import { useDetailData } from '../context/useDetailData';
 import { playTrack, pauseTrack } from '../custom/AudioPlayer';
+import RNFetchBlob from 'rn-fetch-blob';
+import {Secret_key} from '@env';
+
 
 
 const image = 'https://cdn.pixabay.com/photo/2016/11/18/18/35/adult-1836322_960_720.jpg';
@@ -41,93 +43,100 @@ const PaymentScreen = ({ navigation, route }) => {
   const [cardInfo, setCardInfo] = useState(null);
   const [trackData, setTrackData] = useState([])
   const [isPlaying, setIsPlaying] = useState(false)
-  const [currentIndex, setCurrentIndex] = useState(null)
+  const [currentIndex, setCurrentIndex] = useState(null);
+  const [cardDetailsEntered, setCardDetailsEntered] = useState(false);
 
-  console.log('index =>',currentIndex);
 
-  // playing testing
-  // const trackUrl = trackData.map((trackList) => {
-  //   const trackId = trackList?.Tracks?.Track_Id;
-  //   const trackUrl = `${trackList?.Tracks?.Track_RootUrl}${trackList?.Tracks?.Track_AudioFile}`;
-  //   //console.log(`Track ID: ${trackId}, Track URL: ${trackUrl}`);
-  //   return { [trackId]: trackUrl };
-  // });
 
-  // demo testing
+  // TRACK KEYS 
+
   const tracks = trackData.map((trackList) => {
     const currentTrack = trackList?.Tracks;
+    if (!currentTrack) return null;
+
+    const url = currentTrack?.Track_RootUrl && currentTrack?.Track_AudioFile ? currentTrack.Track_RootUrl + currentTrack.Track_AudioFile : '';
+    const title = currentTrack?.Track_Title || '';
+    const artist = currentTrack?.Track_Artist || '';
+    const genre = currentTrack?.Track_SubGenre || '';
+    const date = currentTrack?.Track_Date || '';
+
     return {
-      id: String(currentTrack.Track_Id),
-      url: currentTrack.Track_RootUrl + currentTrack.Track_AudioFile,
-      title: currentTrack.Track_Title,
-      artist: currentTrack.Track_Artist,
-      // artwork: currentTrack.Track_ArtworkUrl, // replace with artwork url if available
+      id: String(currentTrack?.Track_Id || ''),
+      url,
+      title,
+      artist,
       album: '',
-      genre: currentTrack.Track_SubGenre,
-      date: currentTrack.Track_Date,
+      genre,
+      date,
       artwork: '', // add artwork url if available
       duration: 0
     };
-  });
+
+  }).filter(Boolean);
+
+  // await playTrack(track);
+
+
+
+  // TRACKS PLAY AND PAUSE
 
   const handleTogglePlay = (index) => {
     const selectedTrack = tracks[index];
-    //console.log('selectedTrack =>', selectedTrack);
+    // console.log('selectedTrack =>', selectedTrack);
     if (isPlaying && currentIndex === index) {
-      console.log('url =>',selectedTrack.url)
-      
+      // console.log('url =>',selectedTrack.url)
+      // console.log('isPlaying =>',isPlaying)
+      // console.log('currentIndex =>',currentIndex)
+
       pauseTrack(selectedTrack.url);
       setIsPlaying(false);
       setCurrentIndex(null);
     } else {
       if (currentIndex != null) {
         const prevTrack = tracks[currentIndex];
+        // console.log('prevTrack =>', prevTrack)
         pauseTrack(prevTrack.url);
       }
-      playTrack(selectedTrack.url);
+      //playTrack(selectedTrack.url);
+
+      //console.log('Tracks: ', tracks); // Add this line
+      playTrack(tracks[index]);
+      // playTrack(track);
+      // console.log("playTrack =>",selectedTrack.url )
       setIsPlaying(true);
       setCurrentIndex(index);
     }
   };
-
   // end
 
-  // console.log(tracks)
-
-  const handleTogglePlayhh = (index) => {
-    // const currentTrack = trackUrl[index];
-    // const trackId = Object.keys(currentTrack)[0];
-    // const trackUrl = currentTrack[trackId];
-    // console.log(`Button ${index} was clicked with track ID: ${trackId} and track URL: ${trackUrl}`);
-    setCurrentIndex(index);
-    setIsPlaying((prevState) => !prevState);
-    Alert.alert(`Button ${index} was clicked`);
-  };
 
 
+  // DOWNLOADING TRACKS
 
-  const handlePlayPause = (index, trackUrls) => {
-    const selectedTrackUrl = trackUrls[index];
-    if (isPlaying == true && currentIndex == index) {
-      // pause the currently playing track
-      pauseTrack(selectedTrackUrl);
-      setIsPlaying(false);
-      setCurrentIndex(null);
-      // normal rate play
-      // handleDefaultPlaybackRate()
-    } else {
-      // pause the previously playing track (if any)
-      if (currentIndex != null) {
-        const prevTrackUrl = trackUrls[currentIndex];
-        pauseTrack(prevTrackUrl);
-      }
-      // play the selected track
-      playTrack(selectedTrackUrl);
-      setIsPlaying(true);
-      setCurrentIndex(index);
+  const downloadAllTracks = async (tracks) => {
+    console.log('button clicked')
+    if (!cardDetailsEntered) {
+      alert('Please enter card details and click "Done" before purchasing.');
+      return;
     }
-  }
+    try {
+      const downloads = [];
 
+      for (let i = 0; i < tracks.length; i++) {
+        const track = tracks[i];
+        const downloadDest = `${RNFetchBlob.fs.dirs.DocumentDir}/${track.title}.wav`;
+        const response = await RNFetchBlob.config({ path: downloadDest }).fetch('GET', track.url);
+        downloads.push(downloadDest);
+      }
+
+      console.log('All tracks downloaded successfully: ', downloads);
+    } catch (error) {
+      console.log('Error downloading tracks: ', error);
+    }
+  };
+  //end
+
+  // console.log(tracks)
 
   // player testing end
 
@@ -144,8 +153,9 @@ const PaymentScreen = ({ navigation, route }) => {
   // http://84.16.239.66/api/Release/GetReleasesDetails?ReleaseId=80663
 
   // console.log(releaseId);
-  const getAllTrack = () => {
 
+  // GETTING ALL THE TRACKS ON THE BASIC OF RELEASE ID
+  const getAllTrack = () => {
     //console.log('calling api')
     API({
       url: `http://84.16.239.66/api/Release/GetReleasesDetails?ReleaseId=${releaseId}`,
@@ -161,18 +171,30 @@ const PaymentScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-
     getAllTrack()
   }, []);
 
+// PAYMENT PROCESS 
+
+// const confirmPayment = async (paymentIntentId, options) => {
+//   const response = await fetch(`https://api.stripe.com/v1/payment_intents/${paymentIntentId}/confirm`, {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/x-www-form-urlencoded',
+//       'Authorization': `Bearer ${Secret_key}`
+//     },
+//     body: toQueryString(options)
+//   });
+
+//   return await response.json();
+// };
+
 
   const onPressDone = async () => {
-
     let apiData = {
-      amount: 5010,
+      amount: 5000,
       currency: 'INR'
     }
-
     try {
       const res = await createPaymentIntent(apiData)
       //console.log('Payment intent create successfully..!!',res)
@@ -181,19 +203,16 @@ const PaymentScreen = ({ navigation, route }) => {
         let confirmPaymentIndent = await confirmPayment(res?.data?.paymentIntent, { paymentMethodType: 'Card' })
         console.log("Confirm payment indent+", confirmPaymentIndent)
         alert('Payment done Successfully!!')
+        setCardDetailsEntered(true);
       }
     } catch (error) {
       console.log("Error rasing during payment indent", error)
     }
   };
 
-  const renderContent = () => {
 
-    // const renderTrackList = ({item}) => {
-    //   return(
-    //     <Text>{item?.Tracks?.Track_Disc}</Text>
-    //   )
-    // }
+
+  const renderContent = () => {
 
     return (
       <View style={{ flexDirection: 'row' }}>
@@ -238,6 +257,7 @@ const PaymentScreen = ({ navigation, route }) => {
           </Text>
 
           <TouchableOpacity
+            onPress={() => downloadAllTracks(tracks)}
             style={{
               backgroundColor: COLORS.primary,
               width: 100,
@@ -260,7 +280,6 @@ const PaymentScreen = ({ navigation, route }) => {
   const renderTrackList = () => {
 
 
-
     return (
       <FlatList
         data={trackData}
@@ -271,9 +290,8 @@ const PaymentScreen = ({ navigation, route }) => {
           return (
             <View
               key={item.Tracks.Track_Id}
-              style={{ flexDirection: 'row', margin: 20 }}
+              style={{ flexDirection: 'row', margin: 20, alignItems: 'center' }}
             >
-              <Text>{item?.Tracks?.Track_Artist}</Text>
               <TouchableOpacity
                 // onPress={() => playTrack(track)}
                 //onPress={() => handlePlayPause(index, trackUrl)}
@@ -284,7 +302,8 @@ const PaymentScreen = ({ navigation, route }) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   width: 20,
-                  height: 20
+                  height: 20,
+
                 }}>
                 <Image
                   source={currentIndex === index && isPlaying ? { uri: pause } : { uri: play }}
@@ -295,6 +314,7 @@ const PaymentScreen = ({ navigation, route }) => {
                   }}
                 />
               </TouchableOpacity>
+              <Text style={{marginLeft: 20}}>{item?.Tracks?.Track_Artist}</Text>
             </View>
           )
         }}

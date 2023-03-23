@@ -301,7 +301,6 @@ const Dashboard = ({ navigation }) => {
 
   useEffect(() => {
     setupTrackPlayer();
-
   }, [])
 
   const setupTrackPlayer = async () => {

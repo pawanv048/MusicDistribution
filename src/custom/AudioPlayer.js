@@ -1,13 +1,28 @@
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, {State} from 'react-native-track-player';
+
 
 export const playTrack = async (track) => {
-  await TrackPlayer.reset();
-  await TrackPlayer.add(track);
-  await TrackPlayer.play();
+  try {
+    //console.log('Playing track:', track);
+    if (!track || !track.title || !track.artist || !track.url) {
+      console.log('Track is missing a required key');
+      return;
+    }
+    await TrackPlayer.reset();
+    await TrackPlayer.add(track);
+    await TrackPlayer.play();
+  } catch (error) {
+    console.log('Error playing track:', error);
+  }
 };
 
+
 export const pauseTrack = async () => {
-  await TrackPlayer.pause();
+  try {
+    await TrackPlayer.pause();
+  } catch (error) {
+    console.log('Error pausing track:', error);
+  }
 };
 
 export const getTrackInfo = async () => {

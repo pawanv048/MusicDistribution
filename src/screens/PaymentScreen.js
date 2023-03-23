@@ -27,6 +27,7 @@ import {Secret_key} from '@env';
 
 
 
+
 const image = 'https://cdn.pixabay.com/photo/2016/11/18/18/35/adult-1836322_960_720.jpg';
 const play = 'https://cdn-icons-png.flaticon.com/512/189/189638.png';
 const pause = 'https://cdn-icons-png.flaticon.com/512/6364/6364353.png';
@@ -46,6 +47,8 @@ const PaymentScreen = ({ navigation, route }) => {
   const [currentIndex, setCurrentIndex] = useState(null);
   const [cardDetailsEntered, setCardDetailsEntered] = useState(false);
 
+
+  // console.log('card infomation =>', cardInfo)
 
 
   // TRACK KEYS 
@@ -144,6 +147,7 @@ const PaymentScreen = ({ navigation, route }) => {
 
   const fetchCardDetails = (cardDetail) => {
     if (cardDetail.complete) {
+      
       setCardInfo(cardDetail)
     } else {
       setCardInfo(null)
@@ -176,8 +180,18 @@ const PaymentScreen = ({ navigation, route }) => {
 
 // PAYMENT PROCESS 
 
+// const toQueryString = (params) => {
+//   return Object.keys(params)
+//     .map((key) => {
+//       return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
+//     })
+//     .join('&');
+// };
+
+
 // const confirmPayment = async (paymentIntentId, options) => {
 //   const response = await fetch(`https://api.stripe.com/v1/payment_intents/${paymentIntentId}/confirm`, {
+    
 //     method: 'POST',
 //     headers: {
 //       'Content-Type': 'application/x-www-form-urlencoded',
@@ -187,20 +201,22 @@ const PaymentScreen = ({ navigation, route }) => {
 //   });
 
 //   return await response.json();
+  
 // };
 
+//paymentMethodType: 'Card'
 
   const onPressDone = async () => {
     let apiData = {
-      amount: 5000,
+      amount: 800,
       currency: 'INR'
     }
     try {
       const res = await createPaymentIntent(apiData)
-      //console.log('Payment intent create successfully..!!',res)
+      console.log('Payment intent create successfully..!!',res?.data?.test)
 
-      if (res?.data?.paymentIntent) {
-        let confirmPaymentIndent = await confirmPayment(res?.data?.paymentIntent, { paymentMethodType: 'Card' })
+      if (res?.data?.paymentIndent) {
+        let confirmPaymentIndent = await confirmPayment(res?.data?.paymentIndent, { paymentMethodType: 'Card'  })
         console.log("Confirm payment indent+", confirmPaymentIndent)
         alert('Payment done Successfully!!')
         setCardDetailsEntered(true);
@@ -241,7 +257,7 @@ const PaymentScreen = ({ navigation, route }) => {
             }}>
             {item.Release_ReleaseTitle}
           </Text>
-          <Text>{item.Release_Id}</Text>
+          {/* <Text>{item.Release_Id}</Text> */}
           <Text
             style={{
               fontSize: 15,

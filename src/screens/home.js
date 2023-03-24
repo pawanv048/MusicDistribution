@@ -6,7 +6,7 @@ import { S_KEY } from "@env";
 import Payment from './paymentScreen';
 
 const Home = ({navigation}) => {
-
+// console.log(S_KEY);
 
   return (
     <View>

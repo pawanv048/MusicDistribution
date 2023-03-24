@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,25 +6,29 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
-  Alert
+  Alert,
+  Button
 } from 'react-native';
 import {
   CardField,
   useStripe,
   createToken,
   paymentIndent,
-  confirmPayment
+  confirmPayment,
+  CardForm,
+  usePaymentSheet,
+  useConfirmPayment,
+
 } from '@stripe/stripe-react-native';
 
+import RNFetchBlob from 'rn-fetch-blob';
 import FastImage from 'react-native-fast-image';
 import { TextButton } from '../custom/component';
 import { API, createPaymentIntent } from '../api/stripeApis';
 import { COLORS, SIZES } from '../constants/theme';
 import { useDetailData } from '../context/useDetailData';
 import { playTrack, pauseTrack } from '../custom/AudioPlayer';
-import RNFetchBlob from 'rn-fetch-blob';
-import {Secret_key} from '@env';
-
+import { Secret_key } from '@env';
 
 
 
@@ -47,8 +51,11 @@ const PaymentScreen = ({ navigation, route }) => {
   const [currentIndex, setCurrentIndex] = useState(null);
   const [cardDetailsEntered, setCardDetailsEntered] = useState(false);
 
+  // const [loading, setLoading] = useState(false); 
+  const cardFieldRef = useRef(null);
+  const { stripe } = useStripe();
 
-  // console.log('card infomation =>', cardInfo)
+  //  console.log('card infomation =>', cardInfo)
 
 
   // TRACK KEYS 
@@ -147,7 +154,7 @@ const PaymentScreen = ({ navigation, route }) => {
 
   const fetchCardDetails = (cardDetail) => {
     if (cardDetail.complete) {
-      
+
       setCardInfo(cardDetail)
     } else {
       setCardInfo(null)
@@ -178,53 +185,32 @@ const PaymentScreen = ({ navigation, route }) => {
     getAllTrack()
   }, []);
 
-// PAYMENT PROCESS 
+  // PAYMENT PROCESS 
 
-// const toQueryString = (params) => {
-//   return Object.keys(params)
-//     .map((key) => {
-//       return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
-//     })
-//     .join('&');
-// };
-
-
-// const confirmPayment = async (paymentIntentId, options) => {
-//   const response = await fetch(`https://api.stripe.com/v1/payment_intents/${paymentIntentId}/confirm`, {
-    
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/x-www-form-urlencoded',
-//       'Authorization': `Bearer ${Secret_key}`
-//     },
-//     body: toQueryString(options)
-//   });
-
-//   return await response.json();
-  
-// };
-
-//paymentMethodType: 'Card'
-
-  const onPressDone = async () => {
+  const handlePaymentDone = async () => {
     let apiData = {
-      amount: 800,
+      amount: 900,
       currency: 'INR'
     }
     try {
       const res = await createPaymentIntent(apiData)
-      console.log('Payment intent create successfully..!!',res?.data?.test)
+      console.log('Payment intent create successfully..!!', res.data.paymentIntent)
 
-      if (res?.data?.paymentIndent) {
-        let confirmPaymentIndent = await confirmPayment(res?.data?.paymentIndent, { paymentMethodType: 'Card'  })
+      if (res?.data?.paymentIntent) {
+        let confirmPaymentIndent = await confirmPayment(res?.data?.paymentIntent, {paymentMethodType:'Card'})
         console.log("Confirm payment indent+", confirmPaymentIndent)
         alert('Payment done Successfully!!')
         setCardDetailsEntered(true);
+        cardFieldRef.current.clear();
+        setCardInfo(null); // reset the card info state
       }
     } catch (error) {
       console.log("Error rasing during payment indent", error)
     }
   };
+
+
+  //end
 
 
 
@@ -287,14 +273,12 @@ const PaymentScreen = ({ navigation, route }) => {
             <Text>Buy</Text>
           </TouchableOpacity>
         </View>
-
       </View>
     )
   };
 
   // TRACKS
   const renderTrackList = () => {
-
 
     return (
       <FlatList
@@ -330,11 +314,10 @@ const PaymentScreen = ({ navigation, route }) => {
                   }}
                 />
               </TouchableOpacity>
-              <Text style={{marginLeft: 20}}>{item?.Tracks?.Track_Artist}</Text>
+              <Text style={{ marginLeft: 20 }}>{item?.Tracks?.Track_Artist}</Text>
             </View>
           )
         }}
-
       />
     )
   };
@@ -345,7 +328,9 @@ const PaymentScreen = ({ navigation, route }) => {
     <View style={{ margin: SIZES.padding * 2 }}>
       {renderContent()}
 
+      {/* CARDFIELD */}
       <CardField
+        ref={cardFieldRef}
         postalCodeEnabled={false}
         placeholders={{
           number: '4242 4242 4242 4242',
@@ -353,26 +338,30 @@ const PaymentScreen = ({ navigation, route }) => {
         cardStyle={{
           backgroundColor: '#FFFFFF',
           textColor: '#000000',
-          borderWidth: 1,
           borderColor: '#000000',
-          borderRadius: 10,
         }}
         style={{
           width: '100%',
-          height: 100,
+          height: 60,
           marginVertical: 30,
+          borderWidth: 0.5,
         }}
         onCardChange={(cardDetails) => {
           fetchCardDetails(cardDetails)
+          // console.log('cardDetails:',cardDetails);
         }}
         onFocus={(focusedField) => {
-          console.log('focusField', focusedField);
+          // console.log('focusField', focusedField);
         }}
       />
+
+      {/* CARDFORM */}
+      {/* <CardForm style={styles.cardForm} /> */}
+
       <TextButton
         label={'DONE'}
         contentContainerStyle={{ marginHorizontal: 20 }}
-        onPress={onPressDone}
+        onPress={handlePaymentDone}
         disabled={!cardInfo}
       />
       <TouchableOpacity
@@ -395,6 +384,10 @@ export default PaymentScreen
 
 const styles = StyleSheet.create({
 
+  cardForm: {
+    height: 170,
+    width: '90%'
+  }
 })
 
 

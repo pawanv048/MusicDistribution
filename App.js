@@ -10,7 +10,8 @@ import {
   PaymentScreen,
   Login,
   Register,
-  DrawerContent
+  DrawerContent,
+  Detail
 } from './src/screens/index';
 
 
@@ -28,6 +29,7 @@ const App = () => {
           <Drawer.Screen name="Dashboard" component={Dashboard} options={{ title: 'Dashboard' }} />
           <Drawer.Screen name="Home" component={Home} />
           <Drawer.Screen name="PaymentScreen" component={PaymentScreen} />
+          <Drawer.Screen name="Detail" component={Detail} />
           <Drawer.Screen name="Login" component={Login} options={{ headerShown: false }} />
           <Drawer.Screen name="Register" component={Register} options={{ headerShown: false }} />
         </Drawer.Navigator>

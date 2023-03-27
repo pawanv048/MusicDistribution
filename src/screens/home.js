@@ -3,7 +3,7 @@ import { StyleSheet, Text, View,Button } from 'react-native';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { S_KEY } from "@env";
 
-import Payment from './paymentScreen';
+import Payment from './PaymentScreen';
 
 const Home = ({navigation}) => {
 

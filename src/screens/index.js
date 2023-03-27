@@ -1,5 +1,5 @@
 import Dashboard from "./dashboard";
-import PaymentScreen from "./paymentScreen";
+import PaymentScreen from "./PaymentScreen";
 import Home from "./home";
 import Register from "./register";
 import DrawerContent from "./drawer";

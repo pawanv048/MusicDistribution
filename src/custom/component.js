@@ -187,11 +187,11 @@ export const DropdownPicker = ({
   label,
   defaultOption,
   placeholder,
-  data
-  //setSelected = () => {}
+  data,
+  setSelected
 }) => {
 
-  const [selected, setSelected] = React.useState("");
+  // const [selected, setSelected] = React.useState("");
 
   // const data = [
   //   { key: '1', value: 'Select Country' },
@@ -202,6 +202,7 @@ export const DropdownPicker = ({
     <SelectList
       setSelected={setSelected}
       placeholder={placeholder}
+      defaultOption={defaultOption}
       boxStyles={{
         backgroundColor: 'rgb(243,243,243)',
         borderRadius: 4,

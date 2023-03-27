@@ -18,7 +18,9 @@ const Register = ({ navigation }) => {
     email: "",
     phone: "",
     password: "",
-    cnfpassword: ""
+    cnfpassword: "",
+    country: "",
+    state: ""
   });
 
   //console.log('country',selectedCountry)
@@ -44,7 +46,7 @@ const Register = ({ navigation }) => {
   }, [])
 
 
-  
+
   const countryData = selectedCountry.map(item => {
     return { key: item.Country_Id, value: item.Country_Name };
   })
@@ -58,6 +60,16 @@ const Register = ({ navigation }) => {
   // Error Messages
   const handleError = (errorMessage, registerData) => {
     setErrors(prevState => ({ ...prevState, [registerData]: errorMessage }));
+  }
+
+  const handleCountrySelect = (selected) => {
+    setregisterData({ ...registerData, country: selected });
+    // console.log(selected);
+  }
+
+  const handleStateSelect = (selected) => {
+    setregisterData({ ...registerData, state: selected });
+    // console.log(selected);
   }
 
 
@@ -74,15 +86,33 @@ const Register = ({ navigation }) => {
       { name: 'cnfpassword', error: 'Please Enter Confirm Password' },
     ];
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex for email validation
+    const phoneRegex = /^\d{10}$/; // Regex for phone number validation (10 digits)
+
+
     fields.map((field) => {
       if (!registerData[field.name]) {
         handleError(field.error, field.name);
         isValid = false;
+      } else if (field.name === 'email' && !emailRegex.test(registerData[field.name])) {
+        handleError('Please Enter Valid Email Number', field.name);
+        isValid = false;
+      } else if (field.name === 'phone' && !phoneRegex.test(registerData[field.name])) {
+        handleError('Please Enter Valid Phone Number', field.name);
+        isValid = false;
       }
     })
     if (isValid) {
+      setregisterData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        password: "",
+        cnfpassword: "",
+      });
       navigation.navigate('Login')
-      // console.log(registerData)
+      console.log(registerData)
     }
   };
 
@@ -103,6 +133,7 @@ const Register = ({ navigation }) => {
         >
           {/* FIRST NAME */}
           <Input
+            value={registerData.firstName}
             placeholder='First Name'
             onChangeText={text => handleOnChange(text, 'firstName')}
             error={errors.firstName}
@@ -110,6 +141,7 @@ const Register = ({ navigation }) => {
           />
           {/* LAST NAME */}
           <Input
+            value={registerData.lastName}
             placeholder='Last Name'
             onChangeText={text => handleOnChange(text, 'lastName')}
             error={errors.lastName}
@@ -117,6 +149,7 @@ const Register = ({ navigation }) => {
           />
           {/* EMAIL */}
           <Input
+            value={registerData.email}
             placeholder='Email'
             onChangeText={text => handleOnChange(text, 'email')}
             error={errors.email}
@@ -124,25 +157,29 @@ const Register = ({ navigation }) => {
           />
           {/* PHONE NUMBER */}
           <Input
+            value={registerData.phone}
             placeholder='Phone Number'
             onChangeText={text => handleOnChange(text, 'phone')}
             error={errors.phone}
             onFocus={() => handleError(null, 'phone')}
           />
+          {/* COUNTRY  */}
           <DropdownPicker
             placeholder='Select Country'
             data={countryData}
-            setSelected
-          // data={selectedState}
+            setSelected={handleCountrySelect}
           />
+
+          {/* STATE */}
           <DropdownPicker
             placeholder='Select State'
             data={countryData}
-            setSelected
+            setSelected={handleStateSelect}
           />
 
           {/* PASSWORD */}
           <Input
+            value={registerData.password}
             placeholder='Password'
             onChangeText={text => handleOnChange(text, 'password')}
             error={errors.password}
@@ -151,6 +188,7 @@ const Register = ({ navigation }) => {
 
           {/* CONFIRM PASSWORD */}
           <Input
+            value={registerData.cnfpassword}
             placeholder='Confirm Password'
             onChangeText={text => handleOnChange(text, 'cnfpassword')}
             error={errors.cnfpassword}

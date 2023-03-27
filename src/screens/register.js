@@ -1,9 +1,12 @@
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Linking, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { SIZES, COLORS } from '../constants/theme';
-import { Input, DropdownPicker, CustomText, TextButton } from '../custom/component';
+import { Input, DropdownPicker, CustomText, TextButton, Toast } from '../custom/component';
 import CheckBox from '@react-native-community/checkbox';
 import apiServers, { baseUrl, API } from '../api/stripeApis';
+
+
+
 
 
 const Register = ({ navigation }) => {
@@ -12,6 +15,7 @@ const Register = ({ navigation }) => {
   const [errors, setErrors] = useState({});
   const [selectedCountry, setSelectedCountry] = useState([]);
   const [selectedState, setSelectedState] = useState(null);
+  const [showToast, setShowToast] = useState(false);
   const [registerData, setregisterData] = useState({
     firstName: "",
     lastName: "",
@@ -100,9 +104,23 @@ const Register = ({ navigation }) => {
       } else if (field.name === 'phone' && !phoneRegex.test(registerData[field.name])) {
         handleError('Please Enter Valid Phone Number', field.name);
         isValid = false;
+      } else if (field.name === 'cnfpassword' && registerData[field.name] !== registerData['password']) {
+        handleError('Password and Confirm Password should be same', field.name);
+        isValid = false;
       }
     })
+
+    // Show toast if toggleCheckBox is false
+    if (!toggleCheckBox) {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+      // isValid = false;
+      return
+    }
+
+
     if (isValid) {
+
       setregisterData({
         firstName: "",
         lastName: "",
@@ -111,12 +129,12 @@ const Register = ({ navigation }) => {
         password: "",
         cnfpassword: "",
       });
+      
+      //setShowToast(false);
       navigation.navigate('Login')
       console.log(registerData)
     }
   };
-
-
 
 
 
@@ -179,6 +197,7 @@ const Register = ({ navigation }) => {
 
           {/* PASSWORD */}
           <Input
+
             value={registerData.password}
             placeholder='Password'
             onChangeText={text => handleOnChange(text, 'password')}
@@ -195,12 +214,13 @@ const Register = ({ navigation }) => {
             onFocus={() => handleError(null, 'cnfpassword')}
           />
 
-          {/* TERMS */}
+          {/* TERMS AND CONDITIONS */}
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              marginVertical: SIZES.padding
+              marginVertical: SIZES.padding,
+              marginHorizontal: SIZES.padding * 0.4
             }}>
             <CheckBox
               disabled={false}
@@ -218,7 +238,16 @@ const Register = ({ navigation }) => {
               }}
               onValueChange={(newValue) => setToggleCheckBox(newValue)}
             />
-            <CustomText label={'Accept Term and Condition'} />
+            <CustomText
+              label={'Accept Term and Condition'}
+
+            />
+            {showToast && (
+              <Toast
+                toastMessage='Please accept terms and condition'
+              />
+            )}
+
           </View>
 
           <TextButton
@@ -245,8 +274,6 @@ const Register = ({ navigation }) => {
                 }}> Login Here</Text>
             </Text>
           </View>
-
-
         </ScrollView>
       </View>
     </View>

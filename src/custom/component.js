@@ -40,27 +40,7 @@ export const SearchComponent = ({ onSearch }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    // marginBottom: 10,
-    flexDirection: 'row',
-    //borderWidth: 0.2,
-    borderRadius: 10,
-    backgroundColor: COLORS.grey20
-  },
-  input: {
-    width: '80%',
-    height: 50,
-    paddingHorizontal: 5,
-  },
-  search: {
-    height: 20,
-    width: 20,
-    tintColor: COLORS.grey
-  }
-});
+
 
 
 export const TextButton = ({
@@ -228,9 +208,75 @@ export const DropdownPicker = ({
 };
 
 
+// TOAST COMPONENT
 
-const appComponent = { SearchComponent, TextButton, Separator, Input, DropdownPicker }
+export const Toast = ({ toastMessage }) => {
+  // Render the toast component
+  return (
+    <View style={[styles.toastContainer]}>
+      <Text style={styles.message}>{toastMessage}</Text>
+    </View>
+  );
+};
+
+
+
+const appComponent = {
+  SearchComponent,
+  TextButton,
+  Separator,
+  Input,
+  DropdownPicker,
+  Toast
+}
 
 export default appComponent;
 
 
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    // marginBottom: 10,
+    flexDirection: 'row',
+    //borderWidth: 0.2,
+    borderRadius: 10,
+    backgroundColor: COLORS.grey20
+  },
+  input: {
+    width: '80%',
+    height: 50,
+    paddingHorizontal: 5,
+  },
+  search: {
+    height: 20,
+    width: 20,
+    tintColor: COLORS.grey
+  },
+  toastContainer: {
+    position: 'absolute',
+    bottom: -10,
+    left: 15,
+    right: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 25,
+    height: 50,
+    width: '95%',
+    //padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  visible: {
+    opacity: 1,
+    zIndex: 999,
+  },
+  hidden: {
+    opacity: 0,
+    yIndex: -999,
+  },
+  message: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+});

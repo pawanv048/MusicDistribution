@@ -76,6 +76,8 @@ const Register = ({ navigation }) => {
     // console.log(selected);
   }
 
+  
+
 
   const handleSubmit = () => {
     // on click of submit button
@@ -99,7 +101,7 @@ const Register = ({ navigation }) => {
         handleError(field.error, field.name);
         isValid = false;
       } else if (field.name === 'email' && !emailRegex.test(registerData[field.name])) {
-        handleError('Please Enter Valid Email Number', field.name);
+        handleError('Please Enter Valid Email', field.name);
         isValid = false;
       } else if (field.name === 'phone' && !phoneRegex.test(registerData[field.name])) {
         handleError('Please Enter Valid Phone Number', field.name);

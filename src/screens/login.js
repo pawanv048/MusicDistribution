@@ -1,9 +1,11 @@
 import { StyleSheet, Text, View, TouchableOpacity, ImageBackground } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { SIZES, COLORS } from '../constants/theme';
-import { Input, CustomText, TextButton } from '../custom/component';
 import CheckBox from '@react-native-community/checkbox';
+import { Input, CustomText, TextButton } from '../custom/component';
+import { SIZES, COLORS } from '../constants/theme';
 import icons from '../constants/icons';
+import { API } from '../api/stripeApis';
+import axios from 'axios';
 
 
 
@@ -12,12 +14,13 @@ const Login = ({ navigation }) => {
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
   const [errors, setErrors] = useState({});
   const [showToast, setShowToast] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [loginData, setLoginData] = useState({
-    userName: "",
+    email: "",
     password: ""
   });
 
-  // console.log(loginData)
+  //  console.log(loginData.email)
 
   // handle login data change
   const handleOnChange = (text, loginData) => {
@@ -30,23 +33,57 @@ const Login = ({ navigation }) => {
     setErrors(prevState => ({ ...prevState, [loginData]: errorMessage }));
   }
 
+
+// USER LOGIN !!
+  const loginUser = () => {
+    API({
+      method: 'POST',
+      url: 'http://84.16.239.66/LoginDetail',
+      params: {
+        Email: loginData.email,
+        Password: loginData.password
+      },
+      onSuccess: (res) => {
+        console.log('Login response: ',res)
+        if (res[0].Status === "1") {
+          navigation.navigate('Dashboard')  
+        } else {
+          alert("Invalid Email and Password");
+        }
+      },
+      onError: (err) => {
+        console.log(err)
+      }
+    })
+  };
+  
+
+
   const handleSubmit = () => {
     // on click of submit button
     // console.log('button click');
     let isValid = true;
     const fields = [
-      { name: 'userName', error: 'Please Enter Email' },
+      { name: 'email', error: 'Please Enter Email' },
       { name: 'password', error: 'Please Enter Password' },
     ];
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex for email validation
 
     fields.map((field) => {
       if (!loginData[field.name]) {
         handleError(field.error, field.name);
         isValid = false;
+      }else if (field.name === 'email' && !emailRegex.test(loginData[field.name])) {
+        handleError('Please Enter Valid Email', field.name);
+        isValid = false;
       }
     })
     if (isValid) {
-      navigation.navigate('Dashboard')
+      loginUser()
+      setLoginData({
+        email: "",
+        password: ""
+      })
     }
   };
 
@@ -67,13 +104,14 @@ const Login = ({ navigation }) => {
           </View>
           <Input
             placeholder='Enter Email'
-            value={loginData.userName}
-            onChangeText={text => handleOnChange(text, 'userName')}
-            error={errors.userName}
-            // onFocus={() => handleError(null, 'userName')}
-            onFocus={() => setErrors(prevState => ({ ...prevState, userName: null }))}
+            value={loginData.email}
+            onChangeText={text => handleOnChange(text, 'email')}
+            error={errors.email}
+            // onFocus={() => handleError(null, 'email')}
+            onFocus={() => setErrors(prevState => ({ ...prevState, email: null }))}
           />
           <Input
+            value={loginData.password}
             placeholder='Enter Password'
             secureTextEntry
             onChangeText={text => handleOnChange(text, 'password')}

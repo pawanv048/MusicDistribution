@@ -18,7 +18,8 @@ export const trackUrl = 'https://musicdistributionsystem.com/tracks/';
 
 export const API = async ({url, params, method, headers, onSuccess, onError}) => {
     let defaultHeaders = {
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'application/json',
+      // 'Content-Type': 'multipart/form-data',
     };
   
     try {
@@ -27,6 +28,7 @@ export const API = async ({url, params, method, headers, onSuccess, onError}) =>
         url: url,
         headers: headers || defaultHeaders,
         data: params,
+        
       });
       onSuccess(response.data);
     } catch (err) {

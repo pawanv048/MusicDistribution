@@ -10,7 +10,8 @@ import {
   PaymentScreen,
   Login,
   Register,
-  DrawerContent
+  DrawerContent,
+  Forgot
 } from './src/screens/index';
 
 
@@ -30,6 +31,7 @@ const App = () => {
           <Drawer.Screen name="PaymentScreen" component={PaymentScreen} />
           <Drawer.Screen name="Login" component={Login} options={{ headerShown: false }} />
           <Drawer.Screen name="Register" component={Register} options={{ headerShown: false }} />
+          <Drawer.Screen name="Forgot" component={Forgot} options={{ headerShown: false }} />
         </Drawer.Navigator>
       </NavigationContainer>
     </DetailsDataProvider>

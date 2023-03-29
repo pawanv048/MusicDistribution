@@ -59,33 +59,6 @@ const back = 'https://cdn-icons-png.flaticon.com/512/507/507257.png'
 const noImg = 'https://filestore.community.support.microsoft.com/api/images/ext?url=https:%2f%2fanswersstaticfilecdnv2.azureedge.net%2fstatic%2fimages%2fimage-not-found.jpg'
 
 
-const Data = [
-  {
-    id: 1,
-    title: 'S02-E01 - Virat Kohli',
-    desc: 'Catch the hottest punjab song with Guru Randhawa',
-    img: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg'
-  },
-  {
-    id: 2,
-    title: 'S02-E01 - Virat Kohli',
-    desc: 'Catch the hottest punjab song with Guru Randhawa',
-    img: 'https://cdn.pixabay.com/photo/2018/03/30/17/25/women-3275942_960_720.png'
-  },
-  {
-    id: 3,
-    title: 'S02-E01 - Virat Kohli',
-    desc: 'Catch the hottest punjab song with Guru Randhawa',
-    img: 'https://cdn.pixabay.com/photo/2018/03/06/06/58/performance-3202707_960_720.jpg'
-  },
-  {
-    id: 4,
-    title: 'S02-E01 - Virat Kohli',
-    desc: 'Catch the hottest punjab song with Guru Randhawa',
-    img: 'https://cdn.pixabay.com/photo/2015/04/23/18/07/abstract-736439_960_720.jpg'
-  }
-]
-
 const CategoryCardData = [
   {
     id: 1,
@@ -210,9 +183,10 @@ const Dashboard = ({ navigation }) => {
   // const playbackState = usePlaybackState();
 
   const [data, setData] = useState([]);
+  // console.log('data =>', data)
   const [isLoading, setLoading] = useState(false);
-  const [filteredData, setFilteredData] = useState(data);
-  // console.log(filteredData)
+  const [filteredData, setFilteredData] = useState([]);
+    // console.log(filteredData)
   const [range, setRange] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   //const [sliderValue, setSliderValue] = useState(0);
@@ -331,9 +305,9 @@ const Dashboard = ({ navigation }) => {
   }
 
 
-
+// SEARCHING..
   const handleSearch = (searchQuery) => {
-    let newData = data;
+    let newData = [...data];
     if (searchQuery.trim() !== '') {
       newData = data.filter(item => item.Release_ReleaseTitle.toLowerCase().includes(searchQuery.toLowerCase()));
     }
@@ -349,6 +323,7 @@ const Dashboard = ({ navigation }) => {
 
       onSuccess: val => {
         setData(val?.Data)
+        setFilteredData(val?.Data);
         //console.log('Agreement data ==>', val?.Data)
         setLoading(false)
       },
@@ -445,7 +420,9 @@ const Dashboard = ({ navigation }) => {
                 fontSize: 20,
                 fontWeight: 'bold',
                 marginBottom: SIZES.padding
-              }}>Best episodes of the week</Text>
+              }}>
+              Best episodes of the week
+            </Text>
             <Separator
               lineContainer={{
                 width: '50%',
@@ -462,7 +439,7 @@ const Dashboard = ({ navigation }) => {
           {/* EPISODES CARD */}
 
           <FlatList
-            data={data}
+            data={filteredData}
             renderItem={renderCard}
             keyExtractor={item => item.Release_Id.toString()}
             showsHorizontalScrollIndicator={false}
@@ -736,7 +713,16 @@ const Dashboard = ({ navigation }) => {
                 alignItems: 'center',
                 flexDirection: 'row'
               }}>
-              <Image source={{ uri: exit, height: 15, width: 15 }} style={{ tintColor: COLORS.support1, marginRight: 5 }} />
+              <Image
+                source={{
+                  uri: exit,
+                  height: 15,
+                  width: 15
+                }}
+                style={{
+                  tintColor: COLORS.support1,
+                  marginRight: 5
+                }} />
               <TouchableOpacity
                 onPress={() => navigation.navigate('Login')}
               >
@@ -810,7 +796,7 @@ const Dashboard = ({ navigation }) => {
                 lineHeight: 30,
                 fontSize: 20,
                 fontWeight: '700'
-              }}>Raksha Bhandan</Text>
+              }}>Rakash roshan</Text>
             <Text
               style={{
                 color: 'white',

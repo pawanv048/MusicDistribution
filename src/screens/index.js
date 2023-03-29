@@ -4,6 +4,7 @@ import Home from "./home";
 import Register from "./register";
 import DrawerContent from "./drawer";
 import Login from "./login";
+import Forgot from "./forgot";
 
 export {
   Dashboard,
@@ -11,5 +12,6 @@ export {
   Home,
   Register,
   DrawerContent,
-  Login
+  Login,
+  Forgot
 }

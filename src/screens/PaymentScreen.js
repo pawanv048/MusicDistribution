@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import {
   CardField,
@@ -23,7 +24,7 @@ import { COLORS, SIZES } from '../constants/theme';
 import { useDetailData } from '../context/useDetailData';
 import { playTrack, pauseTrack } from '../custom/AudioPlayer';
 import RNFetchBlob from 'rn-fetch-blob';
-import {Secret_key} from '@env';
+import { Secret_key } from '@env';
 
 
 
@@ -48,7 +49,7 @@ const PaymentScreen = ({ navigation, route }) => {
   const [cardDetailsEntered, setCardDetailsEntered] = useState(false);
 
 
-  // console.log('card infomation =>', cardInfo)
+  // console.log('trackData =>', trackData)
 
 
   // TRACK KEYS 
@@ -80,7 +81,6 @@ const PaymentScreen = ({ navigation, route }) => {
   // await playTrack(track);
 
 
-
   // TRACKS PLAY AND PAUSE
 
   const handleTogglePlay = (index) => {
@@ -101,7 +101,6 @@ const PaymentScreen = ({ navigation, route }) => {
         pauseTrack(prevTrack.url);
       }
       //playTrack(selectedTrack.url);
-
       //console.log('Tracks: ', tracks); // Add this line
       playTrack(tracks[index]);
       // playTrack(track);
@@ -147,7 +146,7 @@ const PaymentScreen = ({ navigation, route }) => {
 
   const fetchCardDetails = (cardDetail) => {
     if (cardDetail.complete) {
-      
+
       setCardInfo(cardDetail)
     } else {
       setCardInfo(null)
@@ -178,33 +177,33 @@ const PaymentScreen = ({ navigation, route }) => {
     getAllTrack()
   }, []);
 
-// PAYMENT PROCESS 
+  // PAYMENT PROCESS 
 
-// const toQueryString = (params) => {
-//   return Object.keys(params)
-//     .map((key) => {
-//       return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
-//     })
-//     .join('&');
-// };
+  // const toQueryString = (params) => {
+  //   return Object.keys(params)
+  //     .map((key) => {
+  //       return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
+  //     })
+  //     .join('&');
+  // };
 
 
-// const confirmPayment = async (paymentIntentId, options) => {
-//   const response = await fetch(`https://api.stripe.com/v1/payment_intents/${paymentIntentId}/confirm`, {
-    
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/x-www-form-urlencoded',
-//       'Authorization': `Bearer ${Secret_key}`
-//     },
-//     body: toQueryString(options)
-//   });
+  // const confirmPayment = async (paymentIntentId, options) => {
+  //   const response = await fetch(`https://api.stripe.com/v1/payment_intents/${paymentIntentId}/confirm`, {
 
-//   return await response.json();
-  
-// };
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/x-www-form-urlencoded',
+  //       'Authorization': `Bearer ${Secret_key}`
+  //     },
+  //     body: toQueryString(options)
+  //   });
 
-//paymentMethodType: 'Card'
+  //   return await response.json();
+
+  // };
+
+  //paymentMethodType: 'Card'
 
   const onPressDone = async () => {
     let apiData = {
@@ -213,10 +212,10 @@ const PaymentScreen = ({ navigation, route }) => {
     }
     try {
       const res = await createPaymentIntent(apiData)
-      console.log('Payment intent create successfully..!!',res?.data?.test)
+      console.log('Payment intent create successfully..!!', res?.data?.test)
 
       if (res?.data?.paymentIndent) {
-        let confirmPaymentIndent = await confirmPayment(res?.data?.paymentIndent, { paymentMethodType: 'Card'  })
+        let confirmPaymentIndent = await confirmPayment(res?.data?.paymentIndent, { paymentMethodType: 'Card' })
         console.log("Confirm payment indent+", confirmPaymentIndent)
         alert('Payment done Successfully!!')
         setCardDetailsEntered(true);
@@ -292,52 +291,54 @@ const PaymentScreen = ({ navigation, route }) => {
     )
   };
 
+
+
   // TRACKS
   const renderTrackList = () => {
 
+    const renderTrackItems = ({ item, index }) => {
+      return (
+        <View
+          key={item.Tracks.Track_Id}
+          style={{ flexDirection: 'row', margin: 20, alignItems: 'center' }}
+        >
+          <TouchableOpacity
+            // onPress={() => playTrack(track)}
+            // onPress={() => handlePlayPause(index, trackUrl)}
+            key={`audio-btn-play-${index}`}
+            onPress={() => handleTogglePlay(index)}
+            style={{
+              marginHorizontal: 10,
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 20,
+              height: 20,
 
+            }}>
+            <Image
+              source={currentIndex === index && isPlaying ? { uri: pause } : { uri: play }}
+              //source={{uri: playbtn}}
+              style={{
+                height: 40,
+                width: 40,
+              }}
+            />
+          </TouchableOpacity>
+          <Text style={{ marginLeft: 20 }}>{item?.Tracks?.Track_Artist}</Text>
+        </View>
+      )
+
+    }
     return (
       <FlatList
         data={trackData}
         keyExtractor={item => item.Tracks.Track_Id.toString()}
         style={{ padding: SIZES.padding }}
-        renderItem={({ item, index }) => {
-
-          return (
-            <View
-              key={item.Tracks.Track_Id}
-              style={{ flexDirection: 'row', margin: 20, alignItems: 'center' }}
-            >
-              <TouchableOpacity
-                // onPress={() => playTrack(track)}
-                //onPress={() => handlePlayPause(index, trackUrl)}
-                key={`audio-btn-play-${index}`}
-                onPress={() => handleTogglePlay(index)}
-                style={{
-                  marginHorizontal: 10,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 20,
-                  height: 20,
-
-                }}>
-                <Image
-                  source={currentIndex === index && isPlaying ? { uri: pause } : { uri: play }}
-                  //source={{uri: playbtn}}
-                  style={{
-                    height: 40,
-                    width: 40,
-                  }}
-                />
-              </TouchableOpacity>
-              <Text style={{marginLeft: 20}}>{item?.Tracks?.Track_Artist}</Text>
-            </View>
-          )
-        }}
-
+        renderItem={renderTrackItems}
       />
     )
   };
+
 
 
 

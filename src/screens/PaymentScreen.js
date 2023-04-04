@@ -7,26 +7,26 @@ import {
   Image,
   FlatList,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  Button
 } from 'react-native';
 import {
   CardField,
   useStripe,
   createToken,
   paymentIndent,
-  confirmPayment
+  confirmPayment,
+  
 } from '@stripe/stripe-react-native';
 
 import FastImage from 'react-native-fast-image';
 import { TextButton } from '../custom/component';
-import { API, createPaymentIntent } from '../api/stripeApis';
+import { createPaymentIntent, API } from '../api/stripeApis';
 import { COLORS, SIZES } from '../constants/theme';
 import { useDetailData } from '../context/useDetailData';
 import { playTrack, pauseTrack } from '../custom/AudioPlayer';
 import RNFetchBlob from 'rn-fetch-blob';
 import { Secret_key } from '@env';
-
-
 
 
 const image = 'https://cdn.pixabay.com/photo/2016/11/18/18/35/adult-1836322_960_720.jpg';
@@ -49,7 +49,8 @@ const PaymentScreen = ({ navigation, route }) => {
   const [cardDetailsEntered, setCardDetailsEntered] = useState(false);
 
 
-  // console.log('trackData =>', trackData)
+
+  //  console.log('cardInfo =>', cardInfo)
 
 
   // TRACK KEYS 
@@ -146,7 +147,6 @@ const PaymentScreen = ({ navigation, route }) => {
 
   const fetchCardDetails = (cardDetail) => {
     if (cardDetail.complete) {
-
       setCardInfo(cardDetail)
     } else {
       setCardInfo(null)
@@ -177,45 +177,41 @@ const PaymentScreen = ({ navigation, route }) => {
     getAllTrack()
   }, []);
 
-  // PAYMENT PROCESS 
-
-  // const toQueryString = (params) => {
-  //   return Object.keys(params)
-  //     .map((key) => {
-  //       return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
-  //     })
-  //     .join('&');
-  // };
 
 
-  // const confirmPayment = async (paymentIntentId, options) => {
-  //   const response = await fetch(`https://api.stripe.com/v1/payment_intents/${paymentIntentId}/confirm`, {
+// const createPaymentIntent = async (data) => {
+//     try {
+//       const res = await API({
+//         url: 'http://localhost:4002/payment-sheet/create-payment-intent',
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         params: {
+//           amount: '2000',
+//           currency: 'INR',  
+//         }
+//       });
+//       return res;
+//     } catch (error) {
+//       console.log('Error creating payment intent: ', error);
+//     }
+//   };
 
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/x-www-form-urlencoded',
-  //       'Authorization': `Bearer ${Secret_key}`
-  //     },
-  //     body: toQueryString(options)
-  //   });
 
-  //   return await response.json();
-
-  // };
-
-  //paymentMethodType: 'Card'
-
+  
+// PAYMENT DONE 
   const onPressDone = async () => {
+
     let apiData = {
-      amount: 800,
+      amount: 1000,
       currency: 'INR'
     }
+
     try {
       const res = await createPaymentIntent(apiData)
-      console.log('Payment intent create successfully..!!', res?.data?.test)
+      console.log('Payment intent create successfully..!!', res)
 
-      if (res?.data?.paymentIndent) {
-        let confirmPaymentIndent = await confirmPayment(res?.data?.paymentIndent, { paymentMethodType: 'Card' })
+      if (res?.data?.paymentIntent) {
+        let confirmPaymentIndent = await confirmPayment(res?.data?.paymentIntent, { paymentMethodType: 'Card' })
         console.log("Confirm payment indent+", confirmPaymentIndent)
         alert('Payment done Successfully!!')
         setCardDetailsEntered(true);
@@ -223,6 +219,15 @@ const PaymentScreen = ({ navigation, route }) => {
     } catch (error) {
       console.log("Error rasing during payment indent", error)
     }
+
+    // if(!!cardInfo) {
+    //   try {
+    //     const resToken = await createToken({...cardInfo, type: 'Card'})
+    //     console.log('Token:', resToken);
+    //   } catch (error) {
+    //     alert('Error raised during create token')
+    //   }
+    // }
   };
 
 
@@ -238,11 +243,12 @@ const PaymentScreen = ({ navigation, route }) => {
             cache: FastImage.cacheControl.immutable,
           }}
           style={{
-            width: 150,
-            height: 150,
-            resizeMode: FastImage.resizeMode.cover,
-            borderRadius: 15
+            width: 100,
+            height: 100,
+            borderRadius: 10,
+            marginRight: SIZES.padding
           }}
+          resizeMode={FastImage.resizeMode.cover}
         />
         <View
           style={{
@@ -360,7 +366,7 @@ const PaymentScreen = ({ navigation, route }) => {
         }}
         style={{
           width: '100%',
-          height: 100,
+          height: 60,
           marginVertical: 30,
         }}
         onCardChange={(cardDetails) => {
@@ -370,6 +376,7 @@ const PaymentScreen = ({ navigation, route }) => {
           console.log('focusField', focusedField);
         }}
       />
+
       <TextButton
         label={'DONE'}
         contentContainerStyle={{ marginHorizontal: 20 }}
@@ -397,5 +404,3 @@ export default PaymentScreen
 const styles = StyleSheet.create({
 
 })
-
-

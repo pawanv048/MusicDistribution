@@ -23,6 +23,7 @@
     "npm": "^9.6.0",
     "react": "18.0.0",
     "react-native": "0.69.8",
+    "react-native-config": "^1.5.0",
     "react-native-dotenv": "^3.4.8",
     "react-native-dropdown-select-list": "^2.0.4",
     "react-native-fast-image": "^8.6.3",

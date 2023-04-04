@@ -19,25 +19,20 @@ import TrackPlayer, {
   State,
   usePlaybackState,
   useProgress,
-  useTrackPlayerEvents
+  useTrackPlayerEvents,
+  
+  
 } from 'react-native-track-player';
 import FastImage from 'react-native-fast-image';
 
 /*
 Capability: An enum that describes the various capabilities of a track player instance, such as play, pause, skip to next, skip to previous, and so on.
-
 Event: An enum that lists the various events that can be triggered by the track player instance, such as playback state changes, track changes, and so on.
-
 RepeatMode: An enum that defines the repeat modes available for the track player, such as "off", "track", and "queue".
-
 State: An enum that describes the possible states of the track player, such as "none", "loading", "playing", "paused", and so on.
-
 usePlaybackState: A hook that provides the current state of the track player, such as the playback state, the current track, and so on.
-
 useProgress: A hook that provides information about the current playback progress, such as the current position, the duration, and so on.
-
 useTrackPlayerEvents: A hook that allows you to subscribe to track player events and execute specific actions when those events are triggered.
-
 */
 
 
@@ -171,22 +166,25 @@ const twitter = 'https://cdn-icons-png.flaticon.com/512/25/25347.png';
 const exit = 'https://cdn-icons-png.flaticon.com/512/8983/8983815.png';
 
 
-const API_ALLRELEASE_URL = 'http://84.16.239.66/api/Release/GetAllReleases';
-
+const API_ALLRELEASE_URL = 'http://84.16.239.66/GetAllReleases?UserId=';
+const API_ALLRELEASE = 'http://84.16.239.66/GetAllReleases?UserId=5819A966-F236-4B85-B902-A6E890E38B47';
 
 
 
 // Main screen
-const Dashboard = ({ navigation }) => {
+const Dashboard = ({ route, navigation }) => {
 
   //Get current playback state and subsequent updates  
   // const playbackState = usePlaybackState();
+  // const [userId, setUserId] = useState(route.params.userId);
+  const { userId } = route.params ?? {};
+   //console.log('User-id:', userId);
 
   const [data, setData] = useState([]);
   // console.log('data =>', data)
   const [isLoading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-    // console.log(filteredData)
+  //  console.log(filteredData)
   const [range, setRange] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   //const [sliderValue, setSliderValue] = useState(0);
@@ -198,6 +196,7 @@ const Dashboard = ({ navigation }) => {
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [isImageAvail, setImageAvail] = useState(null)
   const [imageSource, setImageSource] = useState(null);
+  // const [sliderValue, setSliderValue] = useState(0);
 
 
   //modal
@@ -211,10 +210,11 @@ const Dashboard = ({ navigation }) => {
     }
   }
 
+  // showing download and playback speed modal
   const toggleModal = () => {
     setModalVisible(!modalVisible);
+    setPbSpeedVisible(false);
   };
-
 
   // volume
   const handleVolToggle = () => {
@@ -226,6 +226,10 @@ const Dashboard = ({ navigation }) => {
       setVolume(0);
     }
   }
+
+ 
+  
+
 
   // Default playback rate
   const handleDefaultPlaybackRate = async () => {
@@ -239,10 +243,16 @@ const Dashboard = ({ navigation }) => {
     setPlaybackRate(rate);
   }
 
+  // POSITION OF SLIDER
+  const sliderValue = duration ? position / duration : 0;
 
   const handleSliderChange = async (value) => {
     const newPosition = value * duration;
     await TrackPlayer.seekTo(newPosition);
+    setPosition(newPosition);
+    // newPosition is 0 sliderValue is 0
+    
+    // setSliderValue(value);
   };
 
   const updatePosition = async () => {
@@ -267,10 +277,8 @@ const Dashboard = ({ navigation }) => {
     updateDuration();
   }, [isPlaying]);
 
-  const sliderValue = duration ? position / duration : 0;
-
+  
   //end
-
 
 
   useEffect(() => {
@@ -292,11 +300,11 @@ const Dashboard = ({ navigation }) => {
 
   // handle play and pause
 
-  const handlePlayPause = () => {
-    if (isPlaying == true) {
-      TrackPlayer.pause()
-      setIsPlaying(false)
-      // normal rate play
+  const handlePlayPause = async () => {
+    const currentTrack = await TrackPlayer.getCurrentTrack();
+    if (currentTrack !== null && isPlaying == true) {
+      TrackPlayer.pause();
+      setIsPlaying(false);
       handleDefaultPlaybackRate()
     } else {
       TrackPlayer.play();
@@ -305,22 +313,31 @@ const Dashboard = ({ navigation }) => {
   }
 
 
-// SEARCHING..
+  // SEARCHING..
   const handleSearch = (searchQuery) => {
-    let newData = [...data];
-    if (searchQuery.trim() !== '') {
-      newData = data.filter(item => item.Release_ReleaseTitle.toLowerCase().includes(searchQuery.toLowerCase()));
+    if (!searchQuery) {
+      setFilteredData(data);
+    } else {
+      const filteredData = data.filter((item) => {
+        const text = searchQuery.toUpperCase();
+        const itemData = item.Release_ReleaseTitle.toUpperCase();
+        return itemData.indexOf(text) > -1;
+      });
+      setFilteredData(filteredData);
     }
-    setFilteredData(newData);
-  };
+  }
+
+// const printUrl = `${API_ALLRELEASE_URL}${userId}`
+// console.log('printUrl', printUrl);
 
   const getAllReleases = () => {
     //console.log('calling api')
     API({
-      url: `${API_ALLRELEASE_URL}`,
+      //url: `${API_ALLRELEASE_URL}${userId}`,
+      url: `${API_ALLRELEASE}`,
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
-
+      
       onSuccess: val => {
         setData(val?.Data)
         setFilteredData(val?.Data);
@@ -329,6 +346,7 @@ const Dashboard = ({ navigation }) => {
       },
       onError: val => console.log('ERROR:', val),
     });
+
     //setLoading(true);
   };
 
@@ -336,13 +354,12 @@ const Dashboard = ({ navigation }) => {
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size='large' />
+        <ActivityIndicator size='small' />
       </View>
     );
   };
 
   useEffect(() => {
-
     getAllReleases()
   }, [])
 
@@ -372,15 +389,16 @@ const Dashboard = ({ navigation }) => {
               { uri: noImg } :
               {
                 uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}`,
-                priority: FastImage.priority.high,
+                priority: FastImage.priority.normal,
                 cache: FastImage.cacheControl.immutable,
-              }}
+              }
+          }
           style={{
             width: '100%',
             height: '100%',
-            resizeMode: FastImage.resizeMode.cover,
             borderRadius: 10
           }}
+          resizeMode={FastImage.resizeMode.cover}
         />
         <View
           style={{
@@ -490,6 +508,7 @@ const Dashboard = ({ navigation }) => {
           >
             {item.details.map((detail) => (
               <TouchableOpacity
+                // onPress={() => navigation.navigate('PaymentScreen')}
                 key={detail.id}
                 style={{
                   marginRight: SIZES.padding * 2,
@@ -689,7 +708,7 @@ const Dashboard = ({ navigation }) => {
         </View>
       </>
     )
-  }
+  };
 
   // MAIN VIEW
 

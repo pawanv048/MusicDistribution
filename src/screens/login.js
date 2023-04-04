@@ -14,7 +14,7 @@ const Login = ({ navigation }) => {
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
   const [errors, setErrors] = useState({});
   const [showToast, setShowToast] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
+  //const [loggedIn, setLoggedIn] = useState(false);
   const [loginData, setLoginData] = useState({
     email: "",
     password: ""
@@ -45,8 +45,9 @@ const Login = ({ navigation }) => {
       },
       onSuccess: (res) => {
         console.log('Login response: ',res)
-        if (res[0].Status === "1") {
-          navigation.navigate('Dashboard')  
+        if (res[0].Status === "0") {
+          navigation.navigate('Dashboard', { userId: res[0].Userid })
+          //console.log(res[0].Userid);
         } else {
           alert("Invalid Email and Password");
         }
@@ -56,7 +57,6 @@ const Login = ({ navigation }) => {
       }
     })
   };
-  
 
 
   const handleSubmit = () => {
@@ -65,9 +65,9 @@ const Login = ({ navigation }) => {
     let isValid = true;
     const fields = [
       { name: 'email', error: 'Please Enter Email' },
-      { name: 'password', error: 'Please Enter Password' },
+      { name: 'password', error: 'Please Enter Password' }
     ];
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex for email validation
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
     fields.map((field) => {
       if (!loginData[field.name]) {
@@ -76,6 +76,8 @@ const Login = ({ navigation }) => {
       }else if (field.name === 'email' && !emailRegex.test(loginData[field.name])) {
         handleError('Please Enter Valid Email', field.name);
         isValid = false;
+      } else {
+        setErrors(prevState => ({ ...prevState, [field.name]: null }));
       }
     })
     if (isValid) {
@@ -86,7 +88,6 @@ const Login = ({ navigation }) => {
       })
     }
   };
-
 
 
   return (
@@ -147,7 +148,7 @@ const Login = ({ navigation }) => {
                   marginRight: 10,
                   borderWidth: 0.5
                 }}
-                onValueChange={(newValue) => setToggleCheckBox(newValue)}
+                onValueChange={(newValue) => console.log(newValue)}
               />
               <CustomText label={'Remember'} />
 
@@ -212,7 +213,7 @@ const styles = StyleSheet.create({
     //height: SIZES.height / 1.8,
     borderRadius: 10,
     backgroundColor: COLORS.light,
-    padding: SIZES.padding * 3
+    padding: SIZES.padding * 2.5
   },
   userLogin: {
     textAlign: 'center',

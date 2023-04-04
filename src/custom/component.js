@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Text,
   Image,
-  Button
+  Button,
+  KeyboardType
 } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 import { COLORS, SIZES } from '../constants/theme';
@@ -31,6 +32,8 @@ export const SearchComponent = ({ onSearch }) => {
         onSubmitEditing={handleSearch}
         autoCapitalize='none'
         autoCorrect={false}
+        //keyboardType='email-address'
+        returnKeyType='search'
       />
       <Image
         source={icons.search}
@@ -237,9 +240,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    // marginBottom: 10,
     flexDirection: 'row',
-    //borderWidth: 0.2,
     borderRadius: 10,
     backgroundColor: COLORS.grey20
   },
@@ -255,28 +256,17 @@ const styles = StyleSheet.create({
   },
   toastContainer: {
     position: 'absolute',
-    bottom: -10,
-    left: 15,
-    right: 20,
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    padding: 14,
+    zIndex: -1,
     borderRadius: 25,
-    height: 50,
-    width: '95%',
-    //padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  visible: {
-    opacity: 1,
-    zIndex: 999,
-  },
-  hidden: {
-    opacity: 0,
-    yIndex: -999,
   },
   message: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 14,
     textAlign: 'center',
   },
 });

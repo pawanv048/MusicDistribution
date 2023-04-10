@@ -1,10 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View,Button } from 'react-native';
 import { StripeProvider, useConfirmPayment } from '@stripe/stripe-react-native';
-import { S_KEY } from "@env";
+import { Publishable_key } from "@env";
 import Config from 'react-native-config';
-
-
 import Payment from './PaymentScreen';
 
 const Home = ({navigation}) => {
@@ -14,7 +12,9 @@ const Home = ({navigation}) => {
   const { confirmPayment, loading } = useConfirmPayment();
 
   return (
+    
     <View>
+      
       <StripeProvider
         publishableKey='pk_test_51Mix02SImlbs6lSYg9selQR2XWgNqqbeYXMHy55cef58CtxvJ8YZJqtKgu44IMZUOBY9giWVHRoz8S1DFSnsG28r00FSLQB05j'
         merchantIdentifier="merchant.identifier" // required for Apple Pay
@@ -23,6 +23,7 @@ const Home = ({navigation}) => {
         <Payment />        
       </StripeProvider>
       <Button title='Dashboard' onPress={() => navigation.goBack()}/>
+      
     </View>
   )
 }

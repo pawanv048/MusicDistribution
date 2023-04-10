@@ -602,6 +602,7 @@ const Dashboard = ({ route, navigation }) => {
   // FOOTER CONTENT
 
   const renderFooter = () => {
+
     return (
       <>
         <View

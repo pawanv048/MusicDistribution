@@ -25,7 +25,7 @@ const App = () => {
   return (
     <DetailsDataProvider>
       <NavigationContainer>
-        <Drawer.Navigator initialRouteName="Login" drawerContent={props => <DrawerContent {...props} />}>
+        <Drawer.Navigator initialRouteName="Dashboard" drawerContent={props => <DrawerContent {...props} />}>
           <Drawer.Screen name="Dashboard" component={Dashboard} options={{ title: 'Dashboard' }} />
           <Drawer.Screen name="Home" component={Home} />
           <Drawer.Screen name="PaymentScreen" component={PaymentScreen} />

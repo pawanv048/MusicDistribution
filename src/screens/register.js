@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View, ScrollView, Linking, Alert, ImageBackground } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { SIZES, COLORS } from '../constants/theme';
-import { Input, DropdownPicker, CustomText, TextButton, Toast } from '../custom/component';
 import CheckBox from '@react-native-community/checkbox';
+import { Input, DropdownPicker, CustomText, TextButton, Toast } from '../custom/component';
 import { baseUrl, API } from '../api/stripeApis';
+import { SIZES, COLORS } from '../constants/theme';
 import icons from '../constants/icons';
 
 
@@ -132,6 +132,8 @@ const Register = ({ navigation }) => {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     const phoneRegex = /^[0]?[789]\d{9}$/;
 
+    
+
     fields.map((field) => {
       if (!registerData[field.name]) {
         handleError(field.error, field.name);
@@ -152,6 +154,8 @@ const Register = ({ navigation }) => {
         handleError(null, field.name);
       }
     })
+
+
 
     // if checkbox is not checked
     if (!toggleCheckBox) {

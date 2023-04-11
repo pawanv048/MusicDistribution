@@ -16,7 +16,7 @@ import {
   createToken,
   paymentIndent,
   confirmPayment,
-  
+
 } from '@stripe/stripe-react-native';
 
 import FastImage from 'react-native-fast-image';
@@ -179,26 +179,47 @@ const PaymentScreen = ({ navigation, route }) => {
 
 
 
-// const createPaymentIntent = async (data) => {
-//     try {
-//       const res = await API({
-//         url: 'http://localhost:4002/payment-sheet/create-payment-intent',
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         params: {
-//           amount: '2000',
-//           currency: 'INR',  
-//         }
-//       });
-//       return res;
-//     } catch (error) {
-//       console.log('Error creating payment intent: ', error);
-//     }
-//   };
+  // const createPaymentIntent = async (data) => {
+  //     try {
+  //       const res = await API({
+  //         url: 'http://localhost:4002/payment-sheet/create-payment-intent',
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         params: {
+  //           amount: '2000',
+  //           currency: 'INR',  
+  //         }
+  //       });
+  //       return res;
+  //     } catch (error) {
+  //       console.log('Error creating payment intent: ', error);
+  //     }
+  //   };
 
 
-  
-// PAYMENT DONE 
+
+  // PAYMENT DONE 
+
+  const onDone = async () => {
+    API({
+      url: 'http://localhost:4002/payment-sheet',
+      method: 'POST',
+      params: {
+        customer: "cus_Ngb0mvhfTjOUAC",
+        amount: 500,
+        currency: "inr"
+      },
+      onSuccess: (response) => {
+        console.log(response);
+        console.log('Payment intent created: ', response.paymentIntentId);
+      },
+      onError: (error) => {
+        console.log('Error creating payment intent: ', error);
+      },
+    })
+  }
+
+
   const onPressDone = async () => {
 
     let apiData = {
@@ -380,7 +401,8 @@ const PaymentScreen = ({ navigation, route }) => {
       <TextButton
         label={'DONE'}
         contentContainerStyle={{ marginHorizontal: 20 }}
-        onPress={onPressDone}
+        //onPress={onPressDone}
+        onPress={onDone}
         disabled={!cardInfo}
       />
       <TouchableOpacity

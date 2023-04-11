@@ -254,7 +254,7 @@ const Drawer = ({ navigation }) => {
       </View>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('Home')}
+        //onPress={() => navigation.navigate('Home')}
         style={{
           margin: SIZES.padding,
           backgroundColor: 'rgba(17,52,85,1)',

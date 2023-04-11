@@ -9,11 +9,7 @@ export const createPaymentIntent = (data) => {
     )
       .then(function (res) {
         resolve(res)
-        // if(res.data.status === 'succeeded'){
-        //   console.log('Payment Successful')
-        // }else{
-        //   console.log('Payment Failed')
-        // }
+        console.log('Payment intent created:', data);
       })
       .catch(function (error) {
         reject(error)

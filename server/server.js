@@ -1,86 +1,76 @@
-const express = require('express');
-const stripe = require('stripe')('sk_test_51Mix02SImlbs6lSYBt2B1OYwdWc9te2H0njDJ01ioVxbhdAWaIYumQLu4OUTWepHZLjT4vjU4pu3teJ8WixgfGmp00noEmPipq');
-const bodyParser = require('body-parser');
+const express = require("express");
+const cors = require("cors");
+const Stripe = require("stripe");
+const stripe = Stripe("sk_test_51My6FhSEXddR3UfQYHtwfrefFmcM2mHU8ycOs8xg7yX8uyJPUL5ZlxT5F7eguOonisC2ZNVpFpFHRiqWSfOEqgfA00vZ223iYx");
 const app = express();
+const PORT = 4002;
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json())
+app.use("/stripe", express.raw({ type: "*/*" }));
+app.use(express.json());
+app.use(cors());
 
-app.get('/', (req, res) => {
-  res.send('Hello get data successfully')
-})
-
-
-app.post('/payment-sheet', async (req, res) => {
+app.post("/pay", async (req, res) => {
   try {
-    const { customer, amount, currency } = req.body;
+    //const { name } = req.body;
+    //if (!name) return res.status(400).json({ message: "Please enter a name" });
+    const customerId = await stripe.customers.create();
+    const customers = await stripe.customers.list();
+    const customer = customers.data[0];
 
-    let customerId;
-    if (customer) {
-      customerId = customer;
-    } else {
-      const customerObj = await stripe.customers.create();
-      customerId = customerObj.id;
+    if(!customer){
+      return res.send({
+        error: 'you have no customer created'
+      })
     }
+   // console.log(customers); // log the customers array
 
-    async function createPaymentIntent(customerId, amount, currency) {
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount,
-        currency,
-        customer: customerId,
-        payment_method_types: ['card'],
-      });
-      //res.json(paymentIntent);
-      return paymentIntent;
-    }
-
-    async function chargeCustomer(paymentIntentId, paymentMethodId) {
-      const paymentIntent = await stripe.paymentIntents.confirm(paymentIntentId, {
-        payment_method: paymentMethodId,
-      });
-      return paymentIntent;
-    }
-
-    async function retrievePaymentIntent(paymentIntentId) {
-      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-      return paymentIntent;
-    }
-
-    async function listPaymentMethods(customerId) {
-      const paymentMethods = await stripe.paymentMethods.list({
-        customer: customerId,
-        type: 'card',
-      });
-      return paymentMethods;
-    }
-
-    const paymentIntent = await createPaymentIntent(customerId, amount, currency);
-    console.log('Payment Intent created: ', paymentIntent.id);
-
-    const paymentMethods = await listPaymentMethods(customerId);
-    console.log('Payment Methods: ', paymentMethods.data.map(pm => pm.id));
-
-    const paymentMethodId = paymentMethods.data[0].id;
-
-    const chargedPaymentIntent = await chargeCustomer(paymentIntent.id, paymentMethodId);
-    console.log('Payment Intent charged: ', chargedPaymentIntent.id);
-
-    const retrievedPaymentIntent = await retrievePaymentIntent(paymentIntent.id);
-    console.log('Payment Intent retrieved: ', retrievedPaymentIntent.id);
-
-    //console.log(req.body);
-
-    // Send the response to the client
-    res.json({
-      paymentIntentId: paymentIntent.id,
-      amount: paymentIntent.amount,
-      currency: paymentIntent.currency
+    
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: 2000,
+      currency: "INR",
+      payment_method_types: ["card"],
+      customer: customerId.id,
+      //receipt_email: customer.email, 
+      //metadata: { name },
     });
-  } catch (error) {
-    console.error('Error occurred:', error);
-    res.status(500).send({ error: 'An unexpected error occurred' });
+    //console.log(paymentIntent); // log the paymentIntent object
+    //console.log(customers);
+    //console.log(receipt_email, "rahula@gmail.com")
+    const clientSecret = paymentIntent.client_secret;
+    res.json({ message: "Payment initiated", clientSecret });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
-app.listen(4002, () => console.log("Running on http://localhost:4002"))
 
+
+
+app.post("/stripe", async (req, res) => {
+  const sig = req.headers["stripe-signature"];
+  let event;
+  try {
+    event = await stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: err.message });
+  }
+
+  // Event when a payment is initiated
+  if (event.type === "payment_intent.created") {
+    console.log(`${event.data.object.metadata.name} initated payment!`);
+  }
+  // Event when a payment is succeeded
+  if (event.type === "payment_intent.succeeded") {
+    console.log(`${event.data.object.metadata.name} succeeded payment!`);
+    // fulfilment
+  }
+  res.json({ ok: true });
+});
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

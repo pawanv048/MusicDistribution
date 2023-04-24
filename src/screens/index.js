@@ -13,5 +13,5 @@ export {
   Register,
   DrawerContent,
   Login,
-  Forgot
+  Forgot, 
 }

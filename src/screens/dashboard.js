@@ -20,20 +20,11 @@ import TrackPlayer, {
   usePlaybackState,
   useProgress,
   useTrackPlayerEvents,
-  
-  
+
+
 } from 'react-native-track-player';
 import FastImage from 'react-native-fast-image';
-
-/*
-Capability: An enum that describes the various capabilities of a track player instance, such as play, pause, skip to next, skip to previous, and so on.
-Event: An enum that lists the various events that can be triggered by the track player instance, such as playback state changes, track changes, and so on.
-RepeatMode: An enum that defines the repeat modes available for the track player, such as "off", "track", and "queue".
-State: An enum that describes the possible states of the track player, such as "none", "loading", "playing", "paused", and so on.
-usePlaybackState: A hook that provides the current state of the track player, such as the playback state, the current track, and so on.
-useProgress: A hook that provides information about the current playback progress, such as the current position, the duration, and so on.
-useTrackPlayerEvents: A hook that allows you to subscribe to track player events and execute specific actions when those events are triggered.
-*/
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 import { SearchComponent, TextButton, CustomText, Separator } from '../custom/component';
@@ -53,81 +44,6 @@ const playbackspeed = 'https://static.thenounproject.com/png/3565593-200.png'
 const back = 'https://cdn-icons-png.flaticon.com/512/507/507257.png'
 const noImg = 'https://filestore.community.support.microsoft.com/api/images/ext?url=https:%2f%2fanswersstaticfilecdnv2.azureedge.net%2fstatic%2fimages%2fimage-not-found.jpg'
 
-
-const CategoryCardData = [
-  {
-    id: 1,
-    name: 'Big Hits!',
-    details: [
-      {
-        id: '1',
-        title: 'S02-E01 - Virat Kohli',
-        desc: 'This is the description for S02-E01 - Virat Kohli',
-        image: 'https://cdn.pixabay.com/photo/2017/08/02/13/00/lotte-2571479_960_720.jpg',
-      },
-      {
-        id: '2',
-        title: 'S02-E01 - Virat Kohli',
-        desc: 'This is the description for Category 1 Detail 2',
-        image: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
-      },
-      {
-        id: '3',
-        title: 'S02-E01 - Virat Kohli',
-        desc: 'This is the description for Category 1 Detail 3',
-        image: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Top Charts',
-    details: [
-      {
-        id: '1',
-        title: 'S02-E01 - Virat Kohli',
-        desc: 'This is the description for Category 1 Detail 1',
-        image: 'https://cdn.pixabay.com/photo/2016/11/18/18/35/adult-1836322_960_720.jpg',
-      },
-      {
-        id: '2',
-        title: 'S02-E01 - Virat Kohli',
-        desc: 'This is the description for Category 1 Detail 2',
-        image: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
-      },
-      {
-        id: '3',
-        title: 'S02-E01 - Virat Kohli',
-        desc: 'This is the description for Category 1 Detail 3',
-        image: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Popular albums',
-    details: [
-      {
-        id: '1',
-        title: 'S02-E01 - Virat Kohli',
-        desc: 'This is the description for Category 1 Detail 1',
-        image: 'https://cdn.pixabay.com/photo/2016/10/17/16/35/concert-1748102_960_720.jpg',
-      },
-      {
-        id: '2',
-        title: 'S02-E01 - Virat Kohli',
-        desc: 'This is the description for Category 1 Detail 2',
-        image: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
-      },
-      {
-        id: '3',
-        title: 'S02-E01 - Virat Kohli',
-        desc: 'This is the description for Category 1 Detail 3',
-        image: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
-      },
-    ],
-  },
-];
 
 const songs = [
   {
@@ -171,23 +87,15 @@ const API_ALLRELEASE = 'http://84.16.239.66/GetAllReleases?UserId=5819A966-F236-
 
 
 
+
 // Main screen
 const Dashboard = ({ route, navigation }) => {
 
-  //Get current playback state and subsequent updates  
-  // const playbackState = usePlaybackState();
-  // const [userId, setUserId] = useState(route.params.userId);
-  const { userId } = route.params ?? {};
-   //console.log('User-id:', userId);
-
   const [data, setData] = useState([]);
-  // console.log('data =>', data)
   const [isLoading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-  //  console.log(filteredData)
   const [range, setRange] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
-  //const [sliderValue, setSliderValue] = useState(0);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
@@ -196,7 +104,7 @@ const Dashboard = ({ route, navigation }) => {
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [isImageAvail, setImageAvail] = useState(null)
   const [imageSource, setImageSource] = useState(null);
-  // const [sliderValue, setSliderValue] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 
   //modal
@@ -227,8 +135,6 @@ const Dashboard = ({ route, navigation }) => {
     }
   }
 
- 
-  
 
 
   // Default playback rate
@@ -251,7 +157,7 @@ const Dashboard = ({ route, navigation }) => {
     await TrackPlayer.seekTo(newPosition);
     setPosition(newPosition);
     // newPosition is 0 sliderValue is 0
-    
+
     // setSliderValue(value);
   };
 
@@ -265,6 +171,21 @@ const Dashboard = ({ route, navigation }) => {
     setDuration(newDuration);
   };
 
+  // user login 
+  const retrieveLogin = async () => {
+    try {
+      const logindata = await AsyncStorage.getItem('Userid')
+      //console.log('log data =>', logindata);
+      setIsLoggedIn(logindata)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    retrieveLogin()
+  }, []);
+
   useEffect(() => {
     const interval = setInterval(() => {
       updatePosition();
@@ -277,26 +198,27 @@ const Dashboard = ({ route, navigation }) => {
     updateDuration();
   }, [isPlaying]);
 
-  
+
   //end
 
-
   useEffect(() => {
-    setupTrackPlayer();
-  }, [])
+    const setupPlayerAsync = async () => {
+      try {
+        // set up the player if it is not set up yet
 
-  const setupTrackPlayer = async () => {
-    try {
-      await TrackPlayer.setupPlayer();
-      TrackPlayer.updateOptions({
-        capabilities: [Capability.Play, Capability.Pause]
-      });
+        //await TrackPlayer.setupPlayer();
+        TrackPlayer.updateOptions({
+          capabilities: [Capability.Play, Capability.Pause]
+        });
 
-      await TrackPlayer.add(songs)
-    } catch (error) {
-      console.log(error)
+        await TrackPlayer.add(songs)
+      } catch (error) {
+        console.log(error)
+      }
     }
-  }
+
+    setupPlayerAsync();
+  }, [])
 
   // handle play and pause
 
@@ -327,8 +249,8 @@ const Dashboard = ({ route, navigation }) => {
     }
   }
 
-// const printUrl = `${API_ALLRELEASE_URL}${userId}`
-// console.log('printUrl', printUrl);
+  // const printUrl = `${API_ALLRELEASE_URL}${userId}`
+  // console.log('printUrl', printUrl);
 
   const getAllReleases = () => {
     //console.log('calling api')
@@ -337,16 +259,29 @@ const Dashboard = ({ route, navigation }) => {
       url: `${API_ALLRELEASE}`,
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
-      
+
       onSuccess: val => {
         setData(val?.Data)
         setFilteredData(val?.Data);
         //console.log('Agreement data ==>', val?.Data)
         setLoading(false)
       },
-      onError: val => console.log('ERROR:', val),
+      onError: error => {
+        console.log('ERROR:', error);
+        // Handle the error response from the server here.
+        if (error.response) {
+          // The server responded with a status code that is not in the range of 2xx
+          console.log('Server error:', error.response.data);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.log('No response from server');
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error:', error.message);
+        }
+        setLoading(false);
+      },
     });
-
     //setLoading(true);
   };
 
@@ -367,13 +302,14 @@ const Dashboard = ({ route, navigation }) => {
 
   function renderCardView() {
 
-    const renderCard = ({ item }) => (
-      // console.log(item.Release_Id,'showing id')
+    const renderCard = ({ item }) => {
+      //console.log(item.Release_Id);
+     return (  
       <TouchableOpacity
-        onPress={() => navigation.navigate('PaymentScreen', {
-          item: item
-        })}
-        activeOpacity={0.7}
+        // onPress={() => navigation.navigate('PaymentScreen', {
+        //   item: item
+        // })}
+        activeOpacity={1}
         style={{
           //marginHorizontal: SIZES.padding,
           alignItems: 'center',
@@ -425,8 +361,34 @@ const Dashboard = ({ route, navigation }) => {
             }}>{item.Release_PrimaryArtist}</Text>
           </View>
         </View>
+
+        {/* BUY NOW */}
+        {isLoggedIn && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Home', {
+               Release_Id: item.Release_Id,
+               Release_Artwork: item.Release_Artwork, 
+              }
+            )}
+            style={{
+              marginTop: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: COLORS.primary,
+              padding: 10,
+              borderRadius: 5,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: '600',
+                color: '#fff'
+              }}>Buy Now</Text>
+          </TouchableOpacity>
+        )}
       </TouchableOpacity>
-    );
+    )};
 
 
     return (
@@ -436,10 +398,11 @@ const Dashboard = ({ route, navigation }) => {
             <Text
               style={{
                 fontSize: 20,
-                fontWeight: 'bold',
-                marginBottom: SIZES.padding
+                fontWeight: '900',
+                marginBottom: SIZES.padding,
+                color: 'rgb(17,52,85)'
               }}>
-              Best episodes of the week
+              Best episodes of the week!
             </Text>
             <Separator
               lineContainer={{
@@ -471,133 +434,6 @@ const Dashboard = ({ route, navigation }) => {
   };
 
 
-
-  // CATEGORIES CARD
-
-  const renderCategoryView = () => {
-    function renderItem({ item }) {
-      const itemNameLength = item.name.length;
-
-      return (
-        <View
-          style={{
-            flex: 1,
-            marginHorizontal: SIZES.padding * 2,
-            marginTop: SIZES.padding * 3
-          }}>
-          <Text
-            style={styles.categoryTitle}
-          >
-            {item.name}
-          </Text>
-          <Separator
-            lineContainer={{
-              width: `${(itemNameLength * 3)}%`,
-              height: 5
-            }} />
-          <Separator
-            lineContainer={{
-              width: `${(itemNameLength * 2)}%`,
-              height: 5,
-              marginTop: 5
-            }} />
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingVertical: SIZES.padding * 2 }}
-            horizontal
-          >
-            {item.details.map((detail) => (
-              <TouchableOpacity
-                // onPress={() => navigation.navigate('PaymentScreen')}
-                key={detail.id}
-                style={{
-                  marginRight: SIZES.padding * 2,
-                  //marginLeft: SIZES.padding * 0.5,
-                  marginTop: SIZES.padding * 1.5,
-                  alignItems: 'center',
-                  width: SIZES.width - 100,
-                  height: SIZES.height / 3,
-                  //backgroundColor: 'red',
-                  borderRadius: 10
-                }}
-              >
-                <Image
-                  source={{ uri: detail.image }}
-                  style={{
-                    width: '100%',
-                    height: '65%',
-                    resizeMode: 'cover',
-                    borderRadius: 10
-                  }}
-                />
-                <View
-                  style={{
-                    width: '100%',
-                    backgroundColor: 'rgba(243,243,243,1)',
-                    height: 120,
-                    position: 'absolute',
-                    bottom: 0,
-                    borderRadius: 10
-                  }}
-                >
-                  <View style={{ margin: SIZES.padding * 2 }}>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                        marginBottom: 15
-                      }}
-                    >{detail.title}</Text>
-                    <Text style={{
-                      fontSize: 15,
-                      lineHeight: 20,
-                      fontWeight: '400'
-                    }}>{detail.desc}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-        </View>
-
-      )
-    }
-
-
-
-    return (
-      <View
-        style={{
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: 7,
-          },
-          shadowOpacity: 0.30,
-          shadowRadius: 8.0
-        }}>
-        <FlatList
-          data={CategoryCardData}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          style={{
-            backgroundColor: COLORS.light,
-            marginTop: SIZES.padding * 3,
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 4,
-            },
-            shadowOpacity: 0.30,
-            shadowRadius: 8.65,
-            borderRadius: 10,
-          }}
-        />
-      </View>
-    )
-  };
 
   // FOOTER CONTENT
 
@@ -724,7 +560,7 @@ const Dashboard = ({ route, navigation }) => {
         />
         <View style={styles.subContainer}>
           <TextButton
-            // onPress={}
+
             label={'PREMIUM PLANS'}
           />
           <View style={{ flexDirection: 'row' }}>
@@ -780,7 +616,6 @@ const Dashboard = ({ route, navigation }) => {
         </View>
 
         {renderCardView()}
-        {renderCategoryView()}
         {renderFooter()}
       </ScrollView>
 
@@ -1001,7 +836,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: COLORS.light,
-    height: SIZES.height / 1.8,
+    height: SIZES.height / 1.6,
     marginTop: SIZES.padding * 3,
     shadowColor: "#000",
     shadowOffset: {

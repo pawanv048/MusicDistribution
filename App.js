@@ -7,13 +7,11 @@ import { DetailsDataProvider } from './src/context/useDetailData';
 import {
   Dashboard,
   Home,
-  PaymentScreen,
   Login,
   Register,
   DrawerContent,
-  Forgot
+  Forgot,
 } from './src/screens/index';
-
 
 
 const Stack = createNativeStackNavigator();
@@ -28,7 +26,7 @@ const App = () => {
         <Drawer.Navigator initialRouteName="Dashboard" drawerContent={props => <DrawerContent {...props} />}>
           <Drawer.Screen name="Dashboard" component={Dashboard} options={{ title: 'Dashboard' }} />
           <Drawer.Screen name="Home" component={Home} />
-          <Drawer.Screen name="PaymentScreen" component={PaymentScreen} />
+          {/* <Drawer.Screen name="PaymentScreen" component={PaymentScreen} /> */}
           <Drawer.Screen name="Login" component={Login} options={{ headerShown: false }} />
           <Drawer.Screen name="Register" component={Register} options={{ headerShown: false }} />
           <Drawer.Screen name="Forgot" component={Forgot} options={{ headerShown: false }} />

@@ -6,7 +6,7 @@ import { SIZES, COLORS } from '../constants/theme';
 import icons from '../constants/icons';
 import { API } from '../api/stripeApis';
 import axios from 'axios';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Login = ({ navigation }) => {
@@ -19,7 +19,7 @@ const Login = ({ navigation }) => {
     email: "",
     password: ""
   });
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   //  console.log(loginData.email)
 
   // handle login data change
@@ -43,10 +43,15 @@ const Login = ({ navigation }) => {
         Email: loginData.email,
         Password: loginData.password
       },
-      onSuccess: (res) => {
+      onSuccess: async (res) => {
         console.log('Login response: ',res)
         if (res[0].Status === "0") {
+           // Store Userid in local storage
+          //await AsyncStorage.setItem('Userid', res[0].Userid);
+          await AsyncStorage.setItem('Userid', JSON.stringify(true));
+          // Navigate to Dashboard
           navigation.navigate('Dashboard', { userId: res[0].Userid })
+          //navigation.navigate('Dashboard',  { isLoggedIn: true })
           //console.log(res[0].Userid);
         } else {
           alert("Invalid Email and Password");

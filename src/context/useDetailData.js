@@ -3,10 +3,10 @@ import React, {useContext, useState, useReducer} from 'react';
 const DetailsContext = React.createContext();
 
 export const DetailsDataProvider = ({children}) => {
-  const [releaseData, setReleaseData] = useState([]);
+  const [valueToPass, setValueToPass] = useState([]);
   
   return (
-    <DetailsContext.Provider value={{releaseData, setReleaseData}}>
+    <DetailsContext.Provider value={{valueToPass, setValueToPass}}>
       {children}
     </DetailsContext.Provider>
   );

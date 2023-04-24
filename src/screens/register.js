@@ -21,8 +21,6 @@ const Register = ({ navigation }) => {
     phone: "",
     password: "",
     cnfpassword: "",
-    // country: "",
-    // state: ""
   });
 
   //console.log('country',selectedCountry)

@@ -1,12 +1,24 @@
-import React, { useState, useRef } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Alert
+} from 'react-native';
 import {
   DrawerContentScrollView,
   DrawerItem
 } from '@react-navigation/drawer';
-import { SIZES, COLORS } from '../constants/theme';
-import { TextButton } from '../custom/component';
+import { useDispatch } from 'react-redux';
+// import { updateTitle } from '../redux/reducers';
+import { updateTitle } from '../redux/action';
 
+
+import { SIZES, COLORS } from '../constants/theme';
+import { DrawerButton } from '../custom/component';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const wallet_img = 'https://cdn-icons-png.flaticon.com/512/2169/2169854.png';
@@ -17,48 +29,62 @@ const plus = 'https://cdn-icons-png.flaticon.com/512/1828/1828919.png';
 const download = 'https://cdn-icons-png.flaticon.com/512/2382/2382067.png';
 
 
-const drawerItems = [
-  { label: 'New Release', onPress: () => console.log('Home') },
-  { label: 'Top Charts', onPress: () => console.log('Profile pressed') },
-  { label: 'Top Playlist', onPress: () => console.log('Settings pressed') },
-  { label: 'Podcasts', onPress: () => console.log('Settings pressed') },
-  { label: 'Top Artists', onPress: () => console.log('Settings pressed') },
-  { label: 'Radio', onPress: () => console.log('Settings pressed') },
-];
-
-const libraryItems = [
-  { label: 'History', onPress: () => console.log('Home pressed') },
-  { label: 'Songs', onPress: () => console.log('Profile pressed') },
-  { label: 'Albums', onPress: () => console.log('Settings pressed') },
-  { label: 'Podcasts', onPress: () => console.log('Settings pressed') },
-  { label: 'Artists', onPress: () => console.log('Settings pressed') },
-
-];
 
 const Drawer = ({ navigation }) => {
+  console.log('render Drawer');
+
 
   const [showDrawerItems, setShowDrawerItems] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const title = useSelector(state => state.dashboard.title);
 
-  // const toggleDrawerItems = () => {
-  //   // setShowDrawerItems(!showDrawerItems);
-  //   // setIsExpanded(!isExpanded);
-  //   Animated.timing(animation, {
-  //     toValue: isExpanded ? 40 : showDrawerItems ? 40 : 4 + drawerItems.length * 50,
-  //     duration: 500,
-  //     useNativeDriver: false,
-  //   }).start();
-  // };
+  const dispatch = useDispatch();
+
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
+  const checkLoginStatus = async () => {
+    const userId = await AsyncStorage.getItem('Userid');
+    setIsLoggedIn(!!userId);
+  };
+
+  // SHOWING HISTORY WHEN USER LOGIN
+  const handleHistoryPress = () => {
+    console.log('History pressed');
+    if (isLoggedIn) {
+      Alert.alert('You are logined user')
+    } else {
+      navigation.navigate('Login')
+    }
+  }
+
+  const handleSongsPress = () => {
+    dispatch(updateTitle('Top Songs'));
+    console.log('song press');
+  }
+
+  const handleAlbumsPress = () => {
+    console.log('Album press');
+  }
+
+  const handleReleasePress = () => {
+    console.log('Release press');
+  }
+  const handleArtistPress = () => {
+    console.log('Artist press');
+  }
+
+
 
   const browserPressed = () => {
     setIsExpanded(!isExpanded);
-    //toggleDrawerItems()
   };
 
   const libraryPressed = () => {
     setShowDrawerItems(!showDrawerItems);
-    //toggleDrawerItems()
-    // code to handle button 2 press
   };
 
   return (
@@ -98,7 +124,6 @@ const Drawer = ({ navigation }) => {
         </View>
 
         {/* Profile Details */}
-
         <View
           style={{
             marginHorizontal: SIZES.padding * 2,
@@ -123,7 +148,7 @@ const Drawer = ({ navigation }) => {
           />
           <View>
             <Text style={styles.profile_name}>HI, WILLIAM</Text>
-            <Text style={{fontWeight: '600'}}>william@gmail.com</Text>
+            <Text style={{ fontWeight: '600' }}>william@gmail.com</Text>
           </View>
         </View>
 
@@ -157,36 +182,14 @@ const Drawer = ({ navigation }) => {
 
         {isExpanded && (
           <View>
-            {drawerItems.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={item.onPress}
-                style={{
-                  flexDirection: 'row',
-                  backgroundColor: COLORS.grey20,
-                  padding: SIZES.padding * 1.5,
-                  borderBottomWidth: 1,
-                  borderBottomColor: COLORS.grey60,
-                }}
-              >
-                <Image
-                  source={{ uri: down_arrow }}
-                  style={{
-                    width: 20,
-                    height: 20,
-                    tintColor: 'black',
-                    transform: [{ rotate: '-90deg' }]
-                  }}
-                />
-                <Text
-                  style={{
-                    marginLeft: 10,
-                    fontWeight: '500'
-                  }}>
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            <DrawerButton
+              label={'Top Release'}
+              onPress={handleReleasePress}
+            />
+            <DrawerButton
+              label={'Top Artists'}
+              onPress={handleArtistPress}
+            />
           </View>
         )}
 
@@ -219,36 +222,21 @@ const Drawer = ({ navigation }) => {
 
         {showDrawerItems && (
           <View>
-            {libraryItems.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={item.onPress}
-                style={{
-                  flexDirection: 'row',
-                  backgroundColor: COLORS.grey20,
-                  padding: SIZES.padding * 1.5,
-                  borderBottomWidth: 1,
-                  borderBottomColor: COLORS.grey60,
-                }}
-              >
-                <Image
-                  source={{ uri: down_arrow }}
-                  style={{
-                    width: 20,
-                    height: 20,
-                    tintColor: 'black',
-                    transform: [{ rotate: '-90deg' }]
-                  }}
-                />
-                <Text
-                  style={{
-                    marginLeft: 10,
-                    fontWeight: '500'
-                  }}>
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {/* HISTORY */}
+            <DrawerButton
+              label={'History'}
+              onPress={handleHistoryPress}
+            />
+            {/* SONGS */}
+            <DrawerButton
+              label={'Songs'}
+              onPress={handleSongsPress}
+            />
+            {/* ALBUMS */}
+            <DrawerButton
+              label={'Albums'}
+              onPress={handleAlbumsPress}
+            />
           </View>
         )}
       </View>

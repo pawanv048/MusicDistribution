@@ -8,6 +8,7 @@ import icons from '../constants/icons';
 
 
 const Register = ({ navigation }) => {
+  console.log('render Register');
 
   const [toggleCheckBox, setToggleCheckBox] = React.useState(false)
   const [errors, setErrors] = useState({});
@@ -94,8 +95,8 @@ const Register = ({ navigation }) => {
 
   // handle login data change
   const handleOnChange = (text, registerData) => {
-    setregisterData(prevState => ({ ...prevState, [registerData]: text }));
-    setErrors(prevState => ({ ...prevState, [registerData]: null }));
+    setregisterData(prevState => ({ ...prevState, [registerData]: text })); // updater function style
+    setErrors(prevState => ({ ...prevState, [registerData]: null })); // ufs - nothing but store the previous value.
   };
   // Error Messages
   const handleError = (errorMessage, registerData) => {

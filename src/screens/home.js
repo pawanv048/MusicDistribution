@@ -5,48 +5,12 @@ import useDetailData from "../context/useDetailData";
 import PaymentScreen from './PaymentScreen';
 
 export default function Home(props) {
+  console.log('render Home');
   //console.log('renderHomeScreen')
   const route = props.route;
   const{ Release_Id } = route.params
 
-
-  // const Artwork = route.params.Release_Artwork ?? '3f717fef-2d3b-4d87-a8a9-51c707827b23.jpg';
-  // if (!Artwork) {
-  //   Release_Artwork = '3f717fef-2d3b-4d87-a8a9-51c707827b23.jpg';
-  // }
-
-  // const id = route.params.Release_Id
-  //console.log(id);
-  //console.log(Release_Id);
-  //const releaseId = item?.Release_Id;
- // console.log(Release_Artwork);
-
-  const {valueToPass, setValueToPass} = useDetailData();
-  //console.log('Release_id:', valueToPass)
-  
-
-  const getRelease = async () => {
-    try {
-      const resp = await fetch(
-        `http://84.16.239.66/api/Release/GetReleasesDetails?ReleaseId=${releaseId}`,
-      );
-
-      //console.log('ReleaseId123=', detailsData?.Release_Id);
-      const json = await resp.json();
-      setValueToPass(json.Data);
-      //console.log('fetchDetailsUsingReleaseId12=', JSON.stringify(json.Data));
-    } catch (error) {
-      console.error(error);
-    } finally {
-      //setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    //getRelease();
-    //postUser();
-  }, []);
-  
+  // const {valueToPass, setValueToPass} = useDetailData();
   
   return (
     <View style={styles.container}>
@@ -55,6 +19,7 @@ export default function Home(props) {
           navigation={props.navigation}
           Release_Id={route.params.Release_Id} // Pass Release_Id as a prop
           Release_Artwork={route.params.Release_Artwork} // Pass Release_Artwork as a prop
+          //lang={lang}
           //valueToPass={valueToPass} // Pass valueToPass as a prop
         />
       </StripeProvider>

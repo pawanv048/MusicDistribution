@@ -6,7 +6,7 @@ import { Input, TextButton } from '../custom/component';
 
 
 const Forgot = ({ navigation }) => {
-
+  console.log('render Forgot');
   const renderFogotPassword = () => {
     return (
       <View

@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Login = ({ navigation }) => {
-
+  console.log('render Login');
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
   const [errors, setErrors] = useState({});
   const [showToast, setShowToast] = useState(false);
@@ -64,6 +64,7 @@ const Login = ({ navigation }) => {
   };
 
 
+  // USER LOGIN 
   const handleSubmit = () => {
     // on click of submit button
     // console.log('button click');

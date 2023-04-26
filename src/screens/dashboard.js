@@ -20,12 +20,11 @@ import TrackPlayer, {
   usePlaybackState,
   useProgress,
   useTrackPlayerEvents,
-
-
 } from 'react-native-track-player';
 import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { connect } from 'react-redux';
 
 import { SearchComponent, TextButton, CustomText, Separator } from '../custom/component';
 import { COLORS, SIZES } from '../constants/theme';
@@ -89,7 +88,9 @@ const API_ALLRELEASE = 'http://84.16.239.66/GetAllReleases?UserId=5819A966-F236-
 
 
 // Main screen
-const Dashboard = ({ route, navigation }) => {
+const Dashboard = ({ route, navigation, title }) => {
+
+  console.log('render Dashboard')
 
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
@@ -105,7 +106,6 @@ const Dashboard = ({ route, navigation }) => {
   const [isImageAvail, setImageAvail] = useState(null)
   const [imageSource, setImageSource] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
 
   //modal
   const togglePlayBack = () => {
@@ -223,6 +223,7 @@ const Dashboard = ({ route, navigation }) => {
   // handle play and pause
 
   const handlePlayPause = async () => {
+    console.log();
     const currentTrack = await TrackPlayer.getCurrentTrack();
     if (currentTrack !== null && isPlaying == true) {
       TrackPlayer.pause();
@@ -402,7 +403,7 @@ const Dashboard = ({ route, navigation }) => {
                 marginBottom: SIZES.padding,
                 color: 'rgb(17,52,85)'
               }}>
-              Best episodes of the week!
+              {title}
             </Text>
             <Separator
               lineContainer={{
@@ -821,9 +822,16 @@ const Dashboard = ({ route, navigation }) => {
       </View>
     </React.Fragment>
   )
-}
+};
 
-export default Dashboard
+const mapStateToProps = state => {
+  return {
+    title: state.dashboard.title
+  };
+};
+
+export default connect(mapStateToProps)(Dashboard);
+// export default Dashboard
 
 const styles = StyleSheet.create({
   container: {

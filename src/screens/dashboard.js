@@ -24,12 +24,15 @@ import TrackPlayer, {
 import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
+// import { useGetTopReleasesQuery } from '../redux/store';
 
-import { SearchComponent, TextButton, CustomText, Separator } from '../custom/component';
+
+import { SearchComponent, TextButton, CustomText, Separator, CustomLoader } from '../custom/component';
 import { COLORS, SIZES } from '../constants/theme';
 import * as String from '../constants/strings';
 import { API } from '../api/stripeApis';
+
 
 
 const PIC = 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg'
@@ -90,6 +93,9 @@ const API_ALLRELEASE = 'http://84.16.239.66/GetAllReleases?UserId=5819A966-F236-
 // Main screen
 const Dashboard = ({ route, navigation, title }) => {
 
+  // const { data, isLoading, isError } = useGetTopReleasesQuery();
+  // console.log(data);
+
   console.log('render Dashboard')
 
   const [data, setData] = useState([]);
@@ -106,6 +112,12 @@ const Dashboard = ({ route, navigation, title }) => {
   const [isImageAvail, setImageAvail] = useState(null)
   const [imageSource, setImageSource] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+
+  //Redux
+  //dashbord is name given dashboardSlice
+  const titles = useSelector(state => state.dashboard.title)
+
 
   //modal
   const togglePlayBack = () => {
@@ -157,7 +169,6 @@ const Dashboard = ({ route, navigation, title }) => {
     await TrackPlayer.seekTo(newPosition);
     setPosition(newPosition);
     // newPosition is 0 sliderValue is 0
-
     // setSliderValue(value);
   };
 
@@ -255,6 +266,7 @@ const Dashboard = ({ route, navigation, title }) => {
 
   const getAllReleases = () => {
     //console.log('calling api')
+    setLoading(true);
     API({
       //url: `${API_ALLRELEASE_URL}${userId}`,
       url: `${API_ALLRELEASE}`,
@@ -283,17 +295,17 @@ const Dashboard = ({ route, navigation, title }) => {
         setLoading(false);
       },
     });
-    //setLoading(true);
+    // setLoading(true);
   };
 
 
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size='small' />
-      </View>
-    );
-  };
+  // if (isLoading) {
+  //   return (
+  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+  //       <ActivityIndicator size='small' />
+  //     </View>
+  //   );
+  // };
 
   useEffect(() => {
     getAllReleases()
@@ -305,91 +317,92 @@ const Dashboard = ({ route, navigation, title }) => {
 
     const renderCard = ({ item }) => {
       //console.log(item.Release_Id);
-     return (  
-      <TouchableOpacity
-        // onPress={() => navigation.navigate('PaymentScreen', {
-        //   item: item
-        // })}
-        activeOpacity={1}
-        style={{
-          //marginHorizontal: SIZES.padding,
-          alignItems: 'center',
-          width: SIZES.width - 100,
-          height: SIZES.height / 2.7,
-          marginVertical: SIZES.padding * 2,
-          //backgroundColor: 'red',
-          borderRadius: 10
-        }}>
-        <FastImage
-          source={
-            isImageAvail ?
-              { uri: noImg } :
-              {
-                uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}`,
-                priority: FastImage.priority.normal,
-                cache: FastImage.cacheControl.immutable,
-              }
-          }
+      return (
+        <TouchableOpacity
+          // onPress={() => navigation.navigate('PaymentScreen', {
+          //   item: item
+          // })}
+          activeOpacity={1}
           style={{
-            width: '100%',
-            height: '100%',
+            //marginHorizontal: SIZES.padding,
+            alignItems: 'center',
+            width: SIZES.width - 100,
+            height: SIZES.height / 2.7,
+            marginVertical: SIZES.padding * 2,
+            //backgroundColor: 'red',
             borderRadius: 10
-          }}
-          resizeMode={FastImage.resizeMode.cover}
-        />
-        <View
-          style={{
-            width: '100%',
-            backgroundColor: 'rgba(243,243,243,1)',
-            height: 120,
-            position: 'absolute',
-            bottom: 0,
-            borderRadius: 10
-          }}
-        >
-          <View style={{ marginHorizontal: SIZES.padding * 2, marginVertical: SIZES.padding * 1.5 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 'bold',
-                marginBottom: 15
-              }}
-            >{item.Release_ReleaseTitle}</Text>
-            <Text style={{
-              fontSize: 15,
-              lineHeight: 18,
-              fontWeight: '400'
-            }}>{item.Release_PrimaryArtist}</Text>
-          </View>
-        </View>
-
-        {/* BUY NOW */}
-        {isLoggedIn && (
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Home', {
-               Release_Id: item.Release_Id,
-               Release_Artwork: item.Release_Artwork, 
-              }
-            )}
+          }}>
+          <FastImage
+            source={
+              isImageAvail ?
+                { uri: noImg } :
+                {
+                  uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}`,
+                  priority: FastImage.priority.normal,
+                  cache: FastImage.cacheControl.immutable,
+                }
+            }
             style={{
-              marginTop: 10,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: COLORS.primary,
-              padding: 10,
-              borderRadius: 5,
+              width: '100%',
+              height: '100%',
+              borderRadius: 10
+            }}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+          <View
+            style={{
+              width: '100%',
+              backgroundColor: 'rgba(243,243,243,1)',
+              height: 120,
+              position: 'absolute',
+              bottom: 0,
+              borderRadius: 10
             }}
           >
-            <Text
-              style={{
+            <View style={{ marginHorizontal: SIZES.padding * 2, marginVertical: SIZES.padding * 1.5 }}>
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontWeight: 'bold',
+                  marginBottom: 15
+                }}
+              >{item.Release_ReleaseTitle}</Text>
+              <Text style={{
                 fontSize: 15,
-                fontWeight: '600',
-                color: '#fff'
-              }}>Buy Now</Text>
-          </TouchableOpacity>
-        )}
-      </TouchableOpacity>
-    )};
+                lineHeight: 18,
+                fontWeight: '400'
+              }}>{item.Release_PrimaryArtist}</Text>
+            </View>
+          </View>
+
+          {/* BUY NOW */}
+          {isLoggedIn && (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Home', {
+                Release_Id: item.Release_Id,
+                Release_Artwork: item.Release_Artwork,
+              }
+              )}
+              style={{
+                marginTop: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: COLORS.primary,
+                padding: 10,
+                borderRadius: 5,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontWeight: '600',
+                  color: '#fff'
+                }}>Buy Now</Text>
+            </TouchableOpacity>
+          )}
+        </TouchableOpacity>
+      )
+    };
 
 
     return (
@@ -403,32 +416,42 @@ const Dashboard = ({ route, navigation, title }) => {
                 marginBottom: SIZES.padding,
                 color: 'rgb(17,52,85)'
               }}>
-              {title}
+              {/* {title} */}
+              {titles}
             </Text>
-            <Separator
-              lineContainer={{
-                width: '50%',
-                height: 5
-              }} />
-            <Separator
-              lineContainer={{
-                width: '38%',
-                height: 5,
-                marginTop: 5
-              }} />
+            {titles && (
+              <View>
+                <Separator
+                  lineContainer={{
+                    width: '50%',
+                    height: 5
+                  }} />
+                <Separator
+                  lineContainer={{
+                    width: '38%',
+                    height: 5,
+                    marginTop: 5
+                  }} />
+              </View>
+            )}
           </View>
 
           {/* EPISODES CARD */}
 
-          <FlatList
-            data={filteredData}
-            renderItem={renderCard}
-            keyExtractor={item => item.Release_Id.toString()}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
-            contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
-          />
+          {isLoading ? (
+            <CustomLoader />
+          ) : (
+            <FlatList
+              data={filteredData}
+              renderItem={renderCard}
+              keyExtractor={item => item.Release_Id.toString()}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
+              contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
+            />
+          )}
+
         </View>
       </React.Fragment>
     )
@@ -441,7 +464,7 @@ const Dashboard = ({ route, navigation, title }) => {
   const renderFooter = () => {
 
     return (
-      <>
+      <React.Fragment>
         <View
           style={{
             //marginHorizontal: SIZES.padding,
@@ -517,7 +540,8 @@ const Dashboard = ({ route, navigation, title }) => {
             borderBottomWidth: 1,
             marginTop: SIZES.padding2,
             borderBottomColor: COLORS.support1
-          }} />
+          }}
+        />
 
         <View>
           <Text style={[styles.artistTxt, { textAlign: 'left' }]}>{String.rights}</Text>
@@ -544,7 +568,7 @@ const Dashboard = ({ route, navigation, title }) => {
             />
           </View>
         </View>
-      </>
+      </React.Fragment>
     )
   };
 
@@ -560,10 +584,6 @@ const Dashboard = ({ route, navigation, title }) => {
           onSearch={handleSearch}
         />
         <View style={styles.subContainer}>
-          <TextButton
-
-            label={'PREMIUM PLANS'}
-          />
           <View style={{ flexDirection: 'row' }}>
             <View
               style={{
@@ -579,7 +599,8 @@ const Dashboard = ({ route, navigation, title }) => {
                 style={{
                   tintColor: COLORS.support1,
                   marginRight: 5
-                }} />
+                }}
+              />
               <TouchableOpacity
                 onPress={() => navigation.navigate('Login')}
               >
@@ -609,7 +630,7 @@ const Dashboard = ({ route, navigation, title }) => {
                 }}
               />
               <CustomText
-                label={'SIGN IN'}
+                label={'SIGN UP'}
                 onPress={() => navigation.navigate('Register')}
               />
             </View>
@@ -621,7 +642,7 @@ const Dashboard = ({ route, navigation, title }) => {
       </ScrollView>
 
       {/* PLAY AND PAUSE PLAYER */}
-      <View
+      {/* <View
         style={{
           width: SIZES.width,
           height: SIZES.height / 5,
@@ -660,10 +681,10 @@ const Dashboard = ({ route, navigation, title }) => {
                 fontWeight: '400'
               }}>Himesh Reshammiya</Text>
           </View>
-        </View>
+        </View> */}
 
-        {/* MUSIC PLAYER */}
-        <View
+      {/* MUSIC PLAYER */}
+      {/* <View
           style={{
             width: '100%',
             height: 60,
@@ -673,15 +694,15 @@ const Dashboard = ({ route, navigation, title }) => {
             justifyContent: 'center',
             paddingHorizontal: SIZES.padding,
           }}
-        >
+        > */}
 
-          <View
+      {/* <View
             style={{
               flexDirection: 'row',
               alignItems: 'center'
             }}
-          >
-            <TouchableOpacity
+          > */}
+      {/* <TouchableOpacity
               onPress={() => handlePlayPause()}
               style={{
                 marginHorizontal: 10,
@@ -698,12 +719,12 @@ const Dashboard = ({ route, navigation, title }) => {
                   width: 10,
                 }}
               />
-            </TouchableOpacity>
-            <Text>
+            </TouchableOpacity> */}
+      {/* <Text>
               {`${Math.floor(position / 60)}:${Math.floor(position % 60)} / ${Math.floor(duration / 60)}:${Math.floor(duration % 60)}`}
-            </Text>
+            </Text> */}
 
-            <Slider
+      {/* <Slider
               style={{ width: 150, height: 40, marginHorizontal: 15 }}
               minimumValue={0}
               maximumValue={1}
@@ -712,10 +733,10 @@ const Dashboard = ({ route, navigation, title }) => {
               value={sliderValue}
               // onValueChange={setSliderValue}
               onValueChange={handleSliderChange}
-            />
+            /> */}
 
-            {/* VOLUME BUTTON */}
-            <TouchableOpacity
+      {/* VOLUME BUTTON */}
+      {/* <TouchableOpacity
               onPress={handleVolToggle}
             >
               <Image
@@ -737,10 +758,10 @@ const Dashboard = ({ route, navigation, title }) => {
                   height: 20
                 }}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
-            {/* download and playback speed */}
-            {modalVisible ? (
+      {/* download and playback speed */}
+      {/* {modalVisible ? (
               <View
                 style={styles.download}
               >
@@ -776,10 +797,10 @@ const Dashboard = ({ route, navigation, title }) => {
                   <Text style={{ fontSize: 15, fontWeight: '400' }}>Playback Speed</Text>
                 </TouchableOpacity>
               </View>
-            ) : null}
+            ) : null} */}
 
-            {/* Playbackspeed */}
-            {pbspeedVisible && (
+      {/* Playbackspeed */}
+      {/* {pbspeedVisible && (
               <ScrollView
                 style={[styles.download, { height: 200 }]}
                 contentContainerStyle={{ paddingBottom: 25 }}
@@ -815,23 +836,23 @@ const Dashboard = ({ route, navigation, title }) => {
                   )
                 })}
               </ScrollView>
-            )}
+            )} */}
 
-          </View>
-        </View>
-      </View>
+      {/* </View> */}
+      {/* </View> */}
+      {/* </View> */}
     </React.Fragment>
   )
 };
 
-const mapStateToProps = state => {
-  return {
-    title: state.dashboard.title
-  };
-};
+// const mapStateToProps = state => {
+//   return {
+//     title: state.dashboard.title
+//   };
+// };
 
-export default connect(mapStateToProps)(Dashboard);
-// export default Dashboard
+//export default connect(mapStateToProps)(Dashboard);
+export default Dashboard
 
 const styles = StyleSheet.create({
   container: {

@@ -24,12 +24,13 @@ import {
 import RNFetchBlob from 'rn-fetch-blob';
 import { useNavigation } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
-import { TextButton, SearchComponent, CustomText, Separator } from '../custom/component';
+import { TextButton, SearchComponent, CustomText, Separator, CustomLoader } from '../custom/component';
 import { API } from '../api/stripeApis';
 import { COLORS, SIZES } from '../constants/theme';
-import { useDetailData } from '../context/useDetailData';
 import { playTrack, pauseTrack } from '../custom/AudioPlayer';
 import { LogBox } from 'react-native';
+import { useSelector } from 'react-redux';
+import { selectEmail } from '../redux/userSlice';
 
 LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews']);
 
@@ -48,7 +49,10 @@ const exit = 'https://cdn-icons-png.flaticon.com/512/8983/8983815.png';
 
 const PaymentScreen = (props) => {
   console.log('render Payment');
-  const { Release_Id = 31939, Release_Artwork = '79b94356-7690-4dfd-b01c-c5e1386e88e2.jpg' } = props;
+  const {
+    Release_Id = 31939,
+    Release_Artwork = '79b94356-7690-4dfd-b01c-c5e1386e88e2.jpg'
+  } = props;
   // console.log('Release_Artwork:',Release_Artwork);
 
   const [cardInfo, setCardInfo] = useState(null);
@@ -57,18 +61,20 @@ const PaymentScreen = (props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [cardDetailsEntered, setCardDetailsEntered] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
+  const email = useSelector(selectEmail);
+  //console.log('email=>',email);
 
-// STRIPE HOOKS
+  // STRIPE HOOKS
   const stripe = useStripe();
   const navigation = useNavigation();
 
   const handleNavigation = () => {
-    console.log();
     navigation.navigate('Dashboard');
   };
 
-// OPENING PAYMENT SHEET
+  // OPENING PAYMENT SHEET
   const subscribe = async () => {
     try {
       // sending request
@@ -129,12 +135,14 @@ const PaymentScreen = (props) => {
 
   // LIST OF TRACKS
   const getAllTrack = useCallback(() => {
+    setLoading(true)
     API({
       url: `http://84.16.239.66/GetTracks?ReleaseId=${Release_Id}`,
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       onSuccess: val => {
         setTrackData(val?.Data);
+        setLoading(false)
       },
       onError: err => console.log('Error fetching track data:', err),
     });
@@ -146,13 +154,8 @@ const PaymentScreen = (props) => {
 
 
 
-
-
-
-
   // TRACKS
   const renderTrackList = () => {
-
 
     return (
       <View style={styles.card}>
@@ -166,7 +169,7 @@ const PaymentScreen = (props) => {
         >DASHBOARD
         </Text>
         <SearchComponent />
-        <View style={{ flexDirection: 'row', marginTop: 15 }}>
+        <View style={{ flexDirection: 'row', marginTop: 5 }}>
           <Image
             source={{ uri: exit }}
             style={{
@@ -196,7 +199,7 @@ const PaymentScreen = (props) => {
           />
         </View>
 
-        <View style={{ marginTop: 20 }}>
+        {/* <View style={{ marginTop: 20 }}>
           <Text
             style={{
               fontSize: 20,
@@ -217,56 +220,58 @@ const PaymentScreen = (props) => {
               height: 5,
               marginTop: 5
             }} />
-        </View>
+        </View> */}
 
 
         {/* SHOWING TRACK LIST */}
-        <ScrollView
-          horizontal={true}
-          style={{ marginTop: SIZES.padding * 2 }}
-        >
-          {trackData.map((trackList, index) => (
-            <View
-              key={trackList.Track_Id}
-              style={{
-                alignItems: 'center',
-                width: SIZES.width - 100,
-                height: SIZES.height / 2.7,
-                marginRight: index === trackData.length - 1 ? 0 : 15,
-                borderRadius: 10
-              }}
-            >
-              <FastImage
-                source={
-                  {
-                    uri: `https://musicdistributionsystem.com/release/${Release_Artwork}`,
-                    priority: FastImage.priority.normal,
-                    cache: FastImage.cacheControl.immutable,
-                  }
-                }
+        {isLoading ?
+         <CustomLoader /> :
+          <ScrollView
+            horizontal={true}
+            style={{ marginTop: SIZES.padding * 2 }}
+          >
+            {trackData.map((trackList, index) => (
+              <View
+                key={trackList.Track_Id}
                 style={{
-                  width: '100%',
-                  height: '100%',
+                  alignItems: 'center',
+                  width: SIZES.width - 100,
+                  height: SIZES.height / 2.7,
+                  marginRight: index === trackData.length - 1 ? 0 : 15,
                   borderRadius: 10
                 }}
-                resizeMode={FastImage.resizeMode.cover}
-              />
-              <View
-                style={{
-                  width: '100%',
-                  backgroundColor: 'rgba(243,243,243,1)',
-                  height: 120,
-                  position: 'absolute',
-                  bottom: 0,
-                  borderRadius: 10,
-                  padding: 20
-                }}
               >
-                <Text>{trackList.Track_Artist}</Text>
+                <FastImage
+                  source={
+                    {
+                      uri: `https://musicdistributionsystem.com/release/${Release_Artwork}`,
+                      priority: FastImage.priority.normal,
+                      cache: FastImage.cacheControl.immutable,
+                    }
+                  }
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: 10
+                  }}
+                  resizeMode={FastImage.resizeMode.cover}
+                />
+                <View
+                  style={{
+                    width: '100%',
+                    backgroundColor: 'rgba(243,243,243,1)',
+                    height: 120,
+                    position: 'absolute',
+                    bottom: 0,
+                    borderRadius: 10,
+                    padding: 20
+                  }}
+                >
+                  <Text>{trackList.Track_Artist}</Text>
+                </View>
               </View>
-            </View>
-          ))}
-        </ScrollView>
+            ))}
+          </ScrollView>}
 
         <TextButton
           //onPress={() => downloadAllTracks(tracks)}
@@ -333,6 +338,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.light,
     paddingHorizontal: SIZES.padding * 2,
     paddingTop: SIZES.padding * 3,
+    height: SIZES.height / 1.2,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

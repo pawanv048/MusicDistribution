@@ -15,10 +15,12 @@ import { useDispatch } from 'react-redux';
 // import { updateTitle } from '../redux/reducers';
 import { updateTitle } from '../redux/action';
 
+import { useGetTopReleasesQuery } from '../redux/DrawerApiCall';
 
 import { SIZES, COLORS } from '../constants/theme';
 import { DrawerButton } from '../custom/component';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API } from '../api/stripeApis';
 
 
 const wallet_img = 'https://cdn-icons-png.flaticon.com/512/2169/2169854.png';
@@ -33,6 +35,8 @@ const download = 'https://cdn-icons-png.flaticon.com/512/2382/2382067.png';
 const Drawer = ({ navigation }) => {
   console.log('render Drawer');
 
+  const {data, isError, isFetching, isLoading, isSuccess} = useGetTopReleasesQuery();
+  // console.log('data =>', isSuccess);
 
   const [showDrawerItems, setShowDrawerItems] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -59,21 +63,24 @@ const Drawer = ({ navigation }) => {
     } else {
       navigation.navigate('Login')
     }
-  }
+  };
 
   const handleSongsPress = () => {
-    dispatch(updateTitle('Top Songs'));
+    dispatch(updateTitle('Top Songs!'));
     console.log('song press');
   }
 
   const handleAlbumsPress = () => {
+    dispatch(updateTitle('Top Albums'))
     console.log('Album press');
   }
 
   const handleReleasePress = () => {
+    dispatch(updateTitle('Music Releases!'))
     console.log('Release press');
   }
   const handleArtistPress = () => {
+    dispatch(updateTitle('Top Artists'))
     console.log('Artist press');
   }
 

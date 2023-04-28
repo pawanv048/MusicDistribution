@@ -7,7 +7,8 @@ import {
   Text,
   Image,
   Button,
-  KeyboardType
+  KeyboardType,
+  ActivityIndicator
 } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 import { COLORS, SIZES } from '../constants/theme';
@@ -260,6 +261,21 @@ export const DrawerButton = ({
   )
 }
 
+// Loader
+export const CustomLoader = () => {
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      <ActivityIndicator size="small" color="#454545" />
+    </View>
+  );
+};
+
+
 
 
 const appComponent = {
@@ -269,7 +285,8 @@ const appComponent = {
   Input,
   DropdownPicker,
   Toast,
-  DrawerButton
+  DrawerButton,
+  CustomLoader
 }
 
 export default appComponent;
@@ -281,7 +298,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     borderRadius: 10,
-    backgroundColor: COLORS.grey20
+    backgroundColor: COLORS.grey20,
+    marginBottom: SIZES.padding * 2
   },
   input: {
     width: '80%',

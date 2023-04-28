@@ -17,8 +17,11 @@ import {
 
 import { store } from './src/redux/store';
 
+
+
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
+
 // const store = createStore(dashboardSlice.reducer);
 
 

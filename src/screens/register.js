@@ -26,22 +26,6 @@ const Register = ({ navigation }) => {
 
   //console.log('country',selectedCountry)
 
-  const getAllCountries = async () => {
-    try {
-      const response = await API({
-        url: `${baseUrl}Release/GetAllCountry`,
-        method: 'get',
-        onSuccess: (response) => {
-          //console.log(response.Data);
-          setSelectedCountry(response.Data);
-        },
-        onError: (error) => console.log(error),
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const registerUser = async () => {
     API({
       method: 'POST',
@@ -82,9 +66,7 @@ const Register = ({ navigation }) => {
     })
   }
 
-  useEffect(() => {
-    // getAllCountries()
-  }, [])
+  
 
 
 

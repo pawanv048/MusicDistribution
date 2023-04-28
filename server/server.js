@@ -11,36 +11,54 @@ app.use(cors());
 
 app.post("/pay", async (req, res) => {
   try {
-    //const { name } = req.body;
-    //if (!name) return res.status(400).json({ message: "Please enter a name" });
-    const customerId = await stripe.customers.create();
+
+    const { email, amount } = req.body;
+    //if (!email || !amount) return res.status(400).json({ message: "Please provide email and amount" });
+
+    const customerId = await stripe.customers.create({
+      email: 'raj123@gmail.com',
+    });
     const customers = await stripe.customers.list();
     const customer = customers.data[0];
 
-    if(!customer){
+    if (!customer) {
       return res.send({
         error: 'you have no customer created'
       })
     }
-   // console.log(customers); // log the customers array
+    // console.log(customers); // log the customers array
 
-    
+
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: 2000,
+      amount: 3000,
       currency: "INR",
       payment_method_types: ["card"],
       customer: customerId.id,
-      //receipt_email: customer.email, 
+      //receipt_email: customer.email,
       //metadata: { name },
     });
     //console.log(paymentIntent); // log the paymentIntent object
     //console.log(customers);
     //console.log(receipt_email, "rahula@gmail.com")
+    // Get the card brand
+    const cardBrand = paymentIntent.payment_method_details.card.brand;
+    console.log(cardBrand); // e.g. 'visa', 'mastercard', etc.
+    
     const clientSecret = paymentIntent.client_secret;
-    res.json({ message: "Payment initiated", clientSecret });
+    res.json({
+      message: "Payment initiated",
+      clientSecret,
+      email,
+      status: paymentIntent.status,
+      amount: paymentIntent.amount,
+      payment_method_type: paymentIntent.payment_method_types[0],
+      customer_id: customer.id,
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      message: "Internal server error"
+    });
   }
 });
 

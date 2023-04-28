@@ -6,17 +6,25 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  title: 'Best episodes of the week!'
+  title: '',
+  data: null
 };
 
 export const dashboardSlice = createSlice({
   name: 'dashboard',
   initialState,
+  // not a reducer, it object to configure reducers
   reducers: {
     updateTitle: (state, action) => {
       state.title = action.payload;
     },
+    getTopReleaseData: (state, action) => {
+      state.data = action.payload;
+    }
   },
 });
 
+
+// Action creators generated for each case reducer function.
+export const { updateTitle, getTopReleaseData } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

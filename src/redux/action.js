@@ -3,4 +3,6 @@
 
 import { createAction } from '@reduxjs/toolkit';
 
+
 export const updateTitle = createAction('dashboard/updateTitle');
+export const getTopReleaseData = createAction('dashboard/getTopReleaseData');

@@ -7,6 +7,8 @@ import icons from '../constants/icons';
 import { API } from '../api/stripeApis';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setEmail } from '../redux/userSlice';
+import { useDispatch } from 'react-redux';
 
 
 const Login = ({ navigation }) => {
@@ -19,9 +21,11 @@ const Login = ({ navigation }) => {
     email: "",
     password: ""
   });
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   //  console.log(loginData.email)
 
+  const dispatch = useDispatch();
   // handle login data change
   const handleOnChange = (text, loginData) => {
     setLoginData(prevState => ({ ...prevState, [loginData]: text }));
@@ -34,7 +38,7 @@ const Login = ({ navigation }) => {
   }
 
 
-// USER LOGIN !!
+  // USER LOGIN !!
   const loginUser = () => {
     API({
       method: 'POST',
@@ -44,15 +48,17 @@ const Login = ({ navigation }) => {
         Password: loginData.password
       },
       onSuccess: async (res) => {
-        console.log('Login response: ',res)
+        console.log('Login response: ', res)
         if (res[0].Status === "0") {
-           // Store Userid in local storage
+          // Store Userid in local storage
           //await AsyncStorage.setItem('Userid', res[0].Userid);
           await AsyncStorage.setItem('Userid', JSON.stringify(true));
+          // Set email in Redux store
+          dispatch(setEmail(loginData.email));
           // Navigate to Dashboard
           navigation.navigate('Dashboard', { userId: res[0].Userid })
           //navigation.navigate('Dashboard',  { isLoggedIn: true })
-          //console.log(res[0].Userid);
+          // console.log(res[0].Userid);
         } else {
           alert("Invalid Email and Password");
         }
@@ -79,7 +85,7 @@ const Login = ({ navigation }) => {
       if (!loginData[field.name]) {
         handleError(field.error, field.name);
         isValid = false;
-      }else if (field.name === 'email' && !emailRegex.test(loginData[field.name])) {
+      } else if (field.name === 'email' && !emailRegex.test(loginData[field.name])) {
         handleError('Please Enter Valid Email', field.name);
         isValid = false;
       } else {
@@ -165,7 +171,7 @@ const Login = ({ navigation }) => {
               )}
             </View>
 
-            
+
             <CustomText
               label={'Forgot Password?'}
               onPress={() => navigation.navigate('Forgot')}

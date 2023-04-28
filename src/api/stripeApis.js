@@ -15,7 +15,6 @@ export const API = async ({ url, params, method, headers, onSuccess, onError }) 
       url: url,
       headers: headers || defaultHeaders,
       data: params,
-
     });
     onSuccess(response.data);
   } catch (err) {

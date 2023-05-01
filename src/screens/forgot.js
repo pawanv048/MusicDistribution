@@ -35,7 +35,7 @@ const Forgot = ({ navigation }) => {
 
           {/* SAVE */}
           <TextButton
-            onPress={() => navigation.navigate('Dummyscreen')}
+            onPress={() => navigation.navigate('Login')}
             label={'Save'}
             labelStyle={{
               fontSize: 18,

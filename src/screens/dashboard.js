@@ -25,6 +25,7 @@ import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { connect, useSelector } from 'react-redux';
+import { useGetTopReleasesQuery } from '../redux/DrawerApiCall';
 // import { useGetTopReleasesQuery } from '../redux/store';
 
 
@@ -32,6 +33,7 @@ import { SearchComponent, TextButton, CustomText, Separator, CustomLoader } from
 import { COLORS, SIZES } from '../constants/theme';
 import * as String from '../constants/strings';
 import { API } from '../api/stripeApis';
+
 
 
 
@@ -93,10 +95,11 @@ const API_ALLRELEASE = 'http://84.16.239.66/GetAllReleases?UserId=5819A966-F236-
 // Main screen
 const Dashboard = ({ route, navigation, title }) => {
 
-  // const { data, isLoading, isError } = useGetTopReleasesQuery();
-  // console.log(data);
-
   console.log('render Dashboard')
+
+
+  // console.log(topReleasesData);
+
 
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
@@ -114,9 +117,20 @@ const Dashboard = ({ route, navigation, title }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 
+
   //Redux
   //dashbord is name given dashboardSlice
+  // const { data: topReleasesData, isError } = useGetTopReleasesQuery();
+  // console.log(data);
   const titles = useSelector(state => state.dashboard.title)
+
+  const topRelease = useSelector(state => state.dashboard.data);
+  const activeList = useSelector(state => state.dashboard.activeList);
+  // console.log('topRelease:', topRelease);
+
+
+
+  // console.log(titles);
 
 
   //modal
@@ -298,15 +312,6 @@ const Dashboard = ({ route, navigation, title }) => {
     // setLoading(true);
   };
 
-
-  // if (isLoading) {
-  //   return (
-  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-  //       <ActivityIndicator size='small' />
-  //     </View>
-  //   );
-  // };
-
   useEffect(() => {
     getAllReleases()
   }, [])
@@ -316,7 +321,7 @@ const Dashboard = ({ route, navigation, title }) => {
   function renderCardView() {
 
     const renderCard = ({ item }) => {
-      //console.log(item.Release_Id);
+      //  console.log(item);
       return (
         <TouchableOpacity
           // onPress={() => navigation.navigate('PaymentScreen', {
@@ -441,22 +446,36 @@ const Dashboard = ({ route, navigation, title }) => {
           {isLoading ? (
             <CustomLoader />
           ) : (
+            // <FlatList
+            //   data={filteredData}
+            //   renderItem={renderCard}
+            //   keyExtractor={item => item.Release_Id.toString()}
+            //   showsHorizontalScrollIndicator={false}
+            //   horizontal
+            //   ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
+            //   contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
+            // />
             <FlatList
-              data={filteredData}
-              renderItem={renderCard}
-              keyExtractor={item => item.Release_Id.toString()}
-              showsHorizontalScrollIndicator={false}
-              horizontal
-              ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
-              contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
+              data={topRelease}
+              keyExtractor={(item) => item.Release_Id.toString()}
+              renderItem={({ item }) => {
+                console.log(item.Release_Id); // print the Release_Id to the console
+                return (
+                  // render a component that displays the Release_Id
+                  <View>
+                    <Text>{item.Release_Id}</Text>
+                  </View>
+                );
+              }}
             />
+
+
           )}
 
         </View>
       </React.Fragment>
     )
   };
-
 
 
   // FOOTER CONTENT

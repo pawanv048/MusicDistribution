@@ -13,8 +13,7 @@ import {
 } from '@react-navigation/drawer';
 import { useDispatch } from 'react-redux';
 // import { updateTitle } from '../redux/reducers';
-import { updateTitle } from '../redux/action';
-
+import { updateTitle, updateData, setActiveList } from '../redux/action';
 import { useGetTopReleasesQuery } from '../redux/DrawerApiCall';
 
 import { SIZES, COLORS } from '../constants/theme';
@@ -35,13 +34,15 @@ const download = 'https://cdn-icons-png.flaticon.com/512/2382/2382067.png';
 const Drawer = ({ navigation }) => {
   console.log('render Drawer');
 
-  const {data, isError, isFetching, isLoading, isSuccess} = useGetTopReleasesQuery();
+ 
   // console.log('data =>', isSuccess);
 
   const [showDrawerItems, setShowDrawerItems] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // const title = useSelector(state => state.dashboard.title);
+  const { data: topReleasesData } = useGetTopReleasesQuery();
+
 
   const dispatch = useDispatch();
 
@@ -76,9 +77,14 @@ const Drawer = ({ navigation }) => {
   }
 
   const handleReleasePress = () => {
+    //console.log('topReleasesData:', topReleasesData);
+
     dispatch(updateTitle('Music Releases!'))
-    console.log('Release press');
+    dispatch(updateData(topReleasesData));
+    // dispatch(setActiveList('updateRelease'));
+    //console.log('Release press');
   }
+
   const handleArtistPress = () => {
     dispatch(updateTitle('Top Artists'))
     console.log('Artist press');

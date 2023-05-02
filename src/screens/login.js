@@ -4,7 +4,7 @@ import CheckBox from '@react-native-community/checkbox';
 import { Input, CustomText, TextButton } from '../custom/component';
 import { SIZES, COLORS } from '../constants/theme';
 import icons from '../constants/icons';
-import { API } from '../api/stripeApis';
+import { API } from '../api/apiServers';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setEmail } from '../redux/userSlice';

@@ -7,8 +7,6 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  ActivityIndicator,
-  Modal
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 
@@ -28,25 +26,11 @@ import { connect, useSelector } from 'react-redux';
 import { useGetTopReleasesQuery } from '../redux/DrawerApiCall';
 // import { useGetTopReleasesQuery } from '../redux/store';
 
-
 import { SearchComponent, TextButton, CustomText, Separator, CustomLoader } from '../custom/component';
 import { COLORS, SIZES } from '../constants/theme';
 import * as String from '../constants/strings';
-import { API } from '../api/stripeApis';
-
-
-
-
-const PIC = 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg'
-const menu = 'https://cdn-icons-png.flaticon.com/512/2311/2311524.png'
-const playbtn = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'
-const vol = 'https://cdn-icons-png.flaticon.com/512/727/727269.png'
-const pause = 'https://cdn-icons-png.flaticon.com/512/1214/1214679.png'
-const mute = 'https://cdn-icons-png.flaticon.com/512/565/565295.png'
-const download = 'https://cdn-icons-png.flaticon.com/512/3031/3031707.png'
-const playbackspeed = 'https://static.thenounproject.com/png/3565593-200.png'
-const back = 'https://cdn-icons-png.flaticon.com/512/507/507257.png'
-const noImg = 'https://filestore.community.support.microsoft.com/api/images/ext?url=https:%2f%2fanswersstaticfilecdnv2.azureedge.net%2fstatic%2fimages%2fimage-not-found.jpg'
+import { API, API_ALLRELEASE, releaseUrl } from '../api/apiServers';
+import icons from '../constants/icons';
 
 
 const songs = [
@@ -78,18 +62,6 @@ const playbackData = [
   { label: '1.75x', onPress: () => console.log('1.75'), rate: 1.75 },
   { label: '2x', onPress: () => console.log('2'), rate: 2.0 },
 ];
-
-const facebook = 'https://cdn-icons-png.flaticon.com/512/1051/1051309.png';
-const google = 'https://cdn-icons-png.flaticon.com/512/60/60818.png';
-const linkdin = 'https://cdn-icons-png.flaticon.com/512/61/61109.png';
-const twitter = 'https://cdn-icons-png.flaticon.com/512/25/25347.png';
-const exit = 'https://cdn-icons-png.flaticon.com/512/8983/8983815.png';
-
-
-const API_ALLRELEASE_URL = 'http://84.16.239.66/GetAllReleases?UserId=';
-const API_ALLRELEASE = 'http://84.16.239.66/GetAllReleases?UserId=5819A966-F236-4B85-B902-A6E890E38B47';
-
-
 
 
 // Main screen
@@ -123,15 +95,8 @@ const Dashboard = ({ route, navigation, title }) => {
   // const { data: topReleasesData, isError } = useGetTopReleasesQuery();
   // console.log(data);
   const titles = useSelector(state => state.dashboard.title)
-
-  const topRelease = useSelector(state => state.dashboard.data);
-  const activeList = useSelector(state => state.dashboard.activeList);
+  const topRelease = useSelector(state => state?.dashboard?.data?.Data);
   // console.log('topRelease:', topRelease);
-
-
-
-  // console.log(titles);
-
 
   //modal
   const togglePlayBack = () => {
@@ -260,13 +225,15 @@ const Dashboard = ({ route, navigation, title }) => {
     }
   }
 
+  // console.log('topRelease =>>', topRelease)
 
   // SEARCHING..
+
   const handleSearch = (searchQuery) => {
     if (!searchQuery) {
       setFilteredData(data);
     } else {
-      const filteredData = data.filter((item) => {
+      const filteredData = data?.filter((item) => {
         const text = searchQuery.toUpperCase();
         const itemData = item.Release_ReleaseTitle.toUpperCase();
         return itemData.indexOf(text) > -1;
@@ -274,6 +241,8 @@ const Dashboard = ({ route, navigation, title }) => {
       setFilteredData(filteredData);
     }
   }
+
+
 
   // const printUrl = `${API_ALLRELEASE_URL}${userId}`
   // console.log('printUrl', printUrl);
@@ -324,9 +293,6 @@ const Dashboard = ({ route, navigation, title }) => {
       //  console.log(item);
       return (
         <TouchableOpacity
-          // onPress={() => navigation.navigate('PaymentScreen', {
-          //   item: item
-          // })}
           activeOpacity={1}
           style={{
             //marginHorizontal: SIZES.padding,
@@ -338,15 +304,11 @@ const Dashboard = ({ route, navigation, title }) => {
             borderRadius: 10
           }}>
           <FastImage
-            source={
-              isImageAvail ?
-                { uri: noImg } :
-                {
-                  uri: `https://musicdistributionsystem.com/release/${item.Release_Artwork}`,
-                  priority: FastImage.priority.normal,
-                  cache: FastImage.cacheControl.immutable,
-                }
-            }
+            source={{
+              uri: `${releaseUrl}${item.Release_Artwork}`,
+              priority: FastImage.priority.normal,
+              cache: FastImage.cacheControl.immutable,
+            }}
             style={{
               width: '100%',
               height: '100%',
@@ -364,24 +326,36 @@ const Dashboard = ({ route, navigation, title }) => {
               borderRadius: 10
             }}
           >
-            <View style={{ marginHorizontal: SIZES.padding * 2, marginVertical: SIZES.padding * 1.5 }}>
+            {/* Release_ReleaseTitle */}
+            <View
+              style={{
+                marginHorizontal: SIZES.padding * 2,
+                marginVertical: SIZES.padding * 1.5
+              }}
+            >
               <Text
                 style={{
                   fontSize: 15,
                   fontWeight: 'bold',
                   marginBottom: 15
                 }}
-              >{item.Release_ReleaseTitle}</Text>
-              <Text style={{
-                fontSize: 15,
-                lineHeight: 18,
-                fontWeight: '400'
-              }}>{item.Release_PrimaryArtist}</Text>
+              >
+                {item.Release_ReleaseTitle}
+              </Text>
+              {/* Release_PrimaryArtist */}
+              <Text
+                style={{
+                  fontSize: 15,
+                  lineHeight: 18,
+                  fontWeight: '400'
+                }}>
+                {item.Release_PrimaryArtist}
+              </Text>
             </View>
           </View>
 
           {/* BUY NOW */}
-          {isLoggedIn && (
+          {isLoggedIn && !titles && (
             <TouchableOpacity
               onPress={() => navigation.navigate('Home', {
                 Release_Id: item.Release_Id,
@@ -428,12 +402,12 @@ const Dashboard = ({ route, navigation, title }) => {
               <View>
                 <Separator
                   lineContainer={{
-                    width: '50%',
+                    width: `${titles.length * 3}%`,
                     height: 5
                   }} />
                 <Separator
                   lineContainer={{
-                    width: '38%',
+                    width: `${titles.length * 2}%`,
                     height: 5,
                     marginTop: 5
                   }} />
@@ -445,21 +419,22 @@ const Dashboard = ({ route, navigation, title }) => {
 
           {isLoading ? (
             <CustomLoader />
-          ) : (
-            // <FlatList
-            //   data={filteredData}
-            //   renderItem={renderCard}
-            //   keyExtractor={item => item.Release_Id.toString()}
-            //   showsHorizontalScrollIndicator={false}
-            //   horizontal
-            //   ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
-            //   contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
-            // />
+          ) : titles == 'Music Releases!' ? (
             <FlatList
               data={topRelease}
-              keyExtractor={(item) => item.Release_Id.toString()}
+              keyExtractor={(item, index) => item + index}
+              renderItem={renderCard}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
+              contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
+            />
+          ) : titles == 'Top Artists' ? (
+            <FlatList
+              data={topRelease}
+              keyExtractor={(item, index) => item + index}
               renderItem={({ item }) => {
-                console.log(item.Release_Id); // print the Release_Id to the console
+                //console.log('topRelease Item==>>',item); // print the Release_Id to the console
                 return (
                   // render a component that displays the Release_Id
                   <View>
@@ -468,8 +443,16 @@ const Dashboard = ({ route, navigation, title }) => {
                 );
               }}
             />
-
-
+          ) : (
+            <FlatList
+              data={filteredData}
+              renderItem={renderCard}
+              keyExtractor={item => item.Release_Id.toString()}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
+              contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
+            />
           )}
 
         </View>
@@ -570,19 +553,19 @@ const Dashboard = ({ route, navigation, title }) => {
           }}>
             <Text style={[styles.artistTxt, { textAlign: 'left' }]}>{String.social}</Text>
             <Image
-              source={{ uri: facebook }}
+              source={icons.facebook}
               style={styles.socialIcons}
             />
             <Image
-              source={{ uri: google }}
+              source={icons.google}
               style={styles.socialIcons}
             />
             <Image
-              source={{ uri: linkdin }}
+              source={icons.linkdin}
               style={styles.socialIcons}
             />
             <Image
-              source={{ uri: twitter }}
+              source={icons.twitter}
               style={styles.socialIcons}
             />
           </View>
@@ -610,14 +593,12 @@ const Dashboard = ({ route, navigation, title }) => {
                 flexDirection: 'row'
               }}>
               <Image
-                source={{
-                  uri: exit,
-                  height: 15,
-                  width: 15
-                }}
+                source={icons.exit}
                 style={{
                   tintColor: COLORS.support1,
-                  marginRight: 5
+                  marginRight: 5,
+                  height: 15,
+                  width: 15
                 }}
               />
               <TouchableOpacity
@@ -638,9 +619,7 @@ const Dashboard = ({ route, navigation, title }) => {
                 flexDirection: 'row'
               }}>
               <Image
-                source={{
-                  uri: exit
-                }}
+                source={icons.exit}
                 style={{
                   height: 15,
                   width: 15,

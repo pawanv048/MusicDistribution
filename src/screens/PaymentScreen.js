@@ -25,7 +25,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import { useNavigation } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 import { TextButton, SearchComponent, CustomText, Separator, CustomLoader } from '../custom/component';
-import { API } from '../api/stripeApis';
+import { API } from '../api/apiServers';
 import { COLORS, SIZES } from '../constants/theme';
 import { playTrack, pauseTrack } from '../custom/AudioPlayer';
 import { LogBox } from 'react-native';
@@ -110,7 +110,7 @@ const PaymentScreen = (props) => {
   // DOWNLOADING TRACKS
 
   const downloadAllTracks = async () => {
-    console.log('button clicked')
+    // console.log('button clicked')
     try {
       const downloads = [];
       for (let i = 0; i < trackData.length; i++) {
@@ -134,6 +134,7 @@ const PaymentScreen = (props) => {
 
 
   // LIST OF TRACKS
+
   const getAllTrack = useCallback(() => {
     setLoading(true)
     API({

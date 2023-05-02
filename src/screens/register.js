@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, ScrollView, Linking, Alert, ImageBackground } f
 import React, { useState, useEffect } from 'react';
 import CheckBox from '@react-native-community/checkbox';
 import { Input, DropdownPicker, CustomText, TextButton, Toast } from '../custom/component';
-import { baseUrl, API } from '../api/stripeApis';
+import { API } from '../api/apiServers';
 import { SIZES, COLORS } from '../constants/theme';
 import icons from '../constants/icons';
 

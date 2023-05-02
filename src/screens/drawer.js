@@ -19,7 +19,7 @@ import { useGetTopReleasesQuery } from '../redux/DrawerApiCall';
 import { SIZES, COLORS } from '../constants/theme';
 import { DrawerButton } from '../custom/component';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API } from '../api/stripeApis';
+import { API } from '../api/apiServers';
 
 
 const wallet_img = 'https://cdn-icons-png.flaticon.com/512/2169/2169854.png';

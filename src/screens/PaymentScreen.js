@@ -24,28 +24,20 @@ import {
 import RNFetchBlob from 'rn-fetch-blob';
 import { useNavigation } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
-import { TextButton, SearchComponent, CustomText, Separator, CustomLoader } from '../custom/component';
-import { API } from '../api/apiServers';
+import { useSelector } from 'react-redux';
+import { TextButton, SearchComponent, CustomText, CustomLoader } from '../custom/component';
+import { API, releaseUrl } from '../api/apiServers';
 import { COLORS, SIZES } from '../constants/theme';
 import { playTrack, pauseTrack } from '../custom/AudioPlayer';
-import { LogBox } from 'react-native';
-import { useSelector } from 'react-redux';
 import { selectEmail } from '../redux/userSlice';
+import icons from '../constants/icons';
 
+
+import { LogBox } from 'react-native';
 LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews']);
 
 // Your code here
 
-
-const image = 'https://cdn.pixabay.com/photo/2016/11/18/18/35/adult-1836322_960_720.jpg';
-const play = 'https://cdn-icons-png.flaticon.com/512/189/189638.png';
-const pause = 'https://cdn-icons-png.flaticon.com/512/6364/6364353.png';
-
-const facebook = 'https://cdn-icons-png.flaticon.com/512/1051/1051309.png';
-const google = 'https://cdn-icons-png.flaticon.com/512/60/60818.png';
-const linkdin = 'https://cdn-icons-png.flaticon.com/512/61/61109.png';
-const twitter = 'https://cdn-icons-png.flaticon.com/512/25/25347.png';
-const exit = 'https://cdn-icons-png.flaticon.com/512/8983/8983815.png';
 
 const PaymentScreen = (props) => {
   console.log('render Payment');
@@ -172,7 +164,7 @@ const PaymentScreen = (props) => {
         <SearchComponent />
         <View style={{ flexDirection: 'row', marginTop: 5 }}>
           <Image
-            source={{ uri: exit }}
+            source={icons.exit}
             style={{
               width: 18,
               height: 18,
@@ -186,7 +178,7 @@ const PaymentScreen = (props) => {
             onPress={() => navigation.navigate('Register')}
           />
           <Image
-            source={{ uri: exit }}
+            source={icons.exit}
             style={{
               width: 18,
               height: 18,
@@ -226,7 +218,7 @@ const PaymentScreen = (props) => {
 
         {/* SHOWING TRACK LIST */}
         {isLoading ?
-         <CustomLoader /> :
+          <CustomLoader /> :
           <ScrollView
             horizontal={true}
             style={{ marginTop: SIZES.padding * 2 }}
@@ -243,13 +235,11 @@ const PaymentScreen = (props) => {
                 }}
               >
                 <FastImage
-                  source={
-                    {
-                      uri: `https://musicdistributionsystem.com/release/${Release_Artwork}`,
-                      priority: FastImage.priority.normal,
-                      cache: FastImage.cacheControl.immutable,
-                    }
-                  }
+                  source={{
+                    uri: `${releaseUrl}${Release_Artwork}`,
+                    priority: FastImage.priority.normal,
+                    cache: FastImage.cacheControl.immutable,
+                  }}
                   style={{
                     width: '100%',
                     height: '100%',
@@ -289,24 +279,23 @@ const PaymentScreen = (props) => {
           }}>
             <Text style={[styles.artistTxt, { textAlign: 'left' }]}>Follow Us</Text>
             <Image
-              source={{ uri: facebook }}
+              source={icons.facebook}
               style={styles.socialIcons}
             />
             <Image
-              source={{ uri: google }}
+              source={icons.google}
               style={styles.socialIcons}
             />
             <Image
-              source={{ uri: linkdin }}
+              source={icons.linkdin}
               style={styles.socialIcons}
             />
             <Image
-              source={{ uri: twitter }}
+              source={icons.twitter}
               style={styles.socialIcons}
             />
           </View>
         </View>
-
       </View>
     )
   };

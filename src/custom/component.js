@@ -225,7 +225,7 @@ export const Toast = ({ toastMessage }) => {
 
 
 // DRAWER BUTTON
-const down_arrow = 'https://cdn-icons-png.flaticon.com/512/32/32195.png';
+// const down_arrow = 'https://cdn-icons-png.flaticon.com/512/32/32195.png';
 export const DrawerButton = ({
   label,
   onPress
@@ -242,7 +242,7 @@ export const DrawerButton = ({
       }}
     >
       <Image
-        source={{ uri: down_arrow }}
+        source={icons.downarrow}
         style={{
           width: 20,
           height: 20,

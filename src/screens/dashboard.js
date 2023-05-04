@@ -21,14 +21,12 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import { connect, useSelector } from 'react-redux';
 import { useGetTopReleasesQuery } from '../redux/DrawerApiCall';
-// import { useGetTopReleasesQuery } from '../redux/store';
-
 import { SearchComponent, TextButton, CustomText, Separator, CustomLoader } from '../custom/component';
 import { COLORS, SIZES } from '../constants/theme';
 import * as String from '../constants/strings';
+import { artists, devotionals, originalArtists, tems } from '../constants/strings';
 import { API, API_ALLRELEASE, releaseUrl } from '../api/apiServers';
 import icons from '../constants/icons';
 
@@ -65,7 +63,7 @@ const playbackData = [
 
 
 // Main screen
-const Dashboard = ({ route, navigation, title }) => {
+const Dashboard = ({navigation}) => {
 
   console.log('render Dashboard')
 
@@ -76,6 +74,7 @@ const Dashboard = ({ route, navigation, title }) => {
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
+
   const [range, setRange] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [position, setPosition] = useState(0);
@@ -87,16 +86,14 @@ const Dashboard = ({ route, navigation, title }) => {
   const [isImageAvail, setImageAvail] = useState(null)
   const [imageSource, setImageSource] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-
-
-  //Redux
-  //dashbord is name given dashboardSlice
-  // const { data: topReleasesData, isError } = useGetTopReleasesQuery();
-  // console.log(data);
+  
+  //Redux - get
   const titles = useSelector(state => state.dashboard.title)
-  const topRelease = useSelector(state => state?.dashboard?.data?.Data);
-  // console.log('topRelease:', topRelease);
+  const topRelease = useSelector(state => state?.dashboard?.data?.Data)
+  const [topReleaseList, setTopReleaseList] = useState([]);
+  
+  // console.log('topReleaseList=>>', topReleaseList);
+ 
 
   //modal
   const togglePlayBack = () => {
@@ -173,42 +170,53 @@ const Dashboard = ({ route, navigation, title }) => {
   }
 
   useEffect(() => {
+    if (topRelease) {
+      setTopReleaseList(topRelease);
+    }
+  }, [topRelease]);
+
+  useEffect(() => {
     retrieveLogin()
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      updatePosition();
-    }, 1000);
+  // slider position update 
 
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     updatePosition();
+  //   }, 1000);
 
-  useEffect(() => {
-    updateDuration();
-  }, [isPlaying]);
+  //   return () => clearInterval(interval);
+  // }, []);
+
+
+// slider duration update
+  // useEffect(() => {
+  //   updateDuration();
+  // }, [isPlaying]);
 
 
   //end
+// play and pause 
 
-  useEffect(() => {
-    const setupPlayerAsync = async () => {
-      try {
-        // set up the player if it is not set up yet
+  // useEffect(() => {
+  //   const setupPlayerAsync = async () => {
+  //     try {
+  //       // set up the player if it is not set up yet
 
-        //await TrackPlayer.setupPlayer();
-        TrackPlayer.updateOptions({
-          capabilities: [Capability.Play, Capability.Pause]
-        });
+  //       //await TrackPlayer.setupPlayer();
+  //       TrackPlayer.updateOptions({
+  //         capabilities: [Capability.Play, Capability.Pause]
+  //       });
 
-        await TrackPlayer.add(songs)
-      } catch (error) {
-        console.log(error)
-      }
-    }
+  //       await TrackPlayer.add(songs)
+  //     } catch (error) {
+  //       console.log(error)
+  //     }
+  //   }
 
-    setupPlayerAsync();
-  }, [])
+  //   setupPlayerAsync();
+  // }, [])
 
   // handle play and pause
 
@@ -229,19 +237,49 @@ const Dashboard = ({ route, navigation, title }) => {
 
   // SEARCHING..
 
-  const handleSearch = (searchQuery) => {
-    if (!searchQuery) {
-      setFilteredData(data);
-    } else {
-      const filteredData = data?.filter((item) => {
-        const text = searchQuery.toUpperCase();
-        const itemData = item.Release_ReleaseTitle.toUpperCase();
-        return itemData.indexOf(text) > -1;
-      });
-      setFilteredData(filteredData);
-    }
-  }
+  // const handleSearch = (searchQuery) => {
+  //   if (searchQuery == '') {
+  //     setFilteredData(data);
+  //   } else {
+  //     const filteredData = data?.filter((item) => {
+  //       const text = searchQuery.toUpperCase();
+  //       const itemData = item.Release_ReleaseTitle.toUpperCase();
+  //       return itemData.indexOf(text) > -1;
+  //     });
+  //     setFilteredData(filteredData);
+  //   }
+  // }
 
+
+  // const handleSearch = (searchQuery) => {
+  //   if (!searchQuery) {
+  //     setTopRelease(useSelector(state => state?.dashboard?.data?.Data) || []);
+  //   } else {
+  //     const text = searchQuery.trim().toLowerCase();
+  //     const topReleasefilteredData = topRelease?.filter((item) => {
+  //       const itemData = item.Release_ReleaseTitle.toLowerCase() ?? '';
+  //       return itemData.toLowerCase().includes(text);
+  //     });
+  //     setTopRelease(topReleasefilteredData);
+  //   }
+  // }
+
+  const handleSearch = (searchQuery) => {
+    // console.log(searchQuery);
+    if (!searchQuery) {
+      setTopReleaseList(topRelease);
+      // console.log(topRelease);
+    } else {
+      const text = searchQuery.trim().toLowerCase();
+      const topReleaseList = topRelease?.filter((item) => {
+        const itemData = item.Release_ReleaseTitle.toLowerCase() ?? '';
+        return itemData.toLowerCase().includes(text);
+        //console.log('itemdata=>>',itemData.toLowerCase().includes(text));
+      });
+      setTopReleaseList(topReleaseList);
+      //console.log(filterData);
+    }
+  };
 
 
   // const printUrl = `${API_ALLRELEASE_URL}${userId}`
@@ -251,7 +289,6 @@ const Dashboard = ({ route, navigation, title }) => {
     //console.log('calling api')
     setLoading(true);
     API({
-      //url: `${API_ALLRELEASE_URL}${userId}`,
       url: `${API_ALLRELEASE}`,
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -259,7 +296,6 @@ const Dashboard = ({ route, navigation, title }) => {
       onSuccess: val => {
         setData(val?.Data)
         setFilteredData(val?.Data);
-        //console.log('Agreement data ==>', val?.Data)
         setLoading(false)
       },
       onError: error => {
@@ -278,14 +314,13 @@ const Dashboard = ({ route, navigation, title }) => {
         setLoading(false);
       },
     });
-    // setLoading(true);
   };
 
   useEffect(() => {
     getAllReleases()
   }, [])
 
-  // {uri: imageSource}
+// Rendering List of Top Release, All Releases
 
   function renderCardView() {
 
@@ -421,7 +456,8 @@ const Dashboard = ({ route, navigation, title }) => {
             <CustomLoader />
           ) : titles == 'Music Releases!' ? (
             <FlatList
-              data={topRelease}
+              //data={topRelease}
+              data={topReleaseList}
               keyExtractor={(item, index) => item + index}
               renderItem={renderCard}
               showsHorizontalScrollIndicator={false}
@@ -469,34 +505,22 @@ const Dashboard = ({ route, navigation, title }) => {
       <React.Fragment>
         <View
           style={{
-            //marginHorizontal: SIZES.padding,
             marginTop: 20,
-            //alignItems: 'center'
             flexDirection: 'row',
             justifyContent: 'space-between'
           }}>
           <View>
             <Text style={styles.footerTxt}>TOP ARTISTS</Text>
-            <Text style={styles.artistTxt}>{String.neha}</Text>
-            <Text style={styles.artistTxt}>{String.arjit}</Text>
-            <Text style={styles.artistTxt}>{String.badh}</Text>
-            <Text style={styles.artistTxt}>{String.atif}</Text>
-            <Text style={styles.artistTxt}>{String.Justin}</Text>
-            <Text style={styles.artistTxt}>{String.himesh}</Text>
-            <Text style={styles.artistTxt}>{String.lata}</Text>
-            <Text style={styles.artistTxt}>{String.diljit}</Text>
+            {artists.map((artist, index) => (
+              <Text key={index} style={styles.artistTxt}>{artist}</Text>
+            ))}
           </View>
 
           <View>
             <Text style={styles.footerTxt}>TOP ACTORS</Text>
-            <Text style={styles.artistTxt}>{String.neha}</Text>
-            <Text style={styles.artistTxt}>{String.arjit}</Text>
-            <Text style={styles.artistTxt}>{String.badh}</Text>
-            <Text style={styles.artistTxt}>{String.atif}</Text>
-            <Text style={styles.artistTxt}>{String.Justin}</Text>
-            <Text style={styles.artistTxt}>{String.himesh}</Text>
-            <Text style={styles.artistTxt}>{String.lata}</Text>
-            <Text style={styles.artistTxt}>{String.diljit}</Text>
+            {artists.map((artist, index) => (
+              <Text key={index} style={styles.artistTxt}>{artist}</Text>
+            ))}
           </View>
         </View>
 
@@ -504,36 +528,24 @@ const Dashboard = ({ route, navigation, title }) => {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <View>
               <Text style={styles.footerTxt}>DEVOTIONAL SONGS</Text>
-              <Text style={styles.artistTxt}>{String.krishna}</Text>
-              <Text style={styles.artistTxt}>{String.mantra}</Text>
-              <Text style={styles.artistTxt}>{String.deva}</Text>
-              <Text style={styles.artistTxt}>{String.hanuman}</Text>
-              <Text style={styles.artistTxt}>{String.gayatri}</Text>
-              <Text style={styles.artistTxt}>{String.mata}</Text>
-              <Text style={styles.artistTxt}>{String.durga}</Text>
-              <Text style={styles.artistTxt}>{String.maiya}</Text>
+              {devotionals.map((devotional, index) => (
+                <Text key={index} style={styles.artistTxt}>{devotional}</Text>
+              ))}
             </View>
 
             <View>
               <Text style={styles.footerTxt}>COMPANY</Text>
-              <Text style={styles.artistTxt}>{String.about}</Text>
-              <Text style={styles.artistTxt}>{String.culture}</Text>
-              <Text style={styles.artistTxt}>{String.blog}</Text>
-              <Text style={styles.artistTxt}>{String.jobs}</Text>
-              <Text style={styles.artistTxt}>{String.press}</Text>
-              <Text style={styles.artistTxt}>{String.advertise}</Text>
-              <Text style={styles.artistTxt}>{String.terms}</Text>
-              <Text style={styles.artistTxt}>{String.help}</Text>
+              {tems.map((company, index) => (
+                <Text key={index} style={styles.artistTxt}>{company}</Text>
+              ))}
             </View>
           </View>
 
           <View>
             <Text style={styles.footerTxt}>ARTISTS ORIGINALS</Text>
-            <Text style={styles.artistTxt}>{String.zaeden}</Text>
-            <Text style={styles.artistTxt}>{String.raghav}</Text>
-            <Text style={styles.artistTxt}>{String.SIXK}</Text>
-            <Text style={styles.artistTxt}>{String.siri}</Text>
-            <Text style={styles.artistTxt}>{String.lost}</Text>
+            {originalArtists.map((original, index) => (
+              <Text key={index} style={styles.artistTxt}>{original}</Text>
+            ))}
           </View>
         </View>
 
@@ -581,6 +593,7 @@ const Dashboard = ({ route, navigation, title }) => {
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ margin: SIZES.padding * 2, paddingBottom: 100 }}
+        bounces={false}
       >
         <SearchComponent
           onSearch={handleSearch}
@@ -610,7 +623,9 @@ const Dashboard = ({ route, navigation, title }) => {
                     fontWeight: 'bold',
                     color: 'rgba(17,52,85,1)',
                     marginRight: 15
-                  }}>LOG IN</Text>
+                  }}>
+                  {isLoggedIn ? 'LOG OUT' : 'LOG IN'}
+                </Text>
               </TouchableOpacity>
             </View>
             <View
@@ -634,6 +649,7 @@ const Dashboard = ({ route, navigation, title }) => {
             </View>
           </View>
         </View>
+
 
         {renderCardView()}
         {renderFooter()}

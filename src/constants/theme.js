@@ -108,6 +108,98 @@ export const SIZES = {
    height
 }
 
-const appTheme = { COLORS, SIZES };
+ export const TEXTS = {
+  text: {
+    size: {
+      sm: 14,
+      base: 16,
+      md: 18,
+      lg: 20,
+      xl: 24,
+    },
+    weight: {
+      light: '200',
+      normal: '400',
+      bold: '700',
+    },
+    spacing: {
+      tight: 0.8,
+      normal: 1,
+      wide: 1.5,
+    },
+    lineHeight: {
+      none: 1,
+      tight: 1.25,
+      normal: 1.5,
+      large: 2,
+    },
+    fonts: {
+      base: null,
+    },
+  },
+  //COLORS,
+  space: {
+    xs: 8,
+    sm: 16,
+    md: 24,
+    lg: 36,
+    xl: 40,
+  },
+  radius: {
+    xs: 6,
+    sm: 10,
+    base: 14,
+    lg: 20,
+    xl: 30,
+  },
+  opacity: {
+    none: 0,
+    low: 0.3,
+    demi: 0.5,
+    high: 0.8,
+    base: 1,
+  },
+  shadows: [
+    {
+      shadowColor: COLORS.black,
+      shadowOffset: {
+        width: 0,
+        height: 0,
+      },
+      shadowOpacity: 1,
+      shadowRadius: 1,
+    },
+    {
+      shadowColor: COLORS.black,
+      shadowOffset: {
+        width: 0,
+        height: 0,
+      },
+      shadowOpacity: 0.6,
+      shadowRadius: 5,
+    },
+  ],
+  borders: [
+    {
+      borderWidth: 1,
+      borderColor: COLORS.black,
+    },
+    {
+      borderWidth: 2,
+      borderColor: COLORS.black,
+    },
+    {
+      borderWidth: 5,
+      borderColor: COLORS.black,
+    },
+  ],
+  button: {
+    disabled: {
+      opacity: 0.5,
+    },
+  },
+};
+
+const appTheme = { COLORS, SIZES, TEXTS };
 
 export default appTheme;

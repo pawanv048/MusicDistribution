@@ -11,37 +11,28 @@ import {
   DrawerContentScrollView,
   DrawerItem
 } from '@react-navigation/drawer';
-import { useDispatch } from 'react-redux';
-// import { updateTitle } from '../redux/reducers';
-import { updateTitle, updateData, setActiveList } from '../redux/action';
-import { useGetTopReleasesQuery } from '../redux/DrawerApiCall';
-
-import { SIZES, COLORS } from '../constants/theme';
-import { DrawerButton } from '../custom/component';
+import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API } from '../api/apiServers';
-
-
-const wallet_img = 'https://cdn-icons-png.flaticon.com/512/2169/2169854.png';
-const menu = 'https://cdn-icons-png.flaticon.com/512/7231/7231133.png';
-const profile = 'https://cdn.pixabay.com/photo/2021/01/21/16/44/model-5937809_960_720.jpg';
-const down_arrow = 'https://cdn-icons-png.flaticon.com/512/32/32195.png';
-const plus = 'https://cdn-icons-png.flaticon.com/512/1828/1828919.png';
-const download = 'https://cdn-icons-png.flaticon.com/512/2382/2382067.png';
+// import { updateTitle } from '../redux/reducers';
+import { updateTitle, updateData } from '../redux/action';
+import { useGetTopReleasesQuery } from '../redux/DrawerApiCall';
+import { SIZES, COLORS, TEXTS } from '../constants/theme';
+import { DrawerButton } from '../custom/component';
+import icons from '../constants/icons';
+import { selectEmail } from '../redux/userSlice';
 
 
 
 const Drawer = ({ navigation }) => {
   console.log('render Drawer');
-
- 
   // console.log('data =>', isSuccess);
 
-  const [showDrawerItems, setShowDrawerItems] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [showDrawerItems, setShowDrawerItems] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  // const title = useSelector(state => state.dashboard.title);
   const { data: topReleasesData } = useGetTopReleasesQuery();
+  const email = useSelector(selectEmail);
+// console.log('email', email);
 
 
   const dispatch = useDispatch();
@@ -67,13 +58,24 @@ const Drawer = ({ navigation }) => {
   };
 
   const handleSongsPress = () => {
-    dispatch(updateTitle('Top Songs!'));
-    console.log('song press');
+    if (isLoggedIn) {
+      Alert.alert('You are logined user')
+      dispatch(updateTitle('Top Songs!'));
+    } else {
+      navigation.navigate('Login')
+    }
+    //console.log('song press');
   }
 
   const handleAlbumsPress = () => {
-    dispatch(updateTitle('Top Albums'))
-    console.log('Album press');
+    if (isLoggedIn) {
+      Alert.alert('You are logined user')
+      dispatch(updateTitle('Top Albums!'));
+    } else {
+      navigation.navigate('Login')
+    }
+   
+    //console.log('Album press');
   }
 
   const handleReleasePress = () => {
@@ -89,7 +91,6 @@ const Drawer = ({ navigation }) => {
     dispatch(updateTitle('Top Artists'))
     console.log('Artist press');
   }
-
 
 
   const browserPressed = () => {
@@ -118,7 +119,7 @@ const Drawer = ({ navigation }) => {
 
             }}>
             <Image
-              source={{ uri: wallet_img }}
+              source={icons.wallet}
               style={{ width: 30, height: 30, tintColor: COLORS.primary, marginRight: 15 }}
             />
             <Text
@@ -130,8 +131,13 @@ const Drawer = ({ navigation }) => {
               }}>DOMPET</Text>
           </View>
           <TouchableOpacity onPress={() => navigation.closeDrawer()}>
-            <Image source={{ uri: menu }}
-              style={{ width: 20, height: 20 }}
+            <Image
+              source={icons.menu}
+              style={{ 
+                width: 24,
+                height: 24,
+                tintColor: COLORS.primary
+              }}
             />
           </TouchableOpacity>
         </View>
@@ -151,7 +157,7 @@ const Drawer = ({ navigation }) => {
           }}
         >
           <Image
-            source={{ uri: profile }}
+            source={icons.profile}
             style={{
               width: 50,
               height: 50,
@@ -160,7 +166,7 @@ const Drawer = ({ navigation }) => {
             }}
           />
           <View>
-            <Text style={styles.profile_name}>HI, WILLIAM</Text>
+            <Text style={styles.profile_name}>Guest</Text>
             <Text style={{ fontWeight: '600' }}>william@gmail.com</Text>
           </View>
         </View>
@@ -181,7 +187,7 @@ const Drawer = ({ navigation }) => {
           >BROWSER
           </Text>
           <Image
-            source={{ uri: down_arrow }}
+            source={icons.downarrow}
             style={{
               width: 20,
               height: 20,
@@ -221,7 +227,7 @@ const Drawer = ({ navigation }) => {
           >LIBRARY
           </Text>
           <Image
-            source={{ uri: down_arrow }}
+            source={icons.downarrow}
             style={{
               width: 20,
               height: 20,
@@ -267,7 +273,7 @@ const Drawer = ({ navigation }) => {
         }}
       >
         <Image
-          source={{ uri: plus }}
+          source={icons.plus}
           style={{
             width: 20,
             height: 20,
@@ -299,7 +305,7 @@ const styles = StyleSheet.create({
   },
   profile_name: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: TEXTS.text.weight.bold,
     lineHeight: 30,
     color: COLORS.support1
   },

@@ -5,6 +5,11 @@ const google = require("../assets/icons/google.png")
 const linkdin = require("../assets/icons/linkdin.png")
 const twitter = require("../assets/icons/twitter.png")
 const exit = require("../assets/icons/exit.png")
+const downarrow = require("../assets/icons/downarrow.png")
+const menu = require("../assets/icons/menu.png")
+const wallet = require("../assets/icons/wallet.png")
+const plus = require("../assets/icons/plus.png")
+const profile = require("../assets/images/profile.jpeg");
 
 
 // const PIC = 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg'
@@ -18,6 +23,11 @@ const exit = require("../assets/icons/exit.png")
 // const back = 'https://cdn-icons-png.flaticon.com/512/507/507257.png'
 // const noImg = 'https://filestore.community.support.microsoft.com/api/images/ext?url=https:%2f%2fanswersstaticfilecdnv2.azureedge.net%2fstatic%2fimages%2fimage-not-found.jpg'
 
+// const image = 'https://cdn.pixabay.com/photo/2016/11/18/18/35/adult-1836322_960_720.jpg';
+// const play = 'https://cdn-icons-png.flaticon.com/512/189/189638.png';
+// const pause = 'https://cdn-icons-png.flaticon.com/512/6364/6364353.png';
+
+
 
 export default {
   search,
@@ -26,5 +36,10 @@ export default {
   google,
   linkdin,
   twitter,
-  exit
+  exit,
+  downarrow,
+  menu,
+  wallet,
+  plus,
+  profile
 }

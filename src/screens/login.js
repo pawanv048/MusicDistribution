@@ -1,18 +1,17 @@
 import { StyleSheet, Text, View, TouchableOpacity, ImageBackground } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import CheckBox from '@react-native-community/checkbox';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Input, CustomText, TextButton } from '../custom/component';
 import { SIZES, COLORS } from '../constants/theme';
 import icons from '../constants/icons';
-import { API } from '../api/apiServers';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API, loginUrl } from '../api/apiServers';
 import { setEmail } from '../redux/userSlice';
 import { useDispatch } from 'react-redux';
 
 
 const Login = ({ navigation }) => {
-  console.log('render Login');
+  // console.log('render Login');
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
   const [errors, setErrors] = useState({});
   const [showToast, setShowToast] = useState(false);
@@ -42,7 +41,7 @@ const Login = ({ navigation }) => {
   const loginUser = () => {
     API({
       method: 'POST',
-      url: 'http://84.16.239.66/LoginDetail',
+      url: `${loginUrl}`,
       params: {
         Email: loginData.email,
         Password: loginData.password
@@ -60,7 +59,8 @@ const Login = ({ navigation }) => {
           //navigation.navigate('Dashboard',  { isLoggedIn: true })
           // console.log(res[0].Userid);
         } else {
-          alert("Invalid Email and Password");
+          //showAlert('This is an alert message.');
+          alert('Invalid user and Password')
         }
       },
       onError: (err) => {

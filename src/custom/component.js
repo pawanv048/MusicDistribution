@@ -46,7 +46,6 @@ export const SearchComponent = ({ onSearch }) => {
 
 
 
-
 export const TextButton = ({
   contentContainerStyle,
   disabled = false,

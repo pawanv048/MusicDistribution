@@ -23,7 +23,7 @@ import { selectEmail } from '../redux/userSlice';
 
 
 
-const Drawer = ({ navigation }) => {
+const Drawer = ({ navigation, route }) => {
   console.log('render Drawer');
   // console.log('data =>', isSuccess);
 
@@ -31,8 +31,10 @@ const Drawer = ({ navigation }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { data: topReleasesData } = useGetTopReleasesQuery();
-  const email = useSelector(selectEmail);
+   const email = useSelector(selectEmail);
+   
 // console.log('email', email);
+
 
 
   const dispatch = useDispatch();

@@ -237,50 +237,32 @@ const Dashboard = ({navigation}) => {
 
   // SEARCHING..
 
-  // const handleSearch = (searchQuery) => {
-  //   if (searchQuery == '') {
-  //     setFilteredData(data);
-  //   } else {
-  //     const filteredData = data?.filter((item) => {
-  //       const text = searchQuery.toUpperCase();
-  //       const itemData = item.Release_ReleaseTitle.toUpperCase();
-  //       return itemData.indexOf(text) > -1;
-  //     });
-  //     setFilteredData(filteredData);
-  //   }
-  // }
-
-
-  // const handleSearch = (searchQuery) => {
-  //   if (!searchQuery) {
-  //     setTopRelease(useSelector(state => state?.dashboard?.data?.Data) || []);
-  //   } else {
-  //     const text = searchQuery.trim().toLowerCase();
-  //     const topReleasefilteredData = topRelease?.filter((item) => {
-  //       const itemData = item.Release_ReleaseTitle.toLowerCase() ?? '';
-  //       return itemData.toLowerCase().includes(text);
-  //     });
-  //     setTopRelease(topReleasefilteredData);
-  //   }
-  // }
-
   const handleSearch = (searchQuery) => {
-    // console.log(searchQuery);
     if (!searchQuery) {
       setTopReleaseList(topRelease);
-      // console.log(topRelease);
     } else {
-      const text = searchQuery.trim().toLowerCase();
-      const topReleaseList = topRelease?.filter((item) => {
-        const itemData = item.Release_ReleaseTitle.toLowerCase() ?? '';
-        return itemData.toLowerCase().includes(text);
-        //console.log('itemdata=>>',itemData.toLowerCase().includes(text));
+      const firstLetter = searchQuery.trim()[0].toLowerCase();
+      const topReleaseList = topRelease.filter((item) => {
+        const itemData = item.Release_ReleaseTitle.trim().toLowerCase() ?? '';
+        if (itemData[0] === firstLetter) {
+          return itemData.includes(searchQuery.trim().toLowerCase());
+        }
+        return false;
       });
-      setTopReleaseList(topReleaseList);
-      //console.log(filterData);
+      const topReleaseListWithIndex = topReleaseList.map((item) => {
+        const index = topRelease.findIndex((el) => el.id === item.id);
+        return { ...item, index };
+      });
+      if (topReleaseListWithIndex.length > 0) {
+        setTopReleaseList(topReleaseListWithIndex);
+      } else {
+        alert(`No matching element found for '${searchQuery}'.`);
+      }
     }
   };
-
+  
+  
+  
 
   // const printUrl = `${API_ALLRELEASE_URL}${userId}`
   // console.log('printUrl', printUrl);

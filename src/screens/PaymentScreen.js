@@ -97,6 +97,31 @@ const PaymentScreen = (props) => {
     }
   };
 
+  // SEARCH HANDLER
+  // const handleSearch = (searchQuery) => {
+  //   if (!searchQuery) {
+  //     setTopReleaseList(topRelease);
+  //   } else {
+  //     const firstLetter = searchQuery.trim()[0].toLowerCase();
+  //     const topReleaseList = topRelease.filter((item) => {
+  //       const itemData = item.Release_ReleaseTitle.trim().toLowerCase() ?? '';
+  //       if (itemData[0] === firstLetter) {
+  //         return itemData.includes(searchQuery.trim().toLowerCase());
+  //       }
+  //       return false;
+  //     });
+  //     const topReleaseListWithIndex = topReleaseList.map((item) => {
+  //       const index = topRelease.findIndex((el) => el.id === item.id);
+  //       return { ...item, index };
+  //     });
+  //     if (topReleaseListWithIndex.length > 0) {
+  //       setTopReleaseList(topReleaseListWithIndex);
+  //     } else {
+  //       alert(`No matching element found for '${searchQuery}'.`);
+  //     }
+  //   }
+  // };
+
 
 
   // DOWNLOADING TRACKS
@@ -161,7 +186,9 @@ const PaymentScreen = (props) => {
           }}
         >DASHBOARD
         </Text>
-        <SearchComponent />
+        <SearchComponent 
+
+        />
         <View style={{ flexDirection: 'row', marginTop: 5 }}>
           <Image
             source={icons.exit}

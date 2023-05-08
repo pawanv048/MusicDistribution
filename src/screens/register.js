@@ -179,7 +179,7 @@ const Register = ({ navigation }) => {
             <Input
               value={registerData.firstName}
               placeholder='First Name'
-              onChangeText={text => handleOnChange(text, 'firstName')}
+              onChangeText={text => handleOnChange(text, 'firstName')}   
               error={errors.firstName}
               onFocus={() => handleError(null, 'firstName')}
             />

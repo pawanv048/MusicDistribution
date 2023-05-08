@@ -31,9 +31,9 @@ const Drawer = ({ navigation, route }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { data: topReleasesData } = useGetTopReleasesQuery();
-   const email = useSelector(selectEmail);
+  const email = useSelector(selectEmail);
    
-// console.log('email', email);
+//  console.log('topReleasesData=>>', topReleasesData);
 
 
 
@@ -91,6 +91,7 @@ const Drawer = ({ navigation, route }) => {
 
   const handleArtistPress = () => {
     dispatch(updateTitle('Top Artists'))
+    // console.log(updateData(topReleasesData?.Data?.Release_PrimaryArtist));
     console.log('Artist press');
   }
 

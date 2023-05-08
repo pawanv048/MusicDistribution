@@ -5,6 +5,7 @@ import Register from "./register";
 import DrawerContent from "./drawer";
 import Login from "./login";
 import Forgot from "./forgot";
+import Dummy from "./dummy";
 
 export {
   Dashboard,
@@ -14,4 +15,5 @@ export {
   DrawerContent,
   Login,
   Forgot, 
+  Dummy
 }

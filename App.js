@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Button } from 'react-native';
-import React, { useEffect } from 'react';
+import { StyleSheet, Text, View, AppState } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 // import { createStore } from '@reduxjs/toolkit';
 import { dashboardSlice } from './src/redux/reducers';
@@ -13,6 +13,7 @@ import {
   Register,
   DrawerContent,
   Forgot,
+  Dummy,
 } from './src/screens/index';
 
 import { store } from './src/redux/store';
@@ -26,6 +27,7 @@ const Drawer = createDrawerNavigator();
 
 
 const App = () => {
+
   console.log('render App');
   //alert(STRIP_KEY)
   return (
@@ -38,6 +40,7 @@ const App = () => {
           <Drawer.Screen name="Login" component={Login} options={{ headerShown: false }} />
           <Drawer.Screen name="Register" component={Register} options={{ headerShown: false }} />
           <Drawer.Screen name="Forgot" component={Forgot} options={{ headerShown: false }} />
+          <Drawer.Screen name="Dummy" component={Dummy} options={{ headerShown: true }} />
         </Drawer.Navigator>
       </NavigationContainer>
     </Provider>

@@ -24,7 +24,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect, useSelector } from 'react-redux';
 import { useGetTopReleasesQuery } from '../redux/DrawerApiCall';
 import { SearchComponent, TextButton, CustomText, Separator, CustomLoader } from '../custom/component';
-import { COLORS, SIZES } from '../constants/theme';
+import { COLORS, SIZES, TEXTS } from '../constants/theme';
 import * as String from '../constants/strings';
 import { artists, devotionals, originalArtists, tems } from '../constants/strings';
 import { API, API_ALLRELEASE, releaseUrl } from '../api/apiServers';
@@ -63,7 +63,7 @@ const playbackData = [
 
 
 // Main screen
-const Dashboard = ({navigation}) => {
+const Dashboard = ({ navigation }) => {
 
   console.log('render Dashboard')
 
@@ -86,14 +86,14 @@ const Dashboard = ({navigation}) => {
   const [isImageAvail, setImageAvail] = useState(null)
   const [imageSource, setImageSource] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+
   //Redux - get
   const titles = useSelector(state => state.dashboard.title)
   const topRelease = useSelector(state => state?.dashboard?.data?.Data)
   const [topReleaseList, setTopReleaseList] = useState([]);
-  
+
   // console.log('topReleaseList=>>', topReleaseList);
- 
+
 
   //modal
   const togglePlayBack = () => {
@@ -190,14 +190,14 @@ const Dashboard = ({navigation}) => {
   // }, []);
 
 
-// slider duration update
+  // slider duration update
   // useEffect(() => {
   //   updateDuration();
   // }, [isPlaying]);
 
 
   //end
-// play and pause 
+  // play and pause 
 
   // useEffect(() => {
   //   const setupPlayerAsync = async () => {
@@ -260,9 +260,7 @@ const Dashboard = ({navigation}) => {
       }
     }
   };
-  
-  
-  
+
 
   // const printUrl = `${API_ALLRELEASE_URL}${userId}`
   // console.log('printUrl', printUrl);
@@ -302,11 +300,68 @@ const Dashboard = ({navigation}) => {
     getAllReleases()
   }, [])
 
-// Rendering List of Top Release, All Releases
+  // Rendering List of Top Release, All Releases
 
   function renderCardView() {
 
     const renderCard = ({ item }) => {
+      if (titles === 'Top Artists') {
+        return (
+          <View
+            style={{
+              //marginHorizontal: SIZES.padding,
+              alignItems: 'center',
+              width: SIZES.width - 100,
+              height: SIZES.height / 2.7,
+              marginVertical: SIZES.padding * 2,
+              //backgroundColor: 'red',
+              borderRadius: 10
+            }}>
+            <FastImage
+              source={{
+                uri: `${releaseUrl}${item.Release_Artwork}`,
+                priority: FastImage.priority.normal,
+                cache: FastImage.cacheControl.immutable,
+              }}
+              accessibilityLabel="Please wait image is arraving"
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: 10
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+            <View
+              style={{
+                width: '100%',
+                backgroundColor: 'rgba(243,243,243,1)',
+                height: 120,
+                position: 'absolute',
+                bottom: 0,
+                borderRadius: 10
+              }}
+            >
+              {/* Release_ReleaseTitle */}
+              <View
+                style={{
+                  marginHorizontal: SIZES.padding * 2,
+                  marginVertical: SIZES.padding * 1.5
+                }}
+              >
+                {/* Release_PrimaryArtist */}
+                <Text
+                  style={{
+                    fontSize: TEXTS.text.size.sm,
+                    lineHeight: 18,
+                    fontWeight: '400'
+                  }}>
+                  {item.Release_PrimaryArtist}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )
+      }
       //  console.log(item);
       return (
         <TouchableOpacity
@@ -317,7 +372,6 @@ const Dashboard = ({navigation}) => {
             width: SIZES.width - 100,
             height: SIZES.height / 2.7,
             marginVertical: SIZES.padding * 2,
-            //backgroundColor: 'red',
             borderRadius: 10
           }}>
           <FastImage
@@ -326,6 +380,7 @@ const Dashboard = ({navigation}) => {
               priority: FastImage.priority.normal,
               cache: FastImage.cacheControl.immutable,
             }}
+            accessibilityLabel="Please wait image is arraving"
             style={{
               width: '100%',
               height: '100%',
@@ -346,8 +401,7 @@ const Dashboard = ({navigation}) => {
             {/* Release_ReleaseTitle */}
             <View
               style={{
-                marginHorizontal: SIZES.padding * 2,
-                marginVertical: SIZES.padding * 1.5
+                margin: SIZES.padding * 2
               }}
             >
               <Text
@@ -404,6 +458,11 @@ const Dashboard = ({navigation}) => {
     return (
       <React.Fragment>
         <View style={styles.card}>
+
+        {/* <TouchableOpacity onPress={() => navigation.navigate('Dummy')}>
+            <Text>Dummy</Text>
+          </TouchableOpacity> */}
+
           <View style={{ margin: SIZES.padding * 2 }}>
             <Text
               style={{
@@ -451,15 +510,11 @@ const Dashboard = ({navigation}) => {
             <FlatList
               data={topRelease}
               keyExtractor={(item, index) => item + index}
-              renderItem={({ item }) => {
-                //console.log('topRelease Item==>>',item); // print the Release_Id to the console
-                return (
-                  // render a component that displays the Release_Id
-                  <View>
-                    <Text>{item.Release_Id}</Text>
-                  </View>
-                );
-              }}
+              renderItem={renderCard}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
+              contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
             />
           ) : (
             <FlatList

@@ -14,8 +14,8 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { updateTitle } from '../redux/reducers';
-import { updateTitle, updateData } from '../redux/action';
-import { useGetTopReleasesQuery } from '../redux/DrawerApiCall';
+import { updateTitle, updateData, updateTopSongs } from '../redux/action';
+import { useGetTopReleasesQuery, useGetTopSongsQuery } from '../redux/DrawerApiCall';
 import { SIZES, COLORS, TEXTS } from '../constants/theme';
 import { DrawerButton } from '../custom/component';
 import icons from '../constants/icons';
@@ -31,9 +31,11 @@ const Drawer = ({ navigation, route }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { data: topReleasesData } = useGetTopReleasesQuery();
+  const { data: topSongsData } = useGetTopSongsQuery();
+
   const email = useSelector(selectEmail);
    
-//  console.log('topReleasesData=>>', topReleasesData);
+//  console.log('topSongsData=>>', topSongsData);
 
 
 
@@ -61,8 +63,11 @@ const Drawer = ({ navigation, route }) => {
 
   const handleSongsPress = () => {
     if (isLoggedIn) {
-      Alert.alert('You are logined user')
+      //Alert.alert('You are logined user')
+      // console.log('Top Songs Data:', topSongsData); 
       dispatch(updateTitle('Top Songs!'));
+      dispatch(updateTopSongs(topSongsData));
+      //console.log(topSongsData);
     } else {
       navigation.navigate('Login')
     }
@@ -82,7 +87,7 @@ const Drawer = ({ navigation, route }) => {
 
   const handleReleasePress = () => {
     //console.log('topReleasesData:', topReleasesData);
-
+    
     dispatch(updateTitle('Music Releases!'))
     dispatch(updateData(topReleasesData));
     // dispatch(setActiveList('updateRelease'));
@@ -92,7 +97,7 @@ const Drawer = ({ navigation, route }) => {
   const handleArtistPress = () => {
     dispatch(updateTitle('Top Artists'))
     // console.log(updateData(topReleasesData?.Data?.Release_PrimaryArtist));
-    console.log('Artist press');
+    // console.log('Artist press');
   }
 
 

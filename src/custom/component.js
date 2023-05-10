@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   TextInput,
@@ -274,6 +274,22 @@ export const CustomLoader = () => {
   );
 };
 
+// Progress bar
+export const ProgressBar = ({ progress }) => {
+  const [progressWidth, setProgressWidth] = useState(0);
+
+  useEffect(() => {
+    setProgressWidth(progress * 100);
+  }, [progress]);
+
+  return (
+    <View style={styles.progressBarContainer}>
+      <View style={[styles.progressBar, { width: `${progressWidth}%` }]}></View>
+      <Text style={styles.progressText}>{`${progressWidth}%`}</Text>
+    </View>
+  );
+};
+
 
 
 
@@ -285,7 +301,8 @@ const appComponent = {
   DropdownPicker,
   Toast,
   DrawerButton,
-  CustomLoader
+  CustomLoader,
+  ProgressBar
 }
 
 export default appComponent;
@@ -324,5 +341,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     textAlign: 'center',
+  },
+  progressBarContainer: {
+    backgroundColor: '#F5F5F5',
+    height: 20,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+  },
+  progressBar: {
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#1E90FF',
+  },
+  progressText: {
+    color: '#000',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 5,
   },
 });

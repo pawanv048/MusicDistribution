@@ -9,8 +9,14 @@ export const getDrawerApi = createApi({
         url: '/GetTopReleases',
         method: 'get'
       })
+    }),
+    getTopSongs: builder.query({
+      query: () => ({
+        url: '/GetTopSongs',
+        method: 'get'
+      })
     })
   })
 });
 
-export const { useGetTopReleasesQuery } = getDrawerApi;
+export const { useGetTopReleasesQuery, useGetTopSongsQuery } = getDrawerApi;

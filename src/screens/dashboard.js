@@ -10,25 +10,19 @@ import {
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 
-import TrackPlayer, {
-  Capability,
-  Event,
-  RepeatMode,
-  State,
-  usePlaybackState,
-  useProgress,
-  useTrackPlayerEvents,
-} from 'react-native-track-player';
+import TrackPlayer from 'react-native-track-player';
 import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect, useSelector } from 'react-redux';
-import { useGetTopReleasesQuery } from '../redux/DrawerApiCall';
+import * as Progress from 'react-native-progress';
+import { useGetTopSongsQuery } from '../redux/DrawerApiCall';
 import { SearchComponent, TextButton, CustomText, Separator, CustomLoader } from '../custom/component';
 import { COLORS, SIZES, TEXTS } from '../constants/theme';
 import * as String from '../constants/strings';
 import { artists, devotionals, originalArtists, tems } from '../constants/strings';
 import { API, API_ALLRELEASE, releaseUrl } from '../api/apiServers';
 import icons from '../constants/icons';
+import { playTrack, pauseTrack, getTrackInfo } from '../custom/AudioPlayer';
 
 
 const songs = [
@@ -61,6 +55,8 @@ const playbackData = [
   { label: '2x', onPress: () => console.log('2'), rate: 2.0 },
 ];
 
+const playbtn = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'
+const pause = 'https://cdn-icons-png.flaticon.com/512/1214/1214679.png'
 
 // Main screen
 const Dashboard = ({ navigation }) => {
@@ -74,8 +70,8 @@ const Dashboard = ({ navigation }) => {
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-
   const [range, setRange] = useState(0)
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false)
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -86,13 +82,15 @@ const Dashboard = ({ navigation }) => {
   const [isImageAvail, setImageAvail] = useState(null)
   const [imageSource, setImageSource] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   //Redux - get
   const titles = useSelector(state => state.dashboard.title)
   const topRelease = useSelector(state => state?.dashboard?.data?.Data)
+  const topSongsData = useSelector((state) => state.dashboard.topSongs.data);
   const [topReleaseList, setTopReleaseList] = useState([]);
 
-  // console.log('topReleaseList=>>', topReleaseList);
+  // console.log('topSongsData=>>', topSongsData);
 
 
   //modal
@@ -181,57 +179,55 @@ const Dashboard = ({ navigation }) => {
 
   // slider position update 
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     updatePosition();
-  //   }, 1000);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updatePosition();
+    }, 1000);
 
-  //   return () => clearInterval(interval);
-  // }, []);
+    return () => clearInterval(interval);
+  }, []);
 
 
   // slider duration update
-  // useEffect(() => {
-  //   updateDuration();
-  // }, [isPlaying]);
+  useEffect(() => {
+    updateDuration();
+  }, [isPlaying]);
 
-
-  //end
-  // play and pause 
-
-  // useEffect(() => {
-  //   const setupPlayerAsync = async () => {
-  //     try {
-  //       // set up the player if it is not set up yet
-
-  //       //await TrackPlayer.setupPlayer();
-  //       TrackPlayer.updateOptions({
-  //         capabilities: [Capability.Play, Capability.Pause]
-  //       });
-
-  //       await TrackPlayer.add(songs)
-  //     } catch (error) {
-  //       console.log(error)
-  //     }
-  //   }
-
-  //   setupPlayerAsync();
-  // }, [])
 
   // handle play and pause
 
-  const handlePlayPause = async () => {
-    console.log();
-    const currentTrack = await TrackPlayer.getCurrentTrack();
-    if (currentTrack !== null && isPlaying == true) {
-      TrackPlayer.pause();
-      setIsPlaying(false);
-      handleDefaultPlaybackRate()
-    } else {
-      TrackPlayer.play();
-      setIsPlaying(true);
+  const handlePlayPause = async (trackIndex, track) => {
+    try {
+      const currentTrack = await TrackPlayer.getCurrentTrack();
+
+      console.log('Current track:', currentTrack);
+      console.log('Current playback state:', await TrackPlayer.getState());
+      console.log('Track index:', trackIndex);
+
+      if (currentTrack !== null && currentTrackIndex === trackIndex && isPlaying) {
+        const trackInfo = await getTrackInfo();
+        if (trackInfo.trackObject.id === track.Track_Id) {
+          pauseTrack(trackInfo.trackObject.id);
+          setIsPlaying(false);
+          handleDefaultPlaybackRate();
+          console.log('Track paused:', track.Track_Title);
+        }
+      } else {
+        setCurrentTrackIndex(trackIndex);
+        playTrack({
+          id: track.Track_Id,
+          title: track.Track_Title,
+          artist: track.Track_Artist,
+          url: track.url
+        });
+        setIsPlaying(true);
+        console.log('Track played:', track.Track_Title);
+      }
+    } catch (error) {
+      console.log('Error handling play/pause:', error);
     }
-  }
+  };
+
 
   // console.log('topRelease =>>', topRelease)
 
@@ -304,8 +300,75 @@ const Dashboard = ({ navigation }) => {
 
   function renderCardView() {
 
+
+
+
     const renderCard = ({ item }) => {
-      if (titles === 'Top Artists') {
+      if (titles === 'Music Releases!') {
+        return (
+          <View
+            style={{
+              //marginHorizontal: SIZES.padding,
+              alignItems: 'center',
+              width: SIZES.width - 100,
+              height: SIZES.height / 2.7,
+              marginVertical: SIZES.padding * 2,
+              //backgroundColor: 'red',
+              borderRadius: 10
+            }}>
+            <FastImage
+              source={{
+                uri: `${releaseUrl}${item.Release_Artwork}`,
+                priority: FastImage.priority.normal,
+                cache: FastImage.cacheControl.immutable,
+              }}
+              accessibilityLabel="Please wait image is arraving"
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: 10
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+            <View
+              style={{
+                width: '100%',
+                backgroundColor: 'rgba(243,243,243,1)',
+                height: 120,
+                position: 'absolute',
+                bottom: 0,
+                borderRadius: 10
+              }}
+            >
+              {/* Release_ReleaseTitle */}
+              <View
+                style={{
+                  margin: SIZES.padding * 2
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 'bold',
+                    marginBottom: 15
+                  }}
+                >
+                  {item.Release_ReleaseTitle}
+                </Text>
+                {/* Release_PrimaryArtist */}
+                <Text
+                  style={{
+                    fontSize: 15,
+                    lineHeight: 18,
+                    fontWeight: '400'
+                  }}>
+                  {item.Release_PrimaryArtist}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )
+      } else if (titles === 'Top Artists') {
         return (
           <View
             style={{
@@ -362,104 +425,112 @@ const Dashboard = ({ navigation }) => {
           </View>
         )
       }
-      //  console.log(item);
-      return (
-        <TouchableOpacity
-          activeOpacity={1}
-          style={{
-            //marginHorizontal: SIZES.padding,
-            alignItems: 'center',
-            width: SIZES.width - 100,
-            height: SIZES.height / 2.7,
-            marginVertical: SIZES.padding * 2,
-            borderRadius: 10
-          }}>
-          <FastImage
-            source={{
-              uri: `${releaseUrl}${item.Release_Artwork}`,
-              priority: FastImage.priority.normal,
-              cache: FastImage.cacheControl.immutable,
-            }}
-            accessibilityLabel="Please wait image is arraving"
+
+      if (!titles) {
+        return (
+          <TouchableOpacity
+            activeOpacity={1}
             style={{
-              width: '100%',
-              height: '100%',
+              //marginHorizontal: SIZES.padding,
+              alignItems: 'center',
+              width: SIZES.width - 100,
+              height: SIZES.height / 2.7,
+              marginVertical: SIZES.padding * 2,
               borderRadius: 10
-            }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
-          <View
-            style={{
-              width: '100%',
-              backgroundColor: 'rgba(243,243,243,1)',
-              height: 120,
-              position: 'absolute',
-              bottom: 0,
-              borderRadius: 10
-            }}
-          >
-            {/* Release_ReleaseTitle */}
+            }}>
+            <FastImage
+              source={{
+                uri: `${releaseUrl}${item.Release_Artwork}`,
+                priority: FastImage.priority.normal,
+                cache: FastImage.cacheControl.immutable,
+              }}
+              accessibilityLabel="Please wait image is arraving"
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: 10
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+            />
             <View
               style={{
-                margin: SIZES.padding * 2
+                width: '100%',
+                backgroundColor: 'rgba(243,243,243,1)',
+                height: 120,
+                position: 'absolute',
+                bottom: 0,
+                borderRadius: 10
               }}
             >
-              <Text
+              {/* Release_ReleaseTitle */}
+              <View
                 style={{
-                  fontSize: 15,
-                  fontWeight: 'bold',
-                  marginBottom: 15
+                  margin: SIZES.padding * 2
                 }}
               >
-                {item.Release_ReleaseTitle}
-              </Text>
-              {/* Release_PrimaryArtist */}
-              <Text
-                style={{
-                  fontSize: 15,
-                  lineHeight: 18,
-                  fontWeight: '400'
-                }}>
-                {item.Release_PrimaryArtist}
-              </Text>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 'bold',
+                    marginBottom: 15
+                  }}
+                >
+                  {item.Release_ReleaseTitle}
+                </Text>
+                {/* Release_PrimaryArtist */}
+                <Text
+                  style={{
+                    fontSize: 15,
+                    lineHeight: 18,
+                    fontWeight: '400'
+                  }}>
+                  {item.Release_PrimaryArtist}
+                </Text>
+              </View>
             </View>
-          </View>
 
-          {/* BUY NOW */}
-          {isLoggedIn && !titles && (
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Home', {
-                Release_Id: item.Release_Id,
-                Release_Artwork: item.Release_Artwork,
-              }
-              )}
-              style={{
-                marginTop: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: COLORS.primary,
-                padding: 10,
-                borderRadius: 5,
-              }}
-            >
-              <Text
+            {/* BUY NOW */}
+            {isLoggedIn && !titles && (
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Home', {
+                  Release_Id: item.Release_Id,
+                  Release_Artwork: item.Release_Artwork,
+                }
+                )}
                 style={{
-                  fontSize: 15,
-                  fontWeight: '600',
-                  color: '#fff'
-                }}>Buy Now</Text>
-            </TouchableOpacity>
-          )}
-        </TouchableOpacity>
-      )
+                  marginTop: 10,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: COLORS.primary,
+                  padding: 10,
+                  borderRadius: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: '600',
+                    color: '#fff'
+                  }}>Buy Now</Text>
+              </TouchableOpacity>
+            )}
+          </TouchableOpacity>
+        )
+      }
+
+
     };
+
+    // const renderSongItems = ({item}) => {
+    //   console.log('TopSongsitems =>>', item);
+    // }
 
 
     return (
       <React.Fragment>
         <View style={styles.card}>
 
-        {/* <TouchableOpacity onPress={() => navigation.navigate('Dummy')}>
+          {/* <TouchableOpacity onPress={() => navigation.navigate('Dummy')}>
             <Text>Dummy</Text>
           </TouchableOpacity> */}
 
@@ -491,13 +562,13 @@ const Dashboard = ({ navigation }) => {
             )}
           </View>
 
-          {/* EPISODES CARD */}
+          {/* RELEASES CARD */}
 
           {isLoading ? (
             <CustomLoader />
           ) : titles == 'Music Releases!' ? (
             <FlatList
-              //data={topRelease}
+              // data={topRelease}
               data={topReleaseList}
               keyExtractor={(item, index) => item + index}
               renderItem={renderCard}
@@ -512,6 +583,161 @@ const Dashboard = ({ navigation }) => {
               keyExtractor={(item, index) => item + index}
               renderItem={renderCard}
               showsHorizontalScrollIndicator={false}
+              horizontal
+              ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
+              contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
+            />
+          ) : titles == 'Top Songs!' && isLoggedIn ? (
+            // <Text>show top songs</Text>
+            <FlatList
+              data={topSongsData}
+              keyExtractor={(item, index) => item + index}
+              renderItem={({ item, index }) => {
+                // console.log('Item:', item);
+                //const trackId = item.Track_Id.toString();
+                return (
+                  <View
+                    style={{
+                      //marginHorizontal: SIZES.padding,
+                      alignItems: 'center',
+                      width: SIZES.width - 100,
+                      height: SIZES.height / 2.7,
+                      marginVertical: SIZES.padding * 2,
+                      //backgroundColor: 'red',
+                      borderRadius: 10
+                    }}>
+                    <FastImage
+                      source={{
+                        uri: `https://cdn.pixabay.com/photo/2023/05/03/16/05/ai-generated-7968016_960_720.jpg`,
+                        priority: FastImage.priority.normal,
+                        cache: FastImage.cacheControl.immutable,
+                      }}
+                      accessibilityLabel="Please wait image is arraving"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: 10
+                      }}
+                      resizeMode={FastImage.resizeMode.cover}
+                    />
+                    <View
+                      style={{
+                        width: '100%',
+                        backgroundColor: 'rgba(243,243,243,1)',
+                        height: 120,
+                        position: 'absolute',
+                        bottom: 0,
+                        borderRadius: 10,
+                        padding: SIZES.padding * 1.5
+                      }}
+                    >
+                      {/* Release_ReleaseTitle */}
+                      <View
+                        style={{
+                          //backgroundColor: COLORS.lightGrey,
+                          height: 40,
+                          alignItems: 'center',
+                          // paddingHorizontal: SIZES.padding,
+                          borderRadius: 4,
+                          //justifyContent: 'center',
+                          flexDirection: 'row',
+                          marginVertical: SIZES.padding
+                        }}
+                      >
+
+
+                        <TouchableOpacity
+                          onPress={() => handlePlayPause(index, {
+                            Track_Id: item.Track_Id,
+                            Track_Title: item.Track_Title,
+                            Track_Artist: item.Track_Artist,
+                            url: `${item.Track_RootUrl}${item.Track_AudioFile}`
+                          })}
+                          style={{
+                            //marginHorizontal: 10,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: 20,
+                            height: 20
+                          }}>
+                          <Image
+                            //source={isPlaying == true && currentTrackId === item.Track_Id ? { uri: pause } : { uri: playbtn }}
+                            source={isPlaying && currentTrackIndex === index ? { uri: pause } : { uri: playbtn }}
+                            //source={{uri: playbtn}}
+                            style={{
+                              height: 10,
+                              width: 10,
+                            }}
+                          />
+                        </TouchableOpacity>
+
+                        {/* Position */}
+                        <View>
+                          <Text style={{marginHorizontal: 5}}>
+                            {`${Math.floor(position / 60)}:${Math.floor(position % 60)}/${Math.floor(duration / 60)}:${Math.floor(duration % 60)}`}
+                          </Text>
+                        </View>
+
+
+                        {/* Progress bar */}
+
+                        <Progress.Bar
+                          progress={0.2}
+                          width={120}
+                          color='rgb(40,40,40)'
+                          height={4}
+                          style={{
+                            borderRadius: 0,
+                            backgroundColor: 'rgb(187,185,185)',
+                            //marginHorizontal: SIZES.padding * 2.1,
+                            marginLeft: 0,
+                            borderWidth: 0.2
+
+                          }}
+                        />
+
+                        {/* volume */}
+
+                        <TouchableOpacity>
+                          <Image
+                            source={icons.vol}
+                            style={{
+                              width: 15,
+                              height: 15,
+                              marginHorizontal: SIZES.padding
+                            }}
+                          />
+                        </TouchableOpacity>
+
+                        {/* playback */}
+
+                        <TouchableOpacity>
+                          <Image
+                            source={icons.more}
+                            style={{
+                              width: 20,
+                              height: 20,
+                            }}
+                          />
+                        </TouchableOpacity>
+                      </View>
+
+
+                      <View>
+                        {/* Release_PrimaryArtist */}
+                        <Text
+                          style={{
+                            fontSize: TEXTS.text.size.sm,
+                            lineHeight: 18,
+                            fontWeight: '400'
+                          }}>
+                          {item.Track_Artist}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                )
+              }}
               horizontal
               ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
               contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}

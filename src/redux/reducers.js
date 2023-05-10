@@ -8,6 +8,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   title: '',
   data: [],
+  topSongs: [],
   activeList: 'updateRelease'
 };
 
@@ -23,6 +24,9 @@ export const dashboardSlice = createSlice({
       //console.log('updateData called with payload:', action.payload);
       state.data = action.payload;
     },
+    updateTopSongs: (state, action) => {
+      state.topSongs = action.payload;
+    },
     setActiveList: (state, action) => {
       state.activeList = action.payload;
     }
@@ -31,5 +35,11 @@ export const dashboardSlice = createSlice({
 //updateData
 
 // Action creators generated for each case reducer function.
-export const { updateTitle, updateData, setActiveList } = dashboardSlice.actions;
+export const { 
+  updateTitle, 
+  updateData, 
+  updateTopSongs, 
+  setActiveList 
+} = dashboardSlice.actions;
+
 export default dashboardSlice.reducer;

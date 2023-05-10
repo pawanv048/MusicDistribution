@@ -1,9 +1,9 @@
 import TrackPlayer, {State} from 'react-native-track-player';
 
-
 export const playTrack = async (track) => {
+  console.log('Playing track:', track);
   try {
-    //console.log('Playing track:', track);
+    //console.log('Playing track:', topTrackSongs);
     if (!track || !track.title || !track.artist || !track.url) {
       console.log('Track is missing a required key');
       return;
@@ -17,9 +17,13 @@ export const playTrack = async (track) => {
 };
 
 
-export const pauseTrack = async () => {
+export const pauseTrack = async (trackId) => {
   try {
-    await TrackPlayer.pause();
+    console.log('Pausing track with ID:', trackId);
+    console.log('Current playback state:', await TrackPlayer.getState());
+    await TrackPlayer.pause(trackId);
+    console.log('New playback state:', await TrackPlayer.getState());
+    console.log('Track paused successfully');
   } catch (error) {
     console.log('Error pausing track:', error);
   }

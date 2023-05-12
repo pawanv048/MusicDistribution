@@ -13,7 +13,7 @@ import {
 import { SelectList } from 'react-native-dropdown-select-list';
 import { COLORS, SIZES } from '../constants/theme';
 import icons from '../constants/icons';
-
+import { artists, devotionals, originalArtists, tems } from '../constants/strings';
 
 
 export const SearchComponent = ({ onSearch }) => {
@@ -290,6 +290,45 @@ export const ProgressBar = ({ progress }) => {
   );
 };
 
+export const FooterDetails = ({
+  titleHeader,
+  categoryData
+}) => {
+  let data = [];
+
+  if (categoryData === 'artists') {
+    data = artists;
+  } else if (categoryData === 'devotionals') {
+    data = devotionals;
+  } else if (categoryData === 'originalArtists') {
+    data = originalArtists;
+  } else if (categoryData === 'tems') {
+    data = tems;
+  }
+
+  return (
+    <View>
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: 'bold',
+          color: COLORS.support1,
+          marginVertical: SIZES.padding * 2
+        }}>{titleHeader}</Text>
+      {data.map((item, index) => (
+        <Text
+          key={index}
+          style={{
+            fontSize: 18,
+            fontWeight: '400',
+            color: COLORS.support1,
+            marginVertical: SIZES.padding,
+          }}>{item}</Text>
+      ))}
+    </View>
+  )
+}
+
 
 
 
@@ -302,7 +341,8 @@ const appComponent = {
   Toast,
   DrawerButton,
   CustomLoader,
-  ProgressBar
+  ProgressBar,
+  FooterDetails
 }
 
 export default appComponent;

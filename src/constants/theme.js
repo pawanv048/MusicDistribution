@@ -111,6 +111,7 @@ export const SIZES = {
  export const TEXTS = {
   text: {
     size: {
+      xsm: 12,
       sm: 14,
       base: 16,
       md: 18,

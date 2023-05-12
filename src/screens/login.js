@@ -211,7 +211,7 @@ const Login = ({ navigation }) => {
   )
 }
 
-export default Login
+export default Login;
 
 const styles = StyleSheet.create({
 

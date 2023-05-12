@@ -65,7 +65,7 @@ const Register = ({ navigation }) => {
       }
     })
   }
-  
+
 
 
 
@@ -112,7 +112,7 @@ const Register = ({ navigation }) => {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     const phoneRegex = /^[0]?[789]\d{9}$/;
 
-    
+
 
     fields.map((field) => {
       if (!registerData[field.name]) {
@@ -148,9 +148,9 @@ const Register = ({ navigation }) => {
     // if all fields are valid then call api
     if (isValid) {
       registerUser();
-      
+
       //setShowToast(false);
-      
+
       //console.log(registerData)
     }
   };
@@ -179,7 +179,7 @@ const Register = ({ navigation }) => {
             <Input
               value={registerData.firstName}
               placeholder='First Name'
-              onChangeText={text => handleOnChange(text, 'firstName')}   
+              onChangeText={text => handleOnChange(text, 'firstName')}
               error={errors.firstName}
               onFocus={() => handleError(null, 'firstName')}
             />

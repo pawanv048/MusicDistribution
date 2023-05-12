@@ -16,13 +16,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect, useSelector } from 'react-redux';
 import * as Progress from 'react-native-progress';
 import { useGetTopSongsQuery } from '../redux/DrawerApiCall';
-import { SearchComponent, TextButton, CustomText, Separator, CustomLoader } from '../custom/component';
+import { SearchComponent, TextButton, CustomText, Separator, CustomLoader, FooterDetails } from '../custom/component';
 import { COLORS, SIZES, TEXTS } from '../constants/theme';
 import * as String from '../constants/strings';
 import { artists, devotionals, originalArtists, tems } from '../constants/strings';
 import { API, API_ALLRELEASE, releaseUrl } from '../api/apiServers';
 import icons from '../constants/icons';
 import { playTrack, pauseTrack, getTrackInfo } from '../custom/AudioPlayer';
+import { handleSearch } from '../utils/helpers';
+
 
 
 const songs = [
@@ -89,6 +91,9 @@ const Dashboard = ({ navigation }) => {
   const topRelease = useSelector(state => state?.dashboard?.data?.Data)
   const topSongsData = useSelector((state) => state.dashboard.topSongs.data);
   const [topReleaseList, setTopReleaseList] = useState([]);
+  const [topSongsList, setTopSongsList] = useState([])
+  const [topArtistList, setTopArtistList] = useState([])
+
 
   // console.log('topSongsData=>>', topSongsData);
 
@@ -146,6 +151,21 @@ const Dashboard = ({ navigation }) => {
     // setSliderValue(value);
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updatePosition();
+      updateDuration();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isPlaying, sliderValue]);
+
+
+  // slider duration update
+  // useEffect(() => {
+
+  // }, [isPlaying]);
+
   const updatePosition = async () => {
     const newPosition = await TrackPlayer.getPosition();
     setPosition(newPosition);
@@ -157,6 +177,11 @@ const Dashboard = ({ navigation }) => {
   };
 
   // user login 
+
+  useEffect(() => {
+    retrieveLogin()
+  }, []);
+
   const retrieveLogin = async () => {
     try {
       const logindata = await AsyncStorage.getItem('Userid')
@@ -168,30 +193,33 @@ const Dashboard = ({ navigation }) => {
   }
 
   useEffect(() => {
+    if (filteredData) {
+      setFilteredData(filteredData);
+    }
+  }, [filteredData]);
+
+  useEffect(() => {
     if (topRelease) {
       setTopReleaseList(topRelease);
     }
   }, [topRelease]);
 
   useEffect(() => {
-    retrieveLogin()
-  }, []);
+    if (topSongsData) {
+      setTopSongsList(topSongsData);
+    }
+  }, [topSongsData]);
+
+  useEffect(() => {
+    if (topRelease) {
+      setTopArtistList(topRelease);
+    }
+  }, [topRelease]);
+
+
 
   // slider position update 
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      updatePosition();
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-
-  // slider duration update
-  useEffect(() => {
-    updateDuration();
-  }, [isPlaying]);
 
 
   // handle play and pause
@@ -213,6 +241,7 @@ const Dashboard = ({ navigation }) => {
           console.log('Track paused:', track.Track_Title);
         }
       } else {
+
         setCurrentTrackIndex(trackIndex);
         playTrack({
           id: track.Track_Id,
@@ -228,29 +257,90 @@ const Dashboard = ({ navigation }) => {
     }
   };
 
-
   // console.log('topRelease =>>', topRelease)
 
   // SEARCHING..
 
+
   const handleSearch = (searchQuery) => {
     if (!searchQuery) {
+      setFilteredData(data)
       setTopReleaseList(topRelease);
+      setTopSongsList(topSongsData);
+      setTopArtistList(topRelease);
     } else {
       const firstLetter = searchQuery.trim()[0].toLowerCase();
+
+      // Release search
+      const filteredData = data.filter((item) => {
+        const itemData = item.Release_ReleaseTitle.trim().toLowerCase() ?? '';
+        if (itemData[0] === firstLetter) {
+          return itemData.includes(searchQuery.trim().toLowerCase());
+        }
+        return false;
+      }) ?? [];
+
+      // Release search
       const topReleaseList = topRelease.filter((item) => {
         const itemData = item.Release_ReleaseTitle.trim().toLowerCase() ?? '';
         if (itemData[0] === firstLetter) {
           return itemData.includes(searchQuery.trim().toLowerCase());
         }
         return false;
-      });
+      }) ?? [];
+
+      // Top songs search
+      const topSongsList = topSongsData.filter((item) => {
+        console.log(item)
+        const itemSongData = item.Track_Artist.trim().toLowerCase() ?? '';
+        if (itemSongData[0] === firstLetter) {
+          return itemSongData.includes(searchQuery.trim().toLowerCase());
+        }
+        return false;
+      }) ?? [];
+
+      // Top Artist search
+      const topArtistList = topRelease.filter((item) => {
+        const itemData = item.Release_PrimaryArtist.trim().toLowerCase() ?? '';
+        if (itemData[0] === firstLetter) {
+          return itemData.includes(searchQuery.trim().toLowerCase());
+        }
+        return false;
+      }) ?? [];
+
+      const filteredDataWithIndex = filteredData.map((item) => {
+        const index = data.findIndex((el) => el.id === item.id);
+        return { ...item, index };
+      }) ?? [];
+
       const topReleaseListWithIndex = topReleaseList.map((item) => {
         const index = topRelease.findIndex((el) => el.id === item.id);
         return { ...item, index };
+      }) ?? [];
+
+      const topSongsListWithIndex = topSongsList.map((item) => {
+
+        const index = topSongsData.findIndex((el) => el.id === item.id);
+        return { ...item, index };
+      }) ?? [];
+
+      const topArtistListWithIndex = topArtistList.map((item) => {
+        const index = topRelease.findIndex((el) => el.id === item.id);
+        return { ...item, index };
       });
-      if (topReleaseListWithIndex.length > 0) {
+
+
+      if (
+        filteredDataWithIndex.length > 0 ||
+        topReleaseListWithIndex.length > 0 ||
+        topSongsListWithIndex.length > 0 ||
+        topArtistListWithIndex.length > 0
+      ) {
+        setFilteredData(filteredDataWithIndex)
         setTopReleaseList(topReleaseListWithIndex);
+        setTopSongsList(topSongsListWithIndex)
+        setTopArtistList(topArtistListWithIndex)
+        
       } else {
         alert(`No matching element found for '${searchQuery}'.`);
       }
@@ -299,8 +389,6 @@ const Dashboard = ({ navigation }) => {
   // Rendering List of Top Release, All Releases
 
   function renderCardView() {
-
-
 
 
     const renderCard = ({ item }) => {
@@ -579,7 +667,7 @@ const Dashboard = ({ navigation }) => {
             />
           ) : titles == 'Top Artists' ? (
             <FlatList
-              data={topRelease}
+              data={topArtistList}
               keyExtractor={(item, index) => item + index}
               renderItem={renderCard}
               showsHorizontalScrollIndicator={false}
@@ -590,7 +678,7 @@ const Dashboard = ({ navigation }) => {
           ) : titles == 'Top Songs!' && isLoggedIn ? (
             // <Text>show top songs</Text>
             <FlatList
-              data={topSongsData}
+              data={topSongsList}
               keyExtractor={(item, index) => item + index}
               renderItem={({ item, index }) => {
                 // console.log('Item:', item);
@@ -645,7 +733,6 @@ const Dashboard = ({ navigation }) => {
                         }}
                       >
 
-
                         <TouchableOpacity
                           onPress={() => handlePlayPause(index, {
                             Track_Id: item.Track_Id,
@@ -662,7 +749,7 @@ const Dashboard = ({ navigation }) => {
                           }}>
                           <Image
                             //source={isPlaying == true && currentTrackId === item.Track_Id ? { uri: pause } : { uri: playbtn }}
-                            source={isPlaying && currentTrackIndex === index ? { uri: pause } : { uri: playbtn }}
+                            source={isPlaying && currentTrackIndex === index && position < duration ? { uri: pause } : { uri: playbtn }}
                             //source={{uri: playbtn}}
                             style={{
                               height: 10,
@@ -672,39 +759,41 @@ const Dashboard = ({ navigation }) => {
                         </TouchableOpacity>
 
                         {/* Position */}
-                        <View>
-                          <Text style={{marginHorizontal: 5}}>
-                            {`${Math.floor(position / 60)}:${Math.floor(position % 60)}/${Math.floor(duration / 60)}:${Math.floor(duration % 60)}`}
-                          </Text>
-                        </View>
-
+                        <Text style={{ marginHorizontal: 5 }}>
+                          {isPlaying && currentTrackIndex === index && position < duration
+                            ? `${Math.floor(position / 60)}:${Math.floor(position % 60)}/${Math.floor(duration / 60)}:${Math.floor(duration % 60)}`
+                            : "0:0"}
+                        </Text>
 
                         {/* Progress bar */}
 
                         <Progress.Bar
-                          progress={0.2}
+                          progress={currentTrackIndex === index ? sliderValue : 0}
+                          //progress={currentTrackIndex === index ? position / duration : 0}
                           width={120}
                           color='rgb(40,40,40)'
                           height={4}
+
                           style={{
                             borderRadius: 0,
                             backgroundColor: 'rgb(187,185,185)',
-                            //marginHorizontal: SIZES.padding * 2.1,
                             marginLeft: 0,
                             borderWidth: 0.2
-
                           }}
                         />
 
                         {/* volume */}
 
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={handleVolToggle}
+                        >
                           <Image
                             source={icons.vol}
                             style={{
                               width: 15,
                               height: 15,
-                              marginHorizontal: SIZES.padding
+                              marginHorizontal: SIZES.padding,
+                              tintColor: currentTrackIndex === index && volume === 0 ? 'grey' : 'black'
                             }}
                           />
                         </TouchableOpacity>
@@ -764,52 +853,20 @@ const Dashboard = ({ navigation }) => {
 
   const renderFooter = () => {
 
+
     return (
       <React.Fragment>
-        <View
-          style={{
-            marginTop: 20,
-            flexDirection: 'row',
-            justifyContent: 'space-between'
-          }}>
-          <View>
-            <Text style={styles.footerTxt}>TOP ARTISTS</Text>
-            {artists.map((artist, index) => (
-              <Text key={index} style={styles.artistTxt}>{artist}</Text>
-            ))}
-          </View>
-
-          <View>
-            <Text style={styles.footerTxt}>TOP ACTORS</Text>
-            {artists.map((artist, index) => (
-              <Text key={index} style={styles.artistTxt}>{artist}</Text>
-            ))}
-          </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <FooterDetails titleHeader="TOP ARTISTS" categoryData="artists" />
+          <FooterDetails titleHeader="TOP ACTORS" categoryData="artists" />
         </View>
 
         <View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View>
-              <Text style={styles.footerTxt}>DEVOTIONAL SONGS</Text>
-              {devotionals.map((devotional, index) => (
-                <Text key={index} style={styles.artistTxt}>{devotional}</Text>
-              ))}
-            </View>
-
-            <View>
-              <Text style={styles.footerTxt}>COMPANY</Text>
-              {tems.map((company, index) => (
-                <Text key={index} style={styles.artistTxt}>{company}</Text>
-              ))}
-            </View>
+            <FooterDetails titleHeader="DEVOTIONAL SONGS" categoryData="devotionals" />
+            <FooterDetails titleHeader="COMPANY" categoryData="tems" />
           </View>
-
-          <View>
-            <Text style={styles.footerTxt}>ARTISTS ORIGINALS</Text>
-            {originalArtists.map((original, index) => (
-              <Text key={index} style={styles.artistTxt}>{original}</Text>
-            ))}
-          </View>
+          <FooterDetails titleHeader="ARTISTS ORIGINALS" categoryData="originalArtists" />
         </View>
 
         <Separator
@@ -918,206 +975,6 @@ const Dashboard = ({ navigation }) => {
         {renderFooter()}
       </ScrollView>
 
-      {/* PLAY AND PAUSE PLAYER */}
-      {/* <View
-        style={{
-          width: SIZES.width,
-          height: SIZES.height / 5,
-          backgroundColor: 'rgba(17,52,85,1)',
-          position: 'absolute',
-          bottom: 0,
-          padding: SIZES.padding
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            // margin: SIZES.padding
-          }}>
-          <Image
-            source={{ uri: PIC }}
-            style={{
-              width: 50,
-              height: 50,
-              marginRight: 10,
-              borderRadius: 8
-            }}
-          />
-          <View>
-            <Text
-              style={{
-                color: 'white',
-                lineHeight: 30,
-                fontSize: 20,
-                fontWeight: '700'
-              }}>Rakash roshan</Text>
-            <Text
-              style={{
-                color: 'white',
-                fontSize: 13,
-                fontWeight: '400'
-              }}>Himesh Reshammiya</Text>
-          </View>
-        </View> */}
-
-      {/* MUSIC PLAYER */}
-      {/* <View
-          style={{
-            width: '100%',
-            height: 60,
-            backgroundColor: COLORS.light,
-            marginTop: 10,
-            borderRadius: 30,
-            justifyContent: 'center',
-            paddingHorizontal: SIZES.padding,
-          }}
-        > */}
-
-      {/* <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center'
-            }}
-          > */}
-      {/* <TouchableOpacity
-              onPress={() => handlePlayPause()}
-              style={{
-                marginHorizontal: 10,
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 20,
-                height: 20
-              }}>
-              <Image
-                source={isPlaying == true ? { uri: pause } : { uri: playbtn }}
-                //source={{uri: playbtn}}
-                style={{
-                  height: 10,
-                  width: 10,
-                }}
-              />
-            </TouchableOpacity> */}
-      {/* <Text>
-              {`${Math.floor(position / 60)}:${Math.floor(position % 60)} / ${Math.floor(duration / 60)}:${Math.floor(duration % 60)}`}
-            </Text> */}
-
-      {/* <Slider
-              style={{ width: 150, height: 40, marginHorizontal: 15 }}
-              minimumValue={0}
-              maximumValue={1}
-              minimumTrackTintColor="rgba(11,11,11,1)"
-              maximumTrackTintColor="rgba(89,89,89,1)"
-              value={sliderValue}
-              // onValueChange={setSliderValue}
-              onValueChange={handleSliderChange}
-            /> */}
-
-      {/* VOLUME BUTTON */}
-      {/* <TouchableOpacity
-              onPress={handleVolToggle}
-            >
-              <Image
-                source={volume === 1 ? { uri: vol } : { uri: mute }}
-                style={{
-                  width: 20,
-                  height: 20,
-                  marginRight: 15
-                }}
-              />
-            </TouchableOpacity>
-
-
-            <TouchableOpacity onPress={toggleModal}>
-              <Image
-                source={{ uri: menu }}
-                style={{
-                  width: 20,
-                  height: 20
-                }}
-              />
-            </TouchableOpacity> */}
-
-      {/* download and playback speed */}
-      {/* {modalVisible ? (
-              <View
-                style={styles.download}
-              >
-                <TouchableOpacity
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginVertical: 10
-                  }}>
-                  <Image
-                    source={{ uri: download }}
-                    style={{
-                      width: 20,
-                      height: 20,
-                      marginRight: 10
-                    }}
-                  />
-                  <Text style={{ fontSize: 15, fontWeight: '400' }}>Download</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={togglePlayBack}
-                  style={{ flexDirection: 'row', alignItems: 'center' }}
-                >
-                  <Image
-                    source={{ uri: playbackspeed }}
-                    style={{
-                      width: 25,
-                      height: 25,
-                      marginRight: 6
-                    }}
-                  />
-                  <Text style={{ fontSize: 15, fontWeight: '400' }}>Playback Speed</Text>
-                </TouchableOpacity>
-              </View>
-            ) : null} */}
-
-      {/* Playbackspeed */}
-      {/* {pbspeedVisible && (
-              <ScrollView
-                style={[styles.download, { height: 200 }]}
-                contentContainerStyle={{ paddingBottom: 25 }}
-              >
-                <TouchableOpacity
-                  onPress={togglePlayBack}
-                  style={{ flexDirection: 'row' }}
-                >
-                  <Image
-                    source={{ uri: back }}
-                    style={{
-                      width: 15,
-                      height: 15,
-                      marginRight: 20
-                    }}
-                  />
-                  <Text>Option</Text>
-                </TouchableOpacity>
-
-                {playbackData.map((item, index) => {
-
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      onPress={() => handleChangePlaybackRate(item.rate)}
-                      style={{
-                        marginHorizontal: 40,
-                        marginVertical: 10
-                      }}
-                    >
-                      <Text>{item.label}</Text>
-                    </TouchableOpacity>
-                  )
-                })}
-              </ScrollView>
-            )} */}
-
-      {/* </View> */}
-      {/* </View> */}
-      {/* </View> */}
     </React.Fragment>
   )
 };

@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   forgetView: {
     width: '100%',
-    height: SIZES.height / 2,
+    height: SIZES.height / 2.2,
     backgroundColor: 'white',
     borderRadius: 10,
     padding: SIZES.padding * 2,

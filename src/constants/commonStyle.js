@@ -1,14 +1,25 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet } from 'react-native';
 
-const CommonStyle = () => {
-  return (
-    <View>
-      <Text>CommonStyle</Text>
-    </View>
-  )
-}
-
-export default CommonStyle
-
-const styles = StyleSheet.create({})
+const commonStyle = StyleSheet.create({
+  card: {
+    backgroundColor: COLORS.light,
+    height: SIZES.height / 1.6,
+    marginTop: SIZES.padding * 3,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.30,
+    shadowRadius: 8.65,
+    borderRadius: 10,
+  },
+  authCard: {
+    margin: SIZES.padding * 2,
+    marginTop: 100,
+    // height: SIZES.height / 1.3,
+    borderRadius: 10,
+    backgroundColor: COLORS.light,
+    padding: SIZES.padding * 3
+  }
+})

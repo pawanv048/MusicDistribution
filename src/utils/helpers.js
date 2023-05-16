@@ -1,16 +1,12 @@
-export const handleSearch = (searchQuery, data, searchKeys) => {
-  if (!searchQuery) {
-    return data;
-  } else {
-    const filteredData = data.filter((item) => {
-      for (let key of searchKeys) {
-        const itemData = item[key] ? item[key].toString().toLowerCase() : '';
-        if (itemData.includes(searchQuery.toLowerCase())) {
-          return true;
-        }
-      }
-      return false;
-    });
-    return filteredData;
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export async function retrieveItem(key) {
+  try {
+    const retrievedItem = await AsyncStorage.getItem(key);
+    const item = JSON.parse(retrievedItem);
+    return item;
+  } catch (error) {
+    console.log(error.message);
   }
-};
+  return;
+}

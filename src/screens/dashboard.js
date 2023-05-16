@@ -8,43 +8,20 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import Slider from '@react-native-community/slider';
 
 import TrackPlayer from 'react-native-track-player';
 import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { connect, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import * as Progress from 'react-native-progress';
-import { useGetTopSongsQuery } from '../redux/DrawerApiCall';
 import { SearchComponent, TextButton, CustomText, Separator, CustomLoader, FooterDetails } from '../custom/component';
 import { COLORS, SIZES, TEXTS } from '../constants/theme';
 import * as String from '../constants/strings';
-import { artists, devotionals, originalArtists, tems } from '../constants/strings';
 import { API, API_ALLRELEASE, releaseUrl } from '../api/apiServers';
 import icons from '../constants/icons';
 import { playTrack, pauseTrack, getTrackInfo } from '../custom/AudioPlayer';
 import { handleSearch } from '../utils/helpers';
 
-
-
-const songs = [
-  {
-    title: 'Avaritia',
-    artist: 'deadmau5',
-    artwork: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
-    url: require('../../tracks/blues.wav'),
-    id: '1',
-    duration: '311'
-  },
-  {
-    title: 'Raksha',
-    artist: 'Himesh',
-    artwork: 'https://cdn.pixabay.com/photo/2016/09/10/11/11/musician-1658887_960_720.jpg',
-    url: require('../../tracks/tracks_country.mp3'),
-    id: '2',
-    duration: '211'
-  }
-];
 
 const playbackData = [
   { label: '0.25x', onPress: () => console.log('0.25'), rate: 0.25 },
@@ -63,8 +40,7 @@ const pause = 'https://cdn-icons-png.flaticon.com/512/1214/1214679.png'
 // Main screen
 const Dashboard = ({ navigation }) => {
 
-  console.log('render Dashboard')
-
+  // console.log('render Dashboard')
 
   // console.log(topReleasesData);
 
@@ -72,11 +48,14 @@ const Dashboard = ({ navigation }) => {
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
+  // console.log('filteredData:', filteredData);
   const [range, setRange] = useState(0)
   const [currentTrackIndex, setCurrentTrackIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false)
   const [position, setPosition] = useState(0);
+  console.log('position:', position);
   const [duration, setDuration] = useState(0);
+  console.log('duration:', duration);
   const [volume, setVolume] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
   const [pbspeedVisible, setPbSpeedVisible] = useState(false);
@@ -140,8 +119,7 @@ const Dashboard = ({ navigation }) => {
     setPlaybackRate(rate);
   }
 
-  // POSITION OF SLIDER
-  const sliderValue = duration ? position / duration : 0;
+
 
   const handleSliderChange = async (value) => {
     const newPosition = value * duration;
@@ -152,6 +130,7 @@ const Dashboard = ({ navigation }) => {
   };
 
   useEffect(() => {
+    console.log('interval:', interval)
     const interval = setInterval(() => {
       updatePosition();
       updateDuration();
@@ -161,6 +140,11 @@ const Dashboard = ({ navigation }) => {
   }, [isPlaying, sliderValue]);
 
 
+
+  // POSITION OF SLIDER
+  const sliderValue = duration ? position / duration : 0;
+  // console.log('sliderValue:', sliderValue);
+
   // slider duration update
   // useEffect(() => {
 
@@ -169,11 +153,13 @@ const Dashboard = ({ navigation }) => {
   const updatePosition = async () => {
     const newPosition = await TrackPlayer.getPosition();
     setPosition(newPosition);
+    // console.log('newPosition', newPosition)
   };
 
   const updateDuration = async () => {
     const newDuration = await TrackPlayer.getDuration();
     setDuration(newDuration);
+    // console.log('newDuration', newDuration)
   };
 
   // user login 
@@ -190,19 +176,13 @@ const Dashboard = ({ navigation }) => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
     if (filteredData) {
       setFilteredData(filteredData);
     }
   }, [filteredData]);
-
-  useEffect(() => {
-    if (topRelease) {
-      setTopReleaseList(topRelease);
-    }
-  }, [topRelease]);
 
   useEffect(() => {
     if (topSongsData) {
@@ -212,14 +192,12 @@ const Dashboard = ({ navigation }) => {
 
   useEffect(() => {
     if (topRelease) {
+      setTopReleaseList(topRelease);
       setTopArtistList(topRelease);
     }
   }, [topRelease]);
 
-
-
   // slider position update 
-
 
 
   // handle play and pause
@@ -237,7 +215,9 @@ const Dashboard = ({ navigation }) => {
         if (trackInfo.trackObject.id === track.Track_Id) {
           pauseTrack(trackInfo.trackObject.id);
           setIsPlaying(false);
-          handleDefaultPlaybackRate();
+          console.log('Position:', position)
+          console.log('duration:', duration)
+          // handleDefaultPlaybackRate();
           console.log('Track paused:', track.Track_Title);
         }
       } else {
@@ -251,6 +231,7 @@ const Dashboard = ({ navigation }) => {
         });
         setIsPlaying(true);
         console.log('Track played:', track.Track_Title);
+
       }
     } catch (error) {
       console.log('Error handling play/pause:', error);
@@ -259,20 +240,23 @@ const Dashboard = ({ navigation }) => {
 
   // console.log('topRelease =>>', topRelease)
 
-  // SEARCHING..
+  // SEARCHING..  
 
 
   const handleSearch = (searchQuery) => {
     if (!searchQuery) {
-      setFilteredData(data)
-      setTopReleaseList(topRelease);
-      setTopSongsList(topSongsData);
-      setTopArtistList(topRelease);
+      setFilteredData(data);
+      if (titles === 'Music Releases!') {
+        setTopReleaseList(topRelease);
+      } else if (titles === 'Top Artists') {
+        setTopArtistList(topRelease);
+      } else if (titles === 'Top Songs!' && isLoggedIn) {
+        setTopSongsList(topSongsData);
+      }
     } else {
       const firstLetter = searchQuery.trim()[0].toLowerCase();
 
-      // Release search
-      const filteredData = data.filter((item) => {
+      const dashfilter = filteredData.filter((item) => {
         const itemData = item.Release_ReleaseTitle.trim().toLowerCase() ?? '';
         if (itemData[0] === firstLetter) {
           return itemData.includes(searchQuery.trim().toLowerCase());
@@ -280,35 +264,37 @@ const Dashboard = ({ navigation }) => {
         return false;
       }) ?? [];
 
-      // Release search
-      const topReleaseList = topRelease.filter((item) => {
-        const itemData = item.Release_ReleaseTitle.trim().toLowerCase() ?? '';
-        if (itemData[0] === firstLetter) {
-          return itemData.includes(searchQuery.trim().toLowerCase());
-        }
-        return false;
-      }) ?? [];
+      let topReleaseList = [];
+      let topSongsList = [];
+      let topArtistList = [];
 
-      // Top songs search
-      const topSongsList = topSongsData.filter((item) => {
-        console.log(item)
-        const itemSongData = item.Track_Artist.trim().toLowerCase() ?? '';
-        if (itemSongData[0] === firstLetter) {
-          return itemSongData.includes(searchQuery.trim().toLowerCase());
-        }
-        return false;
-      }) ?? [];
+      if (titles === 'Music Releases!') {
+        topReleaseList = topRelease.filter((item) => {
+          const itemData = item.Release_ReleaseTitle.trim().toLowerCase() ?? '';
+          if (itemData[0] === firstLetter) {
+            return itemData.includes(searchQuery.trim().toLowerCase());
+          }
+          return false;
+        }) ?? [];
+      } else if (titles === 'Top Artists') {
+        topArtistList = topRelease.filter((item) => {
+          const itemData = item.Release_PrimaryArtist.trim().toLowerCase() ?? '';
+          if (itemData[0] === firstLetter) {
+            return itemData.includes(searchQuery.trim().toLowerCase());
+          }
+          return false;
+        }) ?? [];
+      } else if (titles === 'Top Songs!' && isLoggedIn) {
+        topSongsList = topSongsData.filter((item) => {
+          const itemSongData = item.Track_Artist.trim().toLowerCase() ?? '';
+          if (itemSongData[0] === firstLetter) {
+            return itemSongData.includes(searchQuery.trim().toLowerCase());
+          }
+          return false;
+        }) ?? [];
+      }
 
-      // Top Artist search
-      const topArtistList = topRelease.filter((item) => {
-        const itemData = item.Release_PrimaryArtist.trim().toLowerCase() ?? '';
-        if (itemData[0] === firstLetter) {
-          return itemData.includes(searchQuery.trim().toLowerCase());
-        }
-        return false;
-      }) ?? [];
-
-      const filteredDataWithIndex = filteredData.map((item) => {
+      const filteredDataWithIndex = dashfilter.map((item) => {
         const index = data.findIndex((el) => el.id === item.id);
         return { ...item, index };
       }) ?? [];
@@ -319,7 +305,6 @@ const Dashboard = ({ navigation }) => {
       }) ?? [];
 
       const topSongsListWithIndex = topSongsList.map((item) => {
-
         const index = topSongsData.findIndex((el) => el.id === item.id);
         return { ...item, index };
       }) ?? [];
@@ -329,18 +314,20 @@ const Dashboard = ({ navigation }) => {
         return { ...item, index };
       });
 
-
       if (
         filteredDataWithIndex.length > 0 ||
         topReleaseListWithIndex.length > 0 ||
         topSongsListWithIndex.length > 0 ||
         topArtistListWithIndex.length > 0
       ) {
-        setFilteredData(filteredDataWithIndex)
-        setTopReleaseList(topReleaseListWithIndex);
-        setTopSongsList(topSongsListWithIndex)
-        setTopArtistList(topArtistListWithIndex)
-        
+        setFilteredData(filteredDataWithIndex);
+        if (titles === 'Music Releases!') {
+          setTopReleaseList(topReleaseListWithIndex);
+        } else if (titles === 'Top Artists') {
+          setTopArtistList(topArtistListWithIndex);
+        } else if (titles === 'Top Songs!' && isLoggedIn) {
+          setTopSongsList(topSongsListWithIndex);
+        }
       } else {
         alert(`No matching element found for '${searchQuery}'.`);
       }
@@ -760,10 +747,11 @@ const Dashboard = ({ navigation }) => {
 
                         {/* Position */}
                         <Text style={{ marginHorizontal: 5 }}>
-                          {isPlaying && currentTrackIndex === index && position < duration
+                          {currentTrackIndex === index && position < duration 
                             ? `${Math.floor(position / 60)}:${Math.floor(position % 60)}/${Math.floor(duration / 60)}:${Math.floor(duration % 60)}`
                             : "0:0"}
                         </Text>
+
 
                         {/* Progress bar */}
 

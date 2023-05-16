@@ -30,12 +30,13 @@ const Drawer = ({ navigation, route }) => {
   const [showDrawerItems, setShowDrawerItems] = useState(true);
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [email, setEmail] = useState('')
   const { data: topReleasesData } = useGetTopReleasesQuery();
   const { data: topSongsData } = useGetTopSongsQuery();
 
-  const email = useSelector(selectEmail);
+  // const email = useSelector(selectEmail);
    
-//  console.log('topSongsData=>>', topSongsData);
+  //  console.log('email=>>', email);
 
 
 
@@ -44,12 +45,20 @@ const Drawer = ({ navigation, route }) => {
 
   useEffect(() => {
     checkLoginStatus();
+    getUserEmail()
   }, []);
 
   const checkLoginStatus = async () => {
     const userId = await AsyncStorage.getItem('Userid');
     setIsLoggedIn(!!userId);
   };
+
+  const getUserEmail = async () => {
+    const userId = await AsyncStorage.getItem('Userid');
+    setEmail(userId.replace(/"/g, ''));
+    // setEmail(userId.slice(1, -1));
+  }
+
 
   // SHOWING HISTORY WHEN USER LOGIN
   const handleHistoryPress = () => {
@@ -174,8 +183,8 @@ const Drawer = ({ navigation, route }) => {
             }}
           />
           <View>
-            <Text style={styles.profile_name}>Guest</Text>
-            <Text style={{ fontWeight: '600' }}>william@gmail.com</Text>
+            <Text style={styles.profile_name}>smaith</Text>
+            {isLoggedIn && <Text style={{ fontWeight: '600' }}>{email}</Text>}
           </View>
         </View>
 

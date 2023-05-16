@@ -21,7 +21,20 @@ export const SearchComponent = ({ onSearch }) => {
 
   const handleSearch = () => {
     onSearch(searchText);
+    // clearSearchText();
   };
+
+  // const handleSearch = () => {
+  //   if (searchText.trim() !== '') {
+  //     onSearch(searchText);
+  //   } else {
+  //     clearSearchText();
+  //   }
+  // };
+
+  // const clearSearchText = () => {
+  //   setSearchText('');
+  // };
 
   return (
     <View style={styles.container}>
@@ -36,10 +49,12 @@ export const SearchComponent = ({ onSearch }) => {
         //keyboardType='email-address'
         returnKeyType='search'
       />
-      <Image
-        source={icons.search}
-        style={styles.search}
-      />
+      <TouchableOpacity onPress={() => console.log('search')}>
+        <Image
+          source={icons.search}
+          style={styles.search}
+        />
+      </TouchableOpacity>
     </View>
   );
 };

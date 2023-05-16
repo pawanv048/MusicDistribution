@@ -6,7 +6,7 @@ import { Input, CustomText, TextButton } from '../custom/component';
 import { SIZES, COLORS } from '../constants/theme';
 import icons from '../constants/icons';
 import { API, loginUrl } from '../api/apiServers';
-import { setEmail } from '../redux/userSlice';
+// import { setEmail } from '../redux/userSlice';
 import { useDispatch } from 'react-redux';
 
 
@@ -21,10 +21,10 @@ const Login = ({ navigation }) => {
     password: ""
   });
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
   //  console.log(loginData.email)
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   // handle login data change
   const handleOnChange = (text, loginData) => {
     setLoginData(prevState => ({ ...prevState, [loginData]: text }));
@@ -51,9 +51,10 @@ const Login = ({ navigation }) => {
         if (res[0].Status === "0") {
           // Store Userid in local storage
           //await AsyncStorage.setItem('Userid', res[0].Userid);
-          await AsyncStorage.setItem('Userid', JSON.stringify(true));
+          await AsyncStorage.setItem('Userid', JSON.stringify(loginData.email));
+          
           // Set email in Redux store
-          dispatch(setEmail(loginData.email));
+          // dispatch(setEmail(loginData.email));
           // Navigate to Dashboard
           navigation.navigate('Dashboard', { userId: res[0].Userid })
           //navigation.navigate('Dashboard',  { isLoggedIn: true })

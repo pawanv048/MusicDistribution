@@ -12,11 +12,11 @@ app.use(cors());
 app.post("/pay", async (req, res) => {
   try {
 
-    const { email, amount } = req.body;
+    const { email, amount, sourceToken } = req.body;
     //if (!email || !amount) return res.status(400).json({ message: "Please provide email and amount" });
 
     const customerId = await stripe.customers.create({
-      email: 'sumit@gmail.com',
+      email: 'sumit@123gmail.com',
     });
     const customers = await stripe.customers.list();
     const customer = customers.data[0];
@@ -26,24 +26,23 @@ app.post("/pay", async (req, res) => {
         error: 'you have no customer created'
       })
     }
-    // console.log(customers); // log the customers array
-
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: 4000,
-      currency: "INR",
+      amount: 500,
+      currency: "usd",
       payment_method_types: ["card"],
       customer: customerId.id,
+      // payment_method: paymentMethod.id,
       //receipt_email: customer.email,
       //metadata: { name },
     });
-    //console.log(paymentIntent); // log the paymentIntent object
-    //console.log(customers);
-    //console.log(receipt_email, "rahula@gmail.com")
-    // Get the card brand
-    // const cardBrand = paymentIntent.payment_method_details.card.brand;
-    // console.log(cardBrand); // e.g. 'visa', 'mastercard', etc.
-    
+    // console.log("Payment Object:", paymentIntent);
+
+    // Retrieve payment method details
+    // const retrievedPaymentMethod = await stripe.paymentMethods.retrieve(paymentIntent.payment_method);
+    // const cardBrand = retrievedPaymentMethod.card.brand;
+    // console.log('brand', cardBrand);
+
     const clientSecret = paymentIntent.client_secret;
     res.json({
       message: "Payment initiated",
@@ -53,6 +52,7 @@ app.post("/pay", async (req, res) => {
       amount: paymentIntent.amount,
       payment_method_type: paymentIntent.payment_method_types[0],
       customer_id: customer.id,
+      // brand: card.brand,
     });
   } catch (err) {
     console.error(err);
@@ -86,6 +86,7 @@ app.post("/stripe", async (req, res) => {
   // Event when a payment is succeeded
   if (event.type === "payment_intent.succeeded") {
     console.log(`${event.data.object.metadata.name} succeeded payment!`);
+    // console.log("Charge ID:", event.data.object.charges.data[0].id); // Print the charge ID
     // fulfilment
   }
   res.json({ ok: true });

@@ -9,7 +9,7 @@ import {
   Image,
 } from 'react-native';
 
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { useProgress } from 'react-native-track-player';
 import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSelector } from 'react-redux';
@@ -53,9 +53,9 @@ const Dashboard = ({ navigation }) => {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false)
   const [position, setPosition] = useState(0);
-  console.log('position:', position);
+  // console.log('position:', position);
   const [duration, setDuration] = useState(0);
-  console.log('duration:', duration);
+  // console.log('duration:', duration);
   const [volume, setVolume] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
   const [pbspeedVisible, setPbSpeedVisible] = useState(false);
@@ -76,7 +76,7 @@ const Dashboard = ({ navigation }) => {
 
   // console.log('topSongsData=>>', topSongsData);
 
-
+  // console.log('progress', progres);
   //modal
   const togglePlayBack = () => {
     if (pbspeedVisible) {
@@ -130,7 +130,7 @@ const Dashboard = ({ navigation }) => {
   };
 
   useEffect(() => {
-    console.log('interval:', interval)
+    // console.log('interval:', interval)
     const interval = setInterval(() => {
       updatePosition();
       updateDuration();
@@ -142,7 +142,10 @@ const Dashboard = ({ navigation }) => {
 
 
   // POSITION OF SLIDER
+  const progres = useProgress();
+  // const {position, duration} = progres
   const sliderValue = duration ? position / duration : 0;
+  // const sliderValue = duration ? position / duration : 0;
   // console.log('sliderValue:', sliderValue);
 
   // slider duration update
@@ -206,29 +209,39 @@ const Dashboard = ({ navigation }) => {
     try {
       const currentTrack = await TrackPlayer.getCurrentTrack();
 
-      console.log('Current track:', currentTrack);
-      console.log('Current playback state:', await TrackPlayer.getState());
-      console.log('Track index:', trackIndex);
+      console.log('Index:', trackIndex);
+      console.log('Track ID:', track.Track_Id);
+
+      // console.log('Current track:', currentTrack);
+      // console.log('Current playback state:', await TrackPlayer.getState());
+      // console.log('Track index:', trackIndex);
 
       if (currentTrack !== null && currentTrackIndex === trackIndex && isPlaying) {
         const trackInfo = await getTrackInfo();
+        // console.log('Track info:', trackInfo);
         if (trackInfo.trackObject.id === track.Track_Id) {
           pauseTrack(trackInfo.trackObject.id);
           setIsPlaying(false);
-          console.log('Position:', position)
-          console.log('duration:', duration)
+          // console.log('Position:', position)
+          // console.log('duration:', duration)
           // handleDefaultPlaybackRate();
           console.log('Track paused:', track.Track_Title);
         }
       } else {
 
         setCurrentTrackIndex(trackIndex);
+        // console.log('Playing new track...');
+        // console.log('Resuming playback...');
+        //await TrackPlayer.reset();
         playTrack({
           id: track.Track_Id,
           title: track.Track_Title,
           artist: track.Track_Artist,
           url: track.url
         });
+        // Seek to the beginning of the new track
+        // await TrackPlayer.seekTo(0);
+
         setIsPlaying(true);
         console.log('Track played:', track.Track_Title);
 
@@ -389,7 +402,11 @@ const Dashboard = ({ navigation }) => {
               height: SIZES.height / 2.7,
               marginVertical: SIZES.padding * 2,
               //backgroundColor: 'red',
-              borderRadius: 10
+              borderRadius: 10,
+              // shadowOffset: {width: 2, height: -2},
+              // shadowColor: 'black',
+              // shadowOpacity: 0.3,
+              // shadowRadius: 4
             }}>
             <FastImage
               source={{
@@ -747,7 +764,7 @@ const Dashboard = ({ navigation }) => {
 
                         {/* Position */}
                         <Text style={{ marginHorizontal: 5 }}>
-                          {currentTrackIndex === index && position < duration 
+                          {currentTrackIndex === index && position < duration
                             ? `${Math.floor(position / 60)}:${Math.floor(position % 60)}/${Math.floor(duration / 60)}:${Math.floor(duration % 60)}`
                             : "0:0"}
                         </Text>
@@ -756,6 +773,7 @@ const Dashboard = ({ navigation }) => {
                         {/* Progress bar */}
 
                         <Progress.Bar
+                          //progress={currentTrackIndex === index ? progress.position/progres.duration : 0}
                           progress={currentTrackIndex === index ? sliderValue : 0}
                           //progress={currentTrackIndex === index ? position / duration : 0}
                           width={120}
@@ -769,6 +787,12 @@ const Dashboard = ({ navigation }) => {
                             borderWidth: 0.2
                           }}
                         />
+
+                        {/* <Text>{formatTime(progress.position)}</Text> */}
+                        {/* <ProgressBar
+                          progress={progress.position}
+                          buffered={progress.buffered}
+                        /> */}
 
                         {/* volume */}
 

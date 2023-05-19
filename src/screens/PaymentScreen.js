@@ -26,11 +26,13 @@ import { useNavigation } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { TextButton, SearchComponent, CustomText, CustomLoader } from '../custom/component';
-import { API, releaseUrl } from '../api/apiServers';
-import { COLORS, SIZES } from '../constants/theme';
+import { useAddPurchaseDetailMutation } from '../redux/DrawerApiCall';
 import { playTrack, pauseTrack } from '../custom/AudioPlayer';
+import { API, releaseUrl } from '../api/apiServers';
 import { selectEmail } from '../redux/userSlice';
+import { COLORS, SIZES } from '../constants/theme';
 import icons from '../constants/icons';
+
 
 
 import { LogBox } from 'react-native';
@@ -45,7 +47,7 @@ const PaymentScreen = (props) => {
     Release_Id = 31939,
     Release_Artwork = '79b94356-7690-4dfd-b01c-c5e1386e88e2.jpg'
   } = props;
-  // console.log('Release_Artwork:',Release_Artwork);
+  //  console.log('Release_Id:',Release_Id);
 
   const [cardInfo, setCardInfo] = useState(null);
   const [trackData, setTrackData] = useState([]);
@@ -54,9 +56,11 @@ const PaymentScreen = (props) => {
   const [currentIndex, setCurrentIndex] = useState(null);
   const [cardDetailsEntered, setCardDetailsEntered] = useState(false);
   const [isLoading, setLoading] = useState(false);
-
   const email = useSelector(selectEmail);
   //console.log('email=>',email);
+
+  // addPurchaseDetail is a function that is use post used id
+  const [addPurchaseDetail] = useAddPurchaseDetailMutation();
 
   // STRIPE HOOKS
   const stripe = useStripe();
@@ -65,6 +69,8 @@ const PaymentScreen = (props) => {
   const handleNavigation = () => {
     navigation.navigate('Dashboard');
   };
+
+
 
   // OPENING PAYMENT SHEET
   const subscribe = async () => {
@@ -89,6 +95,18 @@ const PaymentScreen = (props) => {
         clientSecret,
       });
       if (presentSheet.error) return Alert.alert(presentSheet.error.message);
+
+      // Payment is successful, call the mutation
+      const res = await addPurchaseDetail({
+        ReleaseId: Release_Id,
+        customer: "smaith@gmail.com",
+        PaymentStatus: "paid",
+        UserId: "5819A966-F236-4B85-B902-A6E890E38B47",
+        Amount: "500",
+        CardType: "master",
+        Currency: "usd"
+      });
+      console.log(res);
       Alert.alert("Payment complete, thank you!");
       await downloadAllTracks();
     } catch (err) {
@@ -186,7 +204,7 @@ const PaymentScreen = (props) => {
           }}
         >DASHBOARD
         </Text>
-        <SearchComponent 
+        <SearchComponent
 
         />
         <View style={{ flexDirection: 'row', marginTop: 5 }}>
@@ -294,8 +312,12 @@ const PaymentScreen = (props) => {
         <TextButton
           //onPress={() => downloadAllTracks(tracks)}
           onPress={subscribe}
+          //onPress={handlePayment}
           label={'Payment'}
         />
+        {/* {isSuccess !== '' && (
+          <Text>payment success added in history</Text>
+        )} */}
 
         {/* COPYRIGHTS */}
         <View>

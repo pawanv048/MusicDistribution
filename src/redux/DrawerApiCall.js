@@ -15,8 +15,19 @@ export const getDrawerApi = createApi({
         url: '/GetTopSongs',
         method: 'get'
       })
+    }),
+    addPurchaseDetail: builder.mutation({
+      query: (data) => ({
+        url: '/AddPurchesDetail',
+        method: 'POST',
+        body: data
+      })
     })
   })
 });
 
-export const { useGetTopReleasesQuery, useGetTopSongsQuery } = getDrawerApi;
+export const { 
+  useGetTopReleasesQuery, 
+  useGetTopSongsQuery, 
+  useAddPurchaseDetailMutation 
+} = getDrawerApi;

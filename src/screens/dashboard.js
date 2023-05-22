@@ -881,37 +881,16 @@ const Dashboard = ({ navigation }) => {
           <FooterDetails titleHeader="ARTISTS ORIGINALS" categoryData="originalArtists" />
         </View>
 
-        <Separator
-          lineContainer={{
-            borderBottomWidth: 1,
-            marginTop: SIZES.padding2,
-            borderBottomColor: COLORS.support1
-          }}
-        />
+        <Separator lineContainer={{ borderBottomWidth: 1, marginTop: SIZES.padding2, borderBottomColor: COLORS.support1 }} />
 
         <View>
           <Text style={[styles.artistTxt, { textAlign: 'left' }]}>{String.rights}</Text>
-          <View style={{
-            flexDirection: 'row',
-            alignItems: 'center'
-          }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={[styles.artistTxt, { textAlign: 'left' }]}>{String.social}</Text>
-            <Image
-              source={icons.facebook}
-              style={styles.socialIcons}
-            />
-            <Image
-              source={icons.google}
-              style={styles.socialIcons}
-            />
-            <Image
-              source={icons.linkdin}
-              style={styles.socialIcons}
-            />
-            <Image
-              source={icons.twitter}
-              style={styles.socialIcons}
-            />
+            <Image source={icons.facebook} style={styles.socialIcons} />
+            <Image source={icons.google} style={styles.socialIcons} />
+            <Image source={icons.linkdin} style={styles.socialIcons} />
+            <Image source={icons.twitter} style={styles.socialIcons} />
           </View>
         </View>
       </React.Fragment>

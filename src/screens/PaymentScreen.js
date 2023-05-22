@@ -82,9 +82,13 @@ const PaymentScreen = (props) => {
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ 
+          email: 'rohit123@gmail.com',
+          amount: 1000
+        }),
       });
       const data = await response.json();
-      //console.log('Public key:', data); 
+      // console.log('Public key:', data); 
       if (!response.ok) return Alert.alert(data.message);
       const clientSecret = data.clientSecret;
       const initSheet = await stripe.initPaymentSheet({
@@ -93,6 +97,7 @@ const PaymentScreen = (props) => {
       if (initSheet.error) return Alert.alert(initSheet.error.message);
       const presentSheet = await stripe.presentPaymentSheet({
         clientSecret,
+        
       });
       if (presentSheet.error) return Alert.alert(presentSheet.error.message);
 

@@ -71,62 +71,34 @@ import TrackPlayer, {State} from 'react-native-track-player';
 // };
 
 
-// export const playTrack = async (track) => {
-//   //console.log('Playing track:', track);
-//   try {
-//     if (!track || !track.title || !track.artist || !track.url) {
-//       //console.log('Track is missing a required key');
-//       return;
-//     }
-//     const currentTrack = await TrackPlayer.getCurrentTrack();
-//     if (currentTrack !== null) {
-//       const playbackState = await TrackPlayer.getState();
-//       if (playbackState === TrackPlayer.STATE_PLAYING) {
-        
-//         //console.log('Pausing current track...');
-//         await TrackPlayer.pause();
-//         //console.log('Current track paused');
-//       }
-//     }
-//     await TrackPlayer.reset();
-//     //console.log('Adding track to playback queue:', track);
-//     await TrackPlayer.add(track);
-//     //console.log('Starting playback...');
-   
-//     await TrackPlayer.play();
-//   } catch (error) {
-//     //console.log('Error playing track:', error);
-//   }
-// };
-
 export const playTrack = async (track) => {
+  //console.log('Playing track:', track);
   try {
     if (!track || !track.title || !track.artist || !track.url) {
-      // Track is missing a required key, handle accordingly
+      //console.log('Track is missing a required key');
       return;
     }
-
     const currentTrack = await TrackPlayer.getCurrentTrack();
-    const playbackState = await TrackPlayer.getState();
-
-    if (currentTrack !== null && playbackState === TrackPlayer.STATE_PLAYING) {
-      // Pause the current track if it is playing
-      await TrackPlayer.pause();
+    if (currentTrack !== null) {
+      const playbackState = await TrackPlayer.getState();
+      if (playbackState === TrackPlayer.STATE_PLAYING) {
+        
+        //console.log('Pausing current track...');
+        await TrackPlayer.pause();
+        //console.log('Current track paused');
+      }
     }
-
-    // Stop the current track and reset the player
-    await TrackPlayer.stop();
     await TrackPlayer.reset();
-
-    // Add the new track to the playback queue
+    //console.log('Adding track to playback queue:', track);
     await TrackPlayer.add(track);
-
-    // Start playback with the new track
+    //console.log('Starting playback...');
+   
     await TrackPlayer.play();
   } catch (error) {
-    // Handle any errors that occur during playback
+    //console.log('Error playing track:', error);
   }
 };
+
 
 
 

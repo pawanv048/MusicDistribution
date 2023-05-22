@@ -16,7 +16,7 @@ app.post("/pay", async (req, res) => {
     //if (!email || !amount) return res.status(400).json({ message: "Please provide email and amount" });
 
     const customerId = await stripe.customers.create({
-      email: 'sumit@123gmail.com',
+      email: email,
     });
     const customers = await stripe.customers.list();
     const customer = customers.data[0];
@@ -28,10 +28,22 @@ app.post("/pay", async (req, res) => {
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: 500,
+      amount: amount,
       currency: "usd",
       payment_method_types: ["card"],
       customer: customerId.id,
+      description: "Description of the export transaction",
+      shipping: {
+        name: "rohit", // Replace with the customer's name
+        address: {
+          line1: "Address Line 1", // Replace with the customer's address line 1
+          line2: "Address Line 2", // Replace with the customer's address line 2 (optional)
+          city: "Sacramento", // Replace with the customer's city
+          state: "California", // Replace with the customer's state
+          postal_code: "94203", // Replace with the customer's postal code
+          country: "US", // Replace with the customer's country
+        },
+      },
       // payment_method: paymentMethod.id,
       //receipt_email: customer.email,
       //metadata: { name },
@@ -42,6 +54,8 @@ app.post("/pay", async (req, res) => {
     // const retrievedPaymentMethod = await stripe.paymentMethods.retrieve(paymentIntent.payment_method);
     // const cardBrand = retrievedPaymentMethod.card.brand;
     // console.log('brand', cardBrand);
+
+   
 
     const clientSecret = paymentIntent.client_secret;
     res.json({

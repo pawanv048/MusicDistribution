@@ -1,74 +1,5 @@
 import TrackPlayer, {State} from 'react-native-track-player';
 
-// export const playTrack = async (track) => {
-//   //console.log('Playing track:', track);
-//   try {
-//     ////console.log('Playing track:', topTrackSongs);
-//     if (!track || !track.title || !track.artist || !track.url) {
-//       //console.log('Track is missing a required key');
-//       return;
-//     }
-//     //console.log('Resetting playback...');
-//     await TrackPlayer.reset();
-//     //console.log('Adding track to playback queue:', track);
-//     await TrackPlayer.add(track);
-//     //console.log('Starting playback...');
-//     await TrackPlayer.play();
-//   } catch (error) {
-//     //console.log('Error playing track:', error);
-//   }
-// };
-
-// export const playTrack = async (track) => {
-//   //console.log('Playing track:', track);
-//   try {
-//     if (!track || !track.title || !track.artist || !track.url) {
-//       //console.log('Track is missing a required key');
-//       return;
-//     }
-//     const currentTrack = await TrackPlayer.getCurrentTrack();
-//     if (currentTrack !== null && currentTrack === track.id) {
-//       //console.log('Track is already playing. Skipping playback reset.');
-//       return;
-//     }
-//     //console.log('Resetting playback...');
-//     await TrackPlayer.reset();
-//     //console.log('Adding track to playback queue:', track);
-//     await TrackPlayer.add(track);
-//     //console.log('Starting playback...');
-//     await TrackPlayer.play();
-//   } catch (error) {
-//     //console.log('Error playing track:', error);
-//   }
-// };
-
-// export const playTrack = async (track) => {
-//   //console.log('Playing track:', track);
-//   try {
-//     if (!track || !track.title || !track.artist || !track.url) {
-//       //console.log('Track is missing a required key');
-//       return;
-//     }
-//     const currentTrack = await TrackPlayer.getCurrentTrack();
-//     if (currentTrack !== null && currentTrack === track.id) {
-//       const playbackState = await TrackPlayer.getState();
-//       if (playbackState === TrackPlayer.STATE_PAUSED) {
-//         //console.log('Resuming playback...');
-//         await TrackPlayer.play();
-//         return;
-//       }
-//     }
-//     const isTrackInQueue = await TrackPlayer.getTrack(track.id);
-//     if (isTrackInQueue === null) {
-//       //console.log('Adding track to playback queue:', track);
-//       await TrackPlayer.add(track);
-//     }
-//     //console.log('Starting playback...');
-//     await TrackPlayer.play();
-//   } catch (error) {
-//     //console.log('Error playing track:', error);
-//   }
-// };
 
 
 export const playTrack = async (track) => {
@@ -81,8 +12,8 @@ export const playTrack = async (track) => {
     const currentTrack = await TrackPlayer.getCurrentTrack();
     if (currentTrack !== null) {
       const playbackState = await TrackPlayer.getState();
+      console.log(playbackState);
       if (playbackState === TrackPlayer.STATE_PLAYING) {
-        
         //console.log('Pausing current track...');
         await TrackPlayer.pause();
         //console.log('Current track paused');
@@ -95,9 +26,10 @@ export const playTrack = async (track) => {
    
     await TrackPlayer.play();
   } catch (error) {
-    //console.log('Error playing track:', error);
-  }
+    console.log('Error playing track:', error);
+  } 
 };
+
 
 
 

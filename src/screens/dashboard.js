@@ -14,10 +14,14 @@ import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSelector } from 'react-redux';
 import * as Progress from 'react-native-progress';
-import { SearchComponent, TextButton, CustomText, Separator, CustomLoader, FooterDetails } from '../custom/component';
+import RNFS from 'react-native-fs';
+// import {  } from 'react-native-audio-toolkit';
+// import { AudioCon } from '@react-native-community/audio-toolkit';
+
+import { SearchComponent, CustomText, Separator, CustomLoader, FooterDetails } from '../custom/component';
 import { COLORS, SIZES, TEXTS } from '../constants/theme';
 import * as String from '../constants/strings';
-import { API, API_ALLRELEASE, releaseUrl } from '../api/apiServers';
+import { API, API_ALLRELEASE, releaseUrl, url } from '../api/apiServers';
 import icons from '../constants/icons';
 import { playTrack, pauseTrack, getTrackInfo } from '../custom/AudioPlayer';
 import { handleSearch } from '../utils/helpers';
@@ -68,7 +72,7 @@ const Dashboard = ({ navigation }) => {
   //Redux - get
   const titles = useSelector(state => state.dashboard.title)
   const topRelease = useSelector(state => state?.dashboard?.data?.Data)
-  const topSongsData = useSelector((state) => state.dashboard.topSongs.data);
+  const topSongsData = useSelector((state) => state?.dashboard?.topSongs?.data);
   const [topReleaseList, setTopReleaseList] = useState([]);
   const [topSongsList, setTopSongsList] = useState([])
   const [topArtistList, setTopArtistList] = useState([])
@@ -205,51 +209,44 @@ const Dashboard = ({ navigation }) => {
 
   // handle play and pause
 
-  const handlePlayPause = async (trackIndex, track) => {
-    try {
-      const currentTrack = await TrackPlayer.getCurrentTrack();
+ const handlePlayPause = async (trackIndex, track) => {
+  try {
+    const currentTrack = await TrackPlayer.getCurrentTrack();
+    console.log('Index:', trackIndex);
+    console.log('Track ID:', track.Track_Id);
 
-      console.log('Index:', trackIndex);
-      console.log('Track ID:', track.Track_Id);
-
-      // console.log('Current track:', currentTrack);
-      // console.log('Current playback state:', await TrackPlayer.getState());
-      // console.log('Track index:', trackIndex);
-
-      if (currentTrack !== null && currentTrackIndex === trackIndex && isPlaying) {
-        const trackInfo = await getTrackInfo();
-        // console.log('Track info:', trackInfo);
-        if (trackInfo.trackObject.id === track.Track_Id) {
-          pauseTrack(trackInfo.trackObject.id);
-          setIsPlaying(false);
-          // console.log('Position:', position)
-          // console.log('duration:', duration)
-          // handleDefaultPlaybackRate();
-          console.log('Track paused:', track.Track_Title);
-        }
-      } else {
-
+    if (
+      currentTrack !== null &&
+      currentTrackIndex === trackIndex &&
+      isPlaying
+    ) {
+      const trackInfo = await getTrackInfo();
+      if (trackInfo.trackObject.id === track.Track_Id) {
+        pauseTrack(trackInfo.trackObject.id);
+        setIsPlaying(false);
+        console.log('Track paused:', track.Track_Title);
+      }
+    } else {
+      if (currentTrackIndex !== trackIndex) {
         setCurrentTrackIndex(trackIndex);
-        // console.log('Playing new track...');
-        // console.log('Resuming playback...');
-        //await TrackPlayer.reset();
-        playTrack({
+        await TrackPlayer.reset();
+        await TrackPlayer.add({
           id: track.Track_Id,
           title: track.Track_Title,
           artist: track.Track_Artist,
           url: track.url
         });
-        // Seek to the beginning of the new track
-        // await TrackPlayer.seekTo(0);
-
-        setIsPlaying(true);
-        console.log('Track played:', track.Track_Title);
-
       }
-    } catch (error) {
-      console.log('Error handling play/pause:', error);
+      await TrackPlayer.play();
+      setIsPlaying(true);
+      console.log('Track played:', track.Track_Title);
     }
-  };
+  } catch (error) {
+    console.log('Error handling play/pause:', error);
+  }
+};
+
+
 
   // console.log('topRelease =>>', topRelease)
 
@@ -742,7 +739,7 @@ const Dashboard = ({ navigation }) => {
                             Track_Id: item.Track_Id,
                             Track_Title: item.Track_Title,
                             Track_Artist: item.Track_Artist,
-                            url: `${item.Track_RootUrl}${item.Track_AudioFile}`
+                            url: `https://musicdistributionsystem.com/tracks/${item.Track_AudioFile}`
                           })}
                           style={{
                             //marginHorizontal: 10,
@@ -864,8 +861,6 @@ const Dashboard = ({ navigation }) => {
   // FOOTER CONTENT
 
   const renderFooter = () => {
-
-
     return (
       <React.Fragment>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

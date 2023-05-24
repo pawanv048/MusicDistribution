@@ -19,7 +19,8 @@ import {
   createToken,
   paymentIndent,
   confirmPayment,
-  usePaymentSheet
+  usePaymentSheet,
+  AddressDetails
 } from '@stripe/stripe-react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import { useNavigation } from '@react-navigation/native';
@@ -74,6 +75,8 @@ const PaymentScreen = (props) => {
 
   // OPENING PAYMENT SHEET
   const subscribe = async () => {
+   
+    
     try {
       // sending request
       const response = await fetch("http://localhost:4002/pay", {
@@ -82,7 +85,7 @@ const PaymentScreen = (props) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           email: 'rohit123@gmail.com',
           amount: 1000
         }),
@@ -93,11 +96,23 @@ const PaymentScreen = (props) => {
       const clientSecret = data.clientSecret;
       const initSheet = await stripe.initPaymentSheet({
         paymentIntentClientSecret: clientSecret,
+        
+        // defaultShippingDetails: {
+        //   name: "rohit", // Replace with the customer's name
+        //   address: {
+        //     line1: "Address Line 1", // Replace with the customer's address line 1
+        //     line2: "Address Line 2", // Replace with the customer's address line 2 (optional)
+        //     city: "Sacramento", // Replace with the customer's city
+        //     state: "California", // Replace with the customer's state
+        //     postal_code: "94203", // Replace with the customer's postal code
+        //     country: "US", // Replace with the customer's country
+        //   },
+        // }
       });
       if (initSheet.error) return Alert.alert(initSheet.error.message);
       const presentSheet = await stripe.presentPaymentSheet({
         clientSecret,
-        
+
       });
       if (presentSheet.error) return Alert.alert(presentSheet.error.message);
 

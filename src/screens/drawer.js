@@ -76,6 +76,7 @@ const Drawer = ({ navigation, route }) => {
       // console.log('Top Songs Data:', topSongsData); 
       dispatch(updateTitle('Top Songs!'));
       dispatch(updateTopSongs(topSongsData));
+      navigation.navigate('Dashboard');
       //console.log(topSongsData);
     } else {
       navigation.navigate('Login')

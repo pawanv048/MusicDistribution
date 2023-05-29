@@ -46,7 +46,6 @@ export const tems = [
   'Advertise',
   'Terms & Privacy',
   'Help & Support',
-  
 ]
 
 

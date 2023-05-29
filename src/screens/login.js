@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, ImageBackground } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import CheckBox from '@react-native-community/checkbox';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Input, CustomText, TextButton } from '../custom/component';
@@ -8,9 +8,15 @@ import icons from '../constants/icons';
 import { API, loginUrl } from '../api/apiServers';
 // import { setEmail } from '../redux/userSlice';
 import { useDispatch } from 'react-redux';
+import { ThemeContext } from '../utils/theme-context';
 
 
 const Login = ({ navigation }) => {
+
+  const { theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
+
+  // console.log(theme);
   // console.log('render Login');
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
   const [errors, setErrors] = useState({});
@@ -52,7 +58,7 @@ const Login = ({ navigation }) => {
           // Store Userid in local storage
           //await AsyncStorage.setItem('Userid', res[0].Userid);
           await AsyncStorage.setItem('Userid', JSON.stringify(loginData.email));
-          
+
           // Set email in Redux store
           // dispatch(setEmail(loginData.email));
           // Navigate to Dashboard
@@ -210,46 +216,44 @@ const Login = ({ navigation }) => {
       </ImageBackground>
     </View>
   )
-}
+};
+
+
+const getStyles = (theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1
+    },
+    loginContainer: {
+      margin: SIZES.padding * 2,
+      borderRadius: 10,
+      backgroundColor: theme.white,
+      padding: SIZES.padding * 2.5
+    },
+    userLogin: {
+      textAlign: 'center',
+      fontSize: 30,
+      lineHeight: 35,
+      fontWeight: '800',
+      color: theme.primary,
+      marginBottom: 30
+    },
+    btn: {
+      backgroundColor: '#ff0044',
+      padding: 15,
+      borderRadius: 10,
+      margin: 10,
+      width: 160,
+    },
+    text: {
+      fontSize: 30,
+      color: 'white',
+      textAlign: 'center',
+    },
+    row: {
+      flexDirection: 'row',
+      marginBottom: 20,
+    },
+  });
 
 export default Login;
-
-const styles = StyleSheet.create({
-
-  container: {
-    flex: 1,
-    //backgroundColor: 'rgba(39,139,138,1)'
-  },
-  loginContainer: {
-    margin: SIZES.padding * 2,
-    //marginTop: 20,
-    //height: SIZES.height / 1.8,
-    borderRadius: 10,
-    backgroundColor: COLORS.light,
-    padding: SIZES.padding * 2.5
-  },
-  userLogin: {
-    textAlign: 'center',
-    fontSize: 30,
-    lineHeight: 35,
-    fontWeight: '800',
-    color: COLORS.primary,
-    marginBottom: 30
-  },
-  btn: {
-    backgroundColor: '#ff0044',
-    padding: 15,
-    borderRadius: 10,
-    margin: 10,
-    width: 160,
-  },
-  text: {
-    fontSize: 30,
-    color: 'white',
-    textAlign: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    marginBottom: 20,
-  },
-})

@@ -73,6 +73,7 @@ const Dashboard = ({ navigation }) => {
   const titles = useSelector(state => state.dashboard.title)
   const topRelease = useSelector(state => state?.dashboard?.data?.Data)
   const topSongsData = useSelector((state) => state?.dashboard?.topSongs?.data);
+  // console.log(topSongsData)
   const [topReleaseList, setTopReleaseList] = useState([]);
   const [topSongsList, setTopSongsList] = useState([])
   const [topArtistList, setTopArtistList] = useState([])
@@ -114,6 +115,7 @@ const Dashboard = ({ navigation }) => {
   // Default playback rate
   const handleDefaultPlaybackRate = async () => {
     await TrackPlayer.setRate(1.0);
+   
     setPlaybackRate(1.0);
   }
 
@@ -251,7 +253,6 @@ const Dashboard = ({ navigation }) => {
   // console.log('topRelease =>>', topRelease)
 
   // SEARCHING..  
-
 
   const handleSearch = (searchQuery) => {
     if (!searchQuery) {

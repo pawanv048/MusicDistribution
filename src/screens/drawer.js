@@ -1,4 +1,4 @@
-import React, { useState, useEffect, } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import {
   StyleSheet,
   Text,
@@ -20,13 +20,16 @@ import { SIZES, COLORS, TEXTS } from '../constants/theme';
 import { DrawerButton } from '../custom/component';
 import icons from '../constants/icons';
 import { selectEmail } from '../redux/userSlice';
+import { ThemeContext } from '../utils/theme-context';
+
 
 
 
 const Drawer = ({ navigation, route }) => {
   console.log('render Drawer');
   // console.log('data =>', isSuccess);
-
+  const { theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
   const [showDrawerItems, setShowDrawerItems] = useState(true);
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,8 +40,6 @@ const Drawer = ({ navigation, route }) => {
   // const email = useSelector(selectEmail);
    
   //  console.log('email=>>', email);
-
-
 
   const dispatch = useDispatch();
 
@@ -100,12 +101,14 @@ const Drawer = ({ navigation, route }) => {
     
     dispatch(updateTitle('Music Releases!'))
     dispatch(updateData(topReleasesData));
+    navigation.navigate('Dashboard')
     // dispatch(setActiveList('updateRelease'));
     //console.log('Release press');
   }
 
   const handleArtistPress = () => {
     dispatch(updateTitle('Top Artists'))
+    navigation.navigate('Dashboard')
     // console.log(updateData(topReleasesData?.Data?.Release_PrimaryArtist));
     // console.log('Artist press');
   }
@@ -127,7 +130,6 @@ const Drawer = ({ navigation, route }) => {
     >
 
       <View>
-
         {/* Header */}
         <View style={[styles.container, { marginHorizontal: SIZES.padding * 2 }]}>
           <View
@@ -312,28 +314,30 @@ const Drawer = ({ navigation, route }) => {
   )
 };
 
+const getStyles = (theme) => 
+   StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    },
+    profile_name: {
+      fontSize: 15,
+      fontWeight: TEXTS.text.weight.bold,
+      lineHeight: 30,
+      color: COLORS.support1
+    },
+    browserBtn: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: SIZES.padding,
+      width: '100%',
+      height: 40,
+      backgroundColor: theme.primary
+    }
+  })
+
+
 
 export default Drawer
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  profile_name: {
-    fontSize: 15,
-    fontWeight: TEXTS.text.weight.bold,
-    lineHeight: 30,
-    color: COLORS.support1
-  },
-  browserBtn: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: SIZES.padding,
-    width: '100%',
-    height: 40,
-    backgroundColor: COLORS.primary
-  }
-})

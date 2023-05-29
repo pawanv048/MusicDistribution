@@ -240,40 +240,6 @@ export const Toast = ({ toastMessage }) => {
 
 // DRAWER BUTTON
 // const down_arrow = 'https://cdn-icons-png.flaticon.com/512/32/32195.png';
-export const DrawerButton = ({
-  label,
-  onPress
-}) => {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={{
-        flexDirection: 'row',
-        backgroundColor: COLORS.grey20,
-        padding: SIZES.padding * 1.5,
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.grey60,
-      }}
-    >
-      <Image
-        source={icons.downarrow}
-        style={{
-          width: 20,
-          height: 20,
-          tintColor: 'black',
-          transform: [{ rotate: '-90deg' }]
-        }}
-      />
-      <Text
-        style={{
-          marginLeft: 10,
-          fontWeight: '500'
-        }}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  )
-}
 
 // Loader
 export const CustomLoader = () => {
@@ -354,7 +320,6 @@ const appComponent = {
   Input,
   DropdownPicker,
   Toast,
-  DrawerButton,
   CustomLoader,
   ProgressBar,
   FooterDetails

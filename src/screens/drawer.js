@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {
   DrawerContentScrollView,
+  DrawerItemList,
   DrawerItem
 } from '@react-navigation/drawer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,7 +18,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { updateTitle, updateData, updateTopSongs } from '../redux/action';
 import { useGetTopReleasesQuery, useGetTopSongsQuery } from '../redux/DrawerApiCall';
 import { SIZES, COLORS, TEXTS } from '../constants/theme';
-import { DrawerButton } from '../custom/component';
 import icons from '../constants/icons';
 import { selectEmail } from '../redux/userSlice';
 import { ThemeContext } from '../utils/theme-context';
@@ -25,11 +25,12 @@ import { ThemeContext } from '../utils/theme-context';
 
 
 
-const Drawer = ({ navigation, route }) => {
+const Drawer = ({ navigation, route, ...props }) => {
   console.log('render Drawer');
   // console.log('data =>', isSuccess);
   const { theme } = useContext(ThemeContext);
   const styles = getStyles(theme);
+  
   const [showDrawerItems, setShowDrawerItems] = useState(true);
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,7 +39,7 @@ const Drawer = ({ navigation, route }) => {
   const { data: topSongsData } = useGetTopSongsQuery();
 
   // const email = useSelector(selectEmail);
-   
+
   //  console.log('email=>>', email);
 
   const dispatch = useDispatch();
@@ -92,13 +93,13 @@ const Drawer = ({ navigation, route }) => {
     } else {
       navigation.navigate('Login')
     }
-   
+
     //console.log('Album press');
   }
 
   const handleReleasePress = () => {
     //console.log('topReleasesData:', topReleasesData);
-    
+
     dispatch(updateTitle('Music Releases!'))
     dispatch(updateData(topReleasesData));
     navigation.navigate('Dashboard')
@@ -153,7 +154,7 @@ const Drawer = ({ navigation, route }) => {
           <TouchableOpacity onPress={() => navigation.closeDrawer()}>
             <Image
               source={icons.menu}
-              style={{ 
+              style={{
                 width: 24,
                 height: 24,
                 tintColor: COLORS.primary
@@ -218,16 +219,48 @@ const Drawer = ({ navigation, route }) => {
         </TouchableOpacity>
 
         {/* Drawer items */}
-
+        {/* <DrawerItemList {...props} /> */}
         {isExpanded && (
-          <View>
-            <DrawerButton
-              label={'Top Release'}
+          <View style={{ backgroundColor: 'white', width: '100%' }}>
+            <DrawerItem
+              label='Top Release'
+              labelStyle={{ marginLeft: -20, fontWeight: '500', fontSize: 15, color: 'black' }}
               onPress={handleReleasePress}
+              icon={() => (
+                <Image
+                  source={icons.downarrow}
+                  style={{
+                    width: 15,
+                    height: 15,
+                    tintColor: 'black',
+                    transform: [{ rotate: '-90deg' }]
+                  }}
+                />
+              )}
             />
-            <DrawerButton
-              label={'Top Artists'}
+            <View
+              style={{
+                borderBottomWidth: 0.5,
+                borderBottomColor: 'rgba(190,191,203,1)',
+                borderRadius: 100,
+              }}
+            />
+
+            <DrawerItem
+              label='Top Artists'
+              labelStyle={{ marginLeft: -20, fontWeight: '500', fontSize: 15, color: 'black' }}
               onPress={handleArtistPress}
+              icon={() => (
+                <Image
+                  source={icons.downarrow}
+                  style={{
+                    width: 15,
+                    height: 15,
+                    tintColor: 'black',
+                    transform: [{ rotate: '-90deg' }]
+                  }}
+                />
+              )}
             />
           </View>
         )}
@@ -260,22 +293,89 @@ const Drawer = ({ navigation, route }) => {
         {/* Library items */}
 
         {showDrawerItems && (
-          <View>
+          <View style={{ backgroundColor: 'white', width: '100%' }}>
             {/* HISTORY */}
-            <DrawerButton
-              label={'History'}
+
+            <DrawerItem
+              label='History'
+              labelStyle={{ marginLeft: -20, fontWeight: '500', fontSize: 15, color: 'black' }}
               onPress={handleHistoryPress}
+              icon={() => (
+                <Image
+                  source={icons.downarrow}
+                  style={{
+                    width: 15,
+                    height: 15,
+                    tintColor: 'black',
+                    transform: [{ rotate: '-90deg' }]
+                  }}
+                />
+              )}
             />
+
+            <View
+              style={{
+                borderBottomWidth: 0.7,
+                borderBottomColor: 'rgba(190,191,203,1)',
+                // borderRadius: 100,
+              }}
+            />
+
+           
             {/* SONGS */}
-            <DrawerButton
-              label={'Songs'}
+
+            <DrawerItem
+              label='Songs'
+              labelStyle={{ marginLeft: -20, fontWeight: '500', fontSize: 15, color: 'black' }}
               onPress={handleSongsPress}
+              icon={() => (
+                <Image
+                  source={icons.downarrow}
+                  style={{
+                    width: 15,
+                    height: 15,
+                    tintColor: 'black',
+                    transform: [{ rotate: '-90deg' }]
+                  }}
+                />
+              )}
             />
+
+            <View
+              style={{
+                borderBottomWidth: 0.7,
+                borderBottomColor: 'rgba(190,191,203,1)',
+                borderRadius: 100,
+              }}
+            />
+          
             {/* ALBUMS */}
-            <DrawerButton
-              label={'Albums'}
+
+            <DrawerItem
+              label='Albums'
+              labelStyle={{ marginLeft: -20, fontWeight: '500', fontSize: 15, color: 'black' }}
               onPress={handleAlbumsPress}
+              icon={() => (
+                <Image
+                  source={icons.downarrow}
+                  style={{
+                    width: 15,
+                    height: 15,
+                    tintColor: 'black',
+                    transform: [{ rotate: '-90deg' }]
+                  }}
+                />
+              )}
             />
+
+            <View
+              style={{
+                borderBottomWidth: 0.7,
+                borderBottomColor: 'rgba(190,191,203,1)',
+                borderRadius: 100,
+              }}
+            />
+           
           </View>
         )}
       </View>
@@ -314,8 +414,8 @@ const Drawer = ({ navigation, route }) => {
   )
 };
 
-const getStyles = (theme) => 
-   StyleSheet.create({
+const getStyles = (theme) =>
+  StyleSheet.create({
     container: {
       flexDirection: 'row',
       alignItems: 'center',

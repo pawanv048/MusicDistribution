@@ -17,7 +17,7 @@ import * as Progress from 'react-native-progress';
 import RNFS from 'react-native-fs';
 // import {  } from 'react-native-audio-toolkit';
 // import { AudioCon } from '@react-native-community/audio-toolkit';
-
+import LottieView from "lottie-react-native";
 import { SearchComponent, CustomText, Separator, CustomLoader, FooterDetails } from '../custom/component';
 import { COLORS, SIZES, TEXTS } from '../constants/theme';
 import * as String from '../constants/strings';
@@ -25,6 +25,8 @@ import { API, API_ALLRELEASE, releaseUrl, url } from '../api/apiServers';
 import icons from '../constants/icons';
 import { playTrack, pauseTrack, getTrackInfo } from '../custom/AudioPlayer';
 import { handleSearch } from '../utils/helpers';
+import StyledActivityIndicator from '../custom/ActivityIndicator';
+
 
 
 const playbackData = [
@@ -83,6 +85,13 @@ const Dashboard = ({ navigation }) => {
 
   // console.log('progress', progres);
   //modal
+  // animation
+  const removeAnimation = React.useRef(null);
+  const onRemovePress = () => {
+    removeAnimation?.current.play();
+  };
+
+
   const togglePlayBack = () => {
     if (pbspeedVisible) {
       setPbSpeedVisible(false);
@@ -115,7 +124,7 @@ const Dashboard = ({ navigation }) => {
   // Default playback rate
   const handleDefaultPlaybackRate = async () => {
     await TrackPlayer.setRate(1.0);
-   
+
     setPlaybackRate(1.0);
   }
 
@@ -211,42 +220,42 @@ const Dashboard = ({ navigation }) => {
 
   // handle play and pause
 
- const handlePlayPause = async (trackIndex, track) => {
-  try {
-    const currentTrack = await TrackPlayer.getCurrentTrack();
-    console.log('Index:', trackIndex);
-    console.log('Track ID:', track.Track_Id);
+  const handlePlayPause = async (trackIndex, track) => {
+    try {
+      const currentTrack = await TrackPlayer.getCurrentTrack();
+      console.log('Index:', trackIndex);
+      console.log('Track ID:', track.Track_Id);
 
-    if (
-      currentTrack !== null &&
-      currentTrackIndex === trackIndex &&
-      isPlaying
-    ) {
-      const trackInfo = await getTrackInfo();
-      if (trackInfo.trackObject.id === track.Track_Id) {
-        pauseTrack(trackInfo.trackObject.id);
-        setIsPlaying(false);
-        console.log('Track paused:', track.Track_Title);
+      if (
+        currentTrack !== null &&
+        currentTrackIndex === trackIndex &&
+        isPlaying
+      ) {
+        const trackInfo = await getTrackInfo();
+        if (trackInfo.trackObject.id === track.Track_Id) {
+          pauseTrack(trackInfo.trackObject.id);
+          setIsPlaying(false);
+          console.log('Track paused:', track.Track_Title);
+        }
+      } else {
+        if (currentTrackIndex !== trackIndex) {
+          setCurrentTrackIndex(trackIndex);
+          await TrackPlayer.reset();
+          await TrackPlayer.add({
+            id: track.Track_Id,
+            title: track.Track_Title,
+            artist: track.Track_Artist,
+            url: track.url
+          });
+        }
+        await TrackPlayer.play();
+        setIsPlaying(true);
+        console.log('Track played:', track.Track_Title);
       }
-    } else {
-      if (currentTrackIndex !== trackIndex) {
-        setCurrentTrackIndex(trackIndex);
-        await TrackPlayer.reset();
-        await TrackPlayer.add({
-          id: track.Track_Id,
-          title: track.Track_Title,
-          artist: track.Track_Artist,
-          url: track.url
-        });
-      }
-      await TrackPlayer.play();
-      setIsPlaying(true);
-      console.log('Track played:', track.Track_Title);
+    } catch (error) {
+      console.log('Error handling play/pause:', error);
     }
-  } catch (error) {
-    console.log('Error handling play/pause:', error);
-  }
-};
+  };
 
 
 
@@ -655,7 +664,11 @@ const Dashboard = ({ navigation }) => {
           {/* RELEASES CARD */}
 
           {isLoading ? (
-            <CustomLoader />
+            // <CustomLoader />
+            <LottieView
+              source={require('../assets/loader-animation.json')}
+              autoPlay loop
+            />
           ) : titles == 'Music Releases!' ? (
             <FlatList
               // data={topRelease}

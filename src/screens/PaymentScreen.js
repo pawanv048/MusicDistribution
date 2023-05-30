@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,7 +11,8 @@ import {
   Button,
   ScrollView,
   TextInput,
-  Linking
+  Linking,
+  SafeAreaView
 } from 'react-native';
 import {
   CardField,
@@ -37,6 +38,8 @@ import icons from '../constants/icons';
 
 
 import { LogBox } from 'react-native';
+import Screen from '../custom/Screen';
+import { ThemeContext } from '../utils/theme-context';
 LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews']);
 
 // Your code here
@@ -49,6 +52,10 @@ const PaymentScreen = (props) => {
     Release_Artwork = '79b94356-7690-4dfd-b01c-c5e1386e88e2.jpg'
   } = props;
   //  console.log('Release_Id:',Release_Id);
+
+  const { theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
+
 
   const [cardInfo, setCardInfo] = useState(null);
   const [trackData, setTrackData] = useState([]);
@@ -75,8 +82,8 @@ const PaymentScreen = (props) => {
 
   // OPENING PAYMENT SHEET
   const subscribe = async () => {
-   
-    
+
+
     try {
       // sending request
       const response = await fetch("http://localhost:4002/pay", {
@@ -96,7 +103,7 @@ const PaymentScreen = (props) => {
       const clientSecret = data.clientSecret;
       const initSheet = await stripe.initPaymentSheet({
         paymentIntentClientSecret: clientSecret,
-        
+
         // defaultShippingDetails: {
         //   name: "rohit", // Replace with the customer's name
         //   address: {
@@ -371,11 +378,10 @@ const PaymentScreen = (props) => {
 
 
 
-
+  // MAIN VIEW
   return (
-    <ScrollView
-      style={{ padding: SIZES.padding * 1.5, flex: 1 }}
-      contentContainerStyle={{ paddingBottom: 100 }}
+    <Screen
+      contentContainerStyle={{ margin: SIZES.padding * 2, paddingBottom: 100 }}
     >
       {renderTrackList()}
       <TouchableOpacity
@@ -386,37 +392,41 @@ const PaymentScreen = (props) => {
       >
         <Text>Dashboard</Text>
       </TouchableOpacity>
-    </ScrollView>
+    </Screen>
   )
 }
 
-export default PaymentScreen
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: COLORS.light,
-    paddingHorizontal: SIZES.padding * 2,
-    paddingTop: SIZES.padding * 3,
-    height: SIZES.height / 1.2,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
+const getStyles = (theme) =>
+
+  StyleSheet.create({
+    card: {
+      backgroundColor: COLORS.light,
+      paddingHorizontal: SIZES.padding * 2,
+      paddingTop: SIZES.padding * 3,
+      height: SIZES.height / 1.2,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.30,
+      shadowRadius: 8.65,
+      borderRadius: 10,
     },
-    shadowOpacity: 0.30,
-    shadowRadius: 8.65,
-    borderRadius: 10,
-  },
-  artistTxt: {
-    fontSize: 18,
-    fontWeight: '400',
-    color: COLORS.support1,
-    marginVertical: SIZES.padding,
-  },
-  socialIcons: {
-    height: 15,
-    width: 15,
-    tintColor: COLORS.support1,
-    marginHorizontal: SIZES.padding
-  },
-})
+    artistTxt: {
+      fontSize: 18,
+      fontWeight: '400',
+      color: COLORS.support1,
+      marginVertical: SIZES.padding,
+    },
+    socialIcons: {
+      height: 15,
+      width: 15,
+      tintColor: COLORS.support1,
+      marginHorizontal: SIZES.padding
+    },
+  })
+
+
+export default PaymentScreen;

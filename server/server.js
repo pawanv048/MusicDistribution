@@ -33,6 +33,7 @@ app.post("/pay", async (req, res) => {
       payment_method_types: ["card"],
       customer: customerId.id,
       description: "Description of the export transaction",
+      
       shipping: {
         name: "rohit", // Replace with the customer's name
         address: {

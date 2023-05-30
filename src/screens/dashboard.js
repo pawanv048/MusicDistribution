@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   StyleSheet,
   Text,
@@ -18,14 +18,16 @@ import RNFS from 'react-native-fs';
 // import {  } from 'react-native-audio-toolkit';
 // import { AudioCon } from '@react-native-community/audio-toolkit';
 import LottieView from "lottie-react-native";
-import { SearchComponent, CustomText, Separator, CustomLoader, FooterDetails } from '../custom/component';
+import { SearchComponent, CustomText, Separator, CustomLoader, FooterDetails, SocialIcons } from '../custom/component';
 import { COLORS, SIZES, TEXTS } from '../constants/theme';
 import * as String from '../constants/strings';
 import { API, API_ALLRELEASE, releaseUrl, url } from '../api/apiServers';
 import icons from '../constants/icons';
 import { playTrack, pauseTrack, getTrackInfo } from '../custom/AudioPlayer';
 import { handleSearch } from '../utils/helpers';
-import StyledActivityIndicator from '../custom/ActivityIndicator';
+import { ThemeContext } from '../utils/theme-context';
+import Screen from '../custom/Screen';
+
 
 
 
@@ -49,6 +51,9 @@ const Dashboard = ({ navigation }) => {
   // console.log('render Dashboard')
 
   // console.log(topReleasesData);
+
+  const { theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
 
 
   const [data, setData] = useState([]);
@@ -630,7 +635,8 @@ const Dashboard = ({ navigation }) => {
         <View style={styles.card}>
 
           {/* <TouchableOpacity onPress={() => navigation.navigate('Dummy')}>
-            <Text>Dummy</Text>
+            <Text onPress={() => WebBrowser.openBrowserAsync("https://pinballmap.com")}
+            style={{alignSelf: 'center', paddingTop: 10}}>Dummy</Text>
           </TouchableOpacity> */}
 
           <View style={{ margin: SIZES.padding * 2 }}>
@@ -875,6 +881,13 @@ const Dashboard = ({ navigation }) => {
   // FOOTER CONTENT
 
   const renderFooter = () => {
+    const socialIcons = [
+      { source: icons.facebook },
+      { source: icons.google },
+      { source: icons.linkdin },
+      { source: icons.twitter },
+    ];
+
     return (
       <React.Fragment>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -896,10 +909,11 @@ const Dashboard = ({ navigation }) => {
           <Text style={[styles.artistTxt, { textAlign: 'left' }]}>{String.rights}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={[styles.artistTxt, { textAlign: 'left' }]}>{String.social}</Text>
-            <Image source={icons.facebook} style={styles.socialIcons} />
-            <Image source={icons.google} style={styles.socialIcons} />
-            <Image source={icons.linkdin} style={styles.socialIcons} />
-            <Image source={icons.twitter} style={styles.socialIcons} />
+
+            {/* Social Icons */}
+            {socialIcons.map((icon, index) => (
+              <SocialIcons key={index} source={icon.source} />
+            ))}
           </View>
         </View>
       </React.Fragment>
@@ -910,8 +924,7 @@ const Dashboard = ({ navigation }) => {
 
   return (
     <React.Fragment>
-      <ScrollView
-        style={styles.container}
+      <Screen
         contentContainerStyle={{ margin: SIZES.padding * 2, paddingBottom: 100 }}
         bounces={false}
       >
@@ -969,15 +982,74 @@ const Dashboard = ({ navigation }) => {
             </View>
           </View>
         </View>
-
-
         {renderCardView()}
         {renderFooter()}
-      </ScrollView>
-
+      </Screen>
     </React.Fragment>
   )
 };
+
+
+const getStyles = (theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    subContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    },
+    card: {
+      backgroundColor: COLORS.light,
+      height: SIZES.height / 1.6,
+      marginTop: SIZES.padding * 3,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.30,
+      shadowRadius: 8.65,
+      borderRadius: 10,
+    },
+    categoryTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: SIZES.padding
+    },
+    footerTxt: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: COLORS.support1,
+      marginVertical: SIZES.padding * 2
+    },
+    artistTxt: {
+      fontSize: 18,
+      fontWeight: '400',
+      color: COLORS.support1,
+      marginVertical: SIZES.padding,
+      //textAlign: 'center'
+    },
+    download: {
+      width: '60%',
+      height: 100,
+      backgroundColor: 'white',
+      position: 'absolute',
+      padding: 15,
+      //borderRadius: 20,
+      right: 10,
+      bottom: 60,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.7,
+      shadowRadius: 8.65,
+    }
+  })
+
 
 // const mapStateToProps = state => {
 //   return {
@@ -988,68 +1060,3 @@ const Dashboard = ({ navigation }) => {
 //export default connect(mapStateToProps)(Dashboard);
 export default Dashboard
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  subContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  card: {
-    backgroundColor: COLORS.light,
-    height: SIZES.height / 1.6,
-    marginTop: SIZES.padding * 3,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.30,
-    shadowRadius: 8.65,
-    borderRadius: 10,
-  },
-  categoryTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: SIZES.padding
-  },
-  footerTxt: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.support1,
-    marginVertical: SIZES.padding * 2
-  },
-  artistTxt: {
-    fontSize: 18,
-    fontWeight: '400',
-    color: COLORS.support1,
-    marginVertical: SIZES.padding,
-    //textAlign: 'center'
-  },
-  socialIcons: {
-    height: 15,
-    width: 15,
-    tintColor: COLORS.support1,
-    marginHorizontal: SIZES.padding
-  },
-  download: {
-    width: '60%',
-    height: 100,
-    backgroundColor: 'white',
-    position: 'absolute',
-    padding: 15,
-    //borderRadius: 20,
-    right: 10,
-    bottom: 60,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.7,
-    shadowRadius: 8.65,
-  }
-
-})

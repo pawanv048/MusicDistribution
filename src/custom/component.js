@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   TextInput,
@@ -14,9 +14,15 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import { COLORS, SIZES } from '../constants/theme';
 import icons from '../constants/icons';
 import { artists, devotionals, originalArtists, tems } from '../constants/strings';
+import { ThemeContext } from '../utils/theme-context';
+
 
 
 export const SearchComponent = ({ onSearch }) => {
+
+  const { theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
+
   const [searchText, setSearchText] = useState('');
 
   const handleSearch = () => {
@@ -308,9 +314,32 @@ export const FooterDetails = ({
       ))}
     </View>
   )
-}
+};
 
+export const SocialIcons = ({
+  source
+}) => {
+  return (
+    <View>
+      <Image
+        source={source}
+        style={{
+          height: 15,
+          width: 15,
+          tintColor: COLORS.support1,
+          marginHorizontal: SIZES.padding
+        }}
+      />
+    </View>
+  )
+};
 
+// socialIcons: {
+//   height: 15,
+//   width: 15,
+//   tintColor: COLORS.support1,
+//   marginHorizontal: SIZES.padding
+// },
 
 
 const appComponent = {
@@ -322,63 +351,122 @@ const appComponent = {
   Toast,
   CustomLoader,
   ProgressBar,
-  FooterDetails
+  FooterDetails,
+  SocialIcons
 }
+
+
+const getStyles = (theme) =>
+  StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+      borderRadius: 10,
+      backgroundColor: COLORS.grey20,
+      marginBottom: SIZES.padding * 2
+    },
+    input: {
+      width: '80%',
+      height: 50,
+      paddingHorizontal: 5,
+    },
+    search: {
+      height: 20,
+      width: 20,
+      tintColor: COLORS.grey
+    },
+    toastContainer: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      padding: 14,
+      zIndex: -1,
+      borderRadius: 25,
+    },
+    message: {
+      color: '#fff',
+      fontSize: 14,
+      textAlign: 'center',
+    },
+    progressBarContainer: {
+      backgroundColor: '#F5F5F5',
+      height: 20,
+      borderRadius: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 5,
+    },
+    progressBar: {
+      height: 20,
+      borderRadius: 10,
+      backgroundColor: '#1E90FF',
+    },
+    progressText: {
+      color: '#000',
+      fontSize: 12,
+      fontWeight: 'bold',
+      marginLeft: 5,
+    },
+  })
+
 
 export default appComponent;
 
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    borderRadius: 10,
-    backgroundColor: COLORS.grey20,
-    marginBottom: SIZES.padding * 2
-  },
-  input: {
-    width: '80%',
-    height: 50,
-    paddingHorizontal: 5,
-  },
-  search: {
-    height: 20,
-    width: 20,
-    tintColor: COLORS.grey
-  },
-  toastContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    padding: 14,
-    zIndex: -1,
-    borderRadius: 25,
-  },
-  message: {
-    color: '#fff',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  progressBarContainer: {
-    backgroundColor: '#F5F5F5',
-    height: 20,
-    borderRadius: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 5,
-  },
-  progressBar: {
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#1E90FF',
-  },
-  progressText: {
-    color: '#000',
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginLeft: 5,
-  },
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     flexDirection: 'row',
+//     borderRadius: 10,
+//     backgroundColor: COLORS.grey20,
+//     marginBottom: SIZES.padding * 2
+//   },
+//   input: {
+//     width: '80%',
+//     height: 50,
+//     paddingHorizontal: 5,
+//   },
+//   search: {
+//     height: 20,
+//     width: 20,
+//     tintColor: COLORS.grey
+//   },
+//   toastContainer: {
+//     position: 'absolute',
+//     bottom: 0,
+//     left: 0,
+//     right: 0,
+//     backgroundColor: 'rgba(0, 0, 0, 0.7)',
+//     padding: 14,
+//     zIndex: -1,
+//     borderRadius: 25,
+//   },
+//   message: {
+//     color: '#fff',
+//     fontSize: 14,
+//     textAlign: 'center',
+//   },
+//   progressBarContainer: {
+//     backgroundColor: '#F5F5F5',
+//     height: 20,
+//     borderRadius: 10,
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     paddingHorizontal: 5,
+//   },
+//   progressBar: {
+//     height: 20,
+//     borderRadius: 10,
+//     backgroundColor: '#1E90FF',
+//   },
+//   progressText: {
+//     color: '#000',
+//     fontSize: 12,
+//     fontWeight: 'bold',
+//     marginLeft: 5,
+//   },
+// })

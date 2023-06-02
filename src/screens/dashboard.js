@@ -7,6 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  Button,
 } from 'react-native';
 
 import TrackPlayer, { useProgress } from 'react-native-track-player';
@@ -280,65 +281,40 @@ const Dashboard = ({ navigation }) => {
       }
     } else {
       const firstLetter = searchQuery.trim()[0].toLowerCase();
-
-      const dashfilter = filteredData.filter((item) => {
-        const itemData = item.Release_ReleaseTitle.trim().toLowerCase() ?? '';
-        if (itemData[0] === firstLetter) {
-          return itemData.includes(searchQuery.trim().toLowerCase());
-        }
-        return false;
-      }) ?? [];
-
+  
+      const filterItems = (items, key) => {
+        return items.filter((item) => {
+          const itemData = item[key].trim().toLowerCase() ?? '';
+          return itemData[0] === firstLetter && itemData.includes(searchQuery.trim().toLowerCase());
+        }) ?? [];
+      };
+  
+      const dashfilter = filterItems(filteredData, 'Release_ReleaseTitle');
+  
       let topReleaseList = [];
       let topSongsList = [];
       let topArtistList = [];
-
+  
       if (titles === 'Music Releases!') {
-        topReleaseList = topRelease.filter((item) => {
-          const itemData = item.Release_ReleaseTitle.trim().toLowerCase() ?? '';
-          if (itemData[0] === firstLetter) {
-            return itemData.includes(searchQuery.trim().toLowerCase());
-          }
-          return false;
-        }) ?? [];
+        topReleaseList = filterItems(topRelease, 'Release_ReleaseTitle');
       } else if (titles === 'Top Artists') {
-        topArtistList = topRelease.filter((item) => {
-          const itemData = item.Release_PrimaryArtist.trim().toLowerCase() ?? '';
-          if (itemData[0] === firstLetter) {
-            return itemData.includes(searchQuery.trim().toLowerCase());
-          }
-          return false;
-        }) ?? [];
+        topArtistList = filterItems(topRelease, 'Release_PrimaryArtist');
       } else if (titles === 'Top Songs!' && isLoggedIn) {
-        topSongsList = topSongsData.filter((item) => {
-          const itemSongData = item.Track_Artist.trim().toLowerCase() ?? '';
-          if (itemSongData[0] === firstLetter) {
-            return itemSongData.includes(searchQuery.trim().toLowerCase());
-          }
-          return false;
-        }) ?? [];
+        topSongsList = filterItems(topSongsData, 'Track_Artist');
       }
-
-      const filteredDataWithIndex = dashfilter.map((item) => {
-        const index = data.findIndex((el) => el.id === item.id);
-        return { ...item, index };
-      }) ?? [];
-
-      const topReleaseListWithIndex = topReleaseList.map((item) => {
-        const index = topRelease.findIndex((el) => el.id === item.id);
-        return { ...item, index };
-      }) ?? [];
-
-      const topSongsListWithIndex = topSongsList.map((item) => {
-        const index = topSongsData.findIndex((el) => el.id === item.id);
-        return { ...item, index };
-      }) ?? [];
-
-      const topArtistListWithIndex = topArtistList.map((item) => {
-        const index = topRelease.findIndex((el) => el.id === item.id);
-        return { ...item, index };
-      });
-
+  
+      const addIndexToItems = (items, originalItems) => {
+        return items.map((item) => {
+          const index = originalItems.findIndex((el) => el.id === item.id);
+          return { ...item, index };
+        }) ?? [];
+      };
+  
+      const filteredDataWithIndex = addIndexToItems(dashfilter, data);
+      const topReleaseListWithIndex = addIndexToItems(topReleaseList, topRelease);
+      const topSongsListWithIndex = addIndexToItems(topSongsList, topSongsData);
+      const topArtistListWithIndex = addIndexToItems(topArtistList, topRelease);
+  
       if (
         filteredDataWithIndex.length > 0 ||
         topReleaseListWithIndex.length > 0 ||
@@ -595,7 +571,7 @@ const Dashboard = ({ navigation }) => {
 
             {/* BUY NOW */}
             {isLoggedIn && !titles && (
-              <TouchableOpacity
+              <TouchableOpacity          
                 onPress={() => navigation.navigate('Home', {
                   Release_Id: item.Release_Id,
                   Release_Artwork: item.Release_Artwork,
@@ -674,6 +650,7 @@ const Dashboard = ({ navigation }) => {
             <LottieView
               source={require('../assets/loader-animation.json')}
               autoPlay loop
+              
             />
           ) : titles == 'Music Releases!' ? (
             <FlatList
@@ -701,6 +678,9 @@ const Dashboard = ({ navigation }) => {
             <FlatList
               data={topSongsList}
               keyExtractor={(item, index) => item + index}
+              horizontal
+              ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
+              contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
               renderItem={({ item, index }) => {
                 // console.log('Item:', item);
                 //const trackId = item.Track_Id.toString();
@@ -856,9 +836,7 @@ const Dashboard = ({ navigation }) => {
                   </View>
                 )
               }}
-              horizontal
-              ItemSeparatorComponent={() => <View style={{ width: SIZES.padding * 3 }} />}
-              contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
+
             />
           ) : (
             <FlatList
@@ -994,6 +972,7 @@ const getStyles = (theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
+      
     },
     subContainer: {
       flexDirection: 'row',

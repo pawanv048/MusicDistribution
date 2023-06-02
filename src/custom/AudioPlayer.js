@@ -1,4 +1,4 @@
-import TrackPlayer, {State} from 'react-native-track-player';
+import TrackPlayer, { State } from 'react-native-track-player';
 
 
 
@@ -19,20 +19,19 @@ export const playTrack = async (track) => {
         //console.log('Current track paused');
       }
     }
+    
     await TrackPlayer.reset();
     //console.log('Adding track to playback queue:', track);
     await TrackPlayer.add(track);
     //console.log('Starting playback...');
-   
+
+    const startingPoint = 0; // Adjust this value based on your requirement
+    await TrackPlayer.seekTo(startingPoint);
     await TrackPlayer.play();
   } catch (error) {
     console.log('Error playing track:', error);
-  } 
+  }
 };
-
-
-
-
 
 
 

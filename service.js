@@ -1,9 +1,7 @@
-import TrackPlayer, { State } from 'react-native-track-player';
+
+import TrackPlayer from 'react-native-track-player';
 
 module.exports = async function () {
-  await TrackPlayer.setupPlayer();
-
-
   TrackPlayer.addEventListener('remote-play', () => {
     TrackPlayer.play();
   });
@@ -16,20 +14,41 @@ module.exports = async function () {
     TrackPlayer.stop();
   });
 
-  TrackPlayer.addEventListener('remote-next', () => {
-    TrackPlayer.skipToNext();
-  });
-
   TrackPlayer.addEventListener('playback-state', (state) => {
     console.log('playback state changed', state);
   });
 
   TrackPlayer.addEventListener('playback-track-changed', (track) => {
     console.log('Playback track changed:', track);
+  })
+
+  TrackPlayer.addEventListener('remote-seek', (event) => {
+    TrackPlayer.seekTo(event.position);
   });
-  // Set up the event listener for the playback queue ended event
-  TrackPlayer.addEventListener('playback-queue-ended', () => {
-    // The playback queue has ended, so call the reset method here
-    TrackPlayer.reset();
+
+  TrackPlayer.addEventListener('remote-jump-backward', () => {
+    TrackPlayer.getPosition().then((position) => {
+      TrackPlayer.seekTo(position - 10);
+    });
+  });
+
+  TrackPlayer.addEventListener('remote-jump-forward', () => {
+    TrackPlayer.getPosition().then((position) => {
+      TrackPlayer.seekTo(position + 10);
+    });
+  });
+
+  await TrackPlayer.setupPlayer();
+
+  TrackPlayer.updateOptions({
+    stopWithApp: true,
+    capabilities: [
+      TrackPlayer.CAPABILITY_PLAY,
+      TrackPlayer.CAPABILITY_PAUSE,
+      TrackPlayer.CAPABILITY_STOP,
+      TrackPlayer.CAPABILITY_SEEK_TO,
+      TrackPlayer.CAPABILITY_JUMP_BACKWARD,
+      TrackPlayer.CAPABILITY_JUMP_FORWARD,
+    ],
   });
 };

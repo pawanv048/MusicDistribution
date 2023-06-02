@@ -1,12 +1,18 @@
 import { StyleSheet, Text, View, Button, ImageBackground } from 'react-native';
-import React from 'react';
+import React, {useContext} from 'react';
 import { SIZES, COLORS } from '../constants/theme';
 import icons from '../constants/icons';
 import { Input, TextButton } from '../custom/component';
+import { ThemeContext } from '../utils/theme-context';
+
 
 
 const Forgot = ({ navigation }) => {
   console.log('render Forgot');
+
+  const { theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
+
   const renderFogotPassword = () => {
     return (
       <View
@@ -64,24 +70,46 @@ const Forgot = ({ navigation }) => {
   )
 }
 
+
+const getStyles = (theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    forget: {
+      textAlign: 'center',
+      fontSize: 30,
+      fontWeight: 'bold',
+      color: COLORS.primary,
+      marginBottom: 30
+    },
+    forgetView: {
+      width: '100%',
+      height: SIZES.height / 2.2,
+      backgroundColor: 'white',
+      borderRadius: 10,
+      padding: SIZES.padding * 2,
+    }
+  })
+
 export default Forgot;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  forget: {
-    textAlign: 'center',
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: COLORS.primary,
-    marginBottom: 30
-  },
-  forgetView: {
-    width: '100%',
-    height: SIZES.height / 2.2,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: SIZES.padding * 2,
-  }
-})
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//   },
+//   forget: {
+//     textAlign: 'center',
+//     fontSize: 30,
+//     fontWeight: 'bold',
+//     color: COLORS.primary,
+//     marginBottom: 30
+//   },
+//   forgetView: {
+//     width: '100%',
+//     height: SIZES.height / 2.2,
+//     backgroundColor: 'white',
+//     borderRadius: 10,
+//     padding: SIZES.padding * 2,
+//   }
+// })

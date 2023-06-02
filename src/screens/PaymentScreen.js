@@ -103,7 +103,12 @@ const PaymentScreen = (props) => {
       const clientSecret = data.clientSecret;
       const initSheet = await stripe.initPaymentSheet({
         paymentIntentClientSecret: clientSecret,
-
+        billingDetailsCollectionConfiguration: {
+          name: 'jdsfhkjds',
+          email: 'sdfsdf@gmail.com',
+          address: 'ksjfklsjdlfkj',
+          attachDefaultsToPaymentMethod: true
+        },
         // defaultShippingDetails: {
         //   name: "rohit", // Replace with the customer's name
         //   address: {

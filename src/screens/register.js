@@ -1,14 +1,19 @@
 import { StyleSheet, Text, View, ScrollView, Linking, Alert, ImageBackground } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import CheckBox from '@react-native-community/checkbox';
 import { Input, DropdownPicker, CustomText, TextButton, Toast } from '../custom/component';
 import { API } from '../api/apiServers';
 import { SIZES, COLORS } from '../constants/theme';
 import icons from '../constants/icons';
+import { ThemeContext } from '../utils/theme-context';
+
 
 
 const Register = ({ navigation }) => {
   console.log('render Register');
+
+  const { theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
 
   const [toggleCheckBox, setToggleCheckBox] = React.useState(false)
   const [errors, setErrors] = useState({});
@@ -305,27 +310,28 @@ const Register = ({ navigation }) => {
   )
 }
 
-export default Register
+const getStyles = (theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: 'rgba(39,139,138,1)'
+    },
+    registerContainer: {
+      margin: SIZES.padding * 2,
+      marginTop: 100,
+      height: SIZES.height / 1.3,
+      borderRadius: 10,
+      backgroundColor: COLORS.light,
+      padding: SIZES.padding * 3
+    },
+    registerNow: {
+      textAlign: 'center',
+      fontSize: 30,
+      lineHeight: 35,
+      fontWeight: '800',
+      color: COLORS.primary,
+      marginBottom: 30
+    }
+  })
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'rgba(39,139,138,1)'
-  },
-  registerContainer: {
-    margin: SIZES.padding * 2,
-    marginTop: 100,
-    height: SIZES.height / 1.3,
-    borderRadius: 10,
-    backgroundColor: COLORS.light,
-    padding: SIZES.padding * 3
-  },
-  registerNow: {
-    textAlign: 'center',
-    fontSize: 30,
-    lineHeight: 35,
-    fontWeight: '800',
-    color: COLORS.primary,
-    marginBottom: 30
-  }
-})
+export default Register

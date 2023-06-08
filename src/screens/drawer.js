@@ -26,6 +26,7 @@ import { ThemeContext } from '../utils/theme-context';
 
 
 const Drawer = ({ navigation, route, ...props }) => {
+
   console.log('render Drawer');
   // console.log('data =>', isSuccess);
   const { theme } = useContext(ThemeContext);
@@ -33,14 +34,15 @@ const Drawer = ({ navigation, route, ...props }) => {
   
   const [showDrawerItems, setShowDrawerItems] = useState(true);
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setLoggedIn] = useState(false);
+  
   const [email, setEmail] = useState('')
   const { data: topReleasesData } = useGetTopReleasesQuery();
   const { data: topSongsData } = useGetTopSongsQuery();
 
   // const email = useSelector(selectEmail);
 
-  //  console.log('email=>>', email);
+    // console.log('email=>>', email);
 
   const dispatch = useDispatch();
 
@@ -52,7 +54,7 @@ const Drawer = ({ navigation, route, ...props }) => {
 
   const checkLoginStatus = async () => {
     const userId = await AsyncStorage.getItem('Userid');
-    setIsLoggedIn(!!userId);
+    setLoggedIn(!!userId);
   };
 
   const getUserEmail = async () => {
@@ -436,8 +438,7 @@ const getStyles = (theme) =>
       height: 40,
       backgroundColor: theme.primary
     }
-  })
-
+  });
 
 
 export default Drawer

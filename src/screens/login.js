@@ -53,20 +53,12 @@ const Login = ({ navigation }) => {
         Password: loginData.password
       },
       onSuccess: async (res) => {
-        console.log('Login response: ', res)
+        //console.log('Login response: ', res)
         if (res[0].Status === "0") {
-          // Store Userid in local storage
-          //await AsyncStorage.setItem('Userid', res[0].Userid);
           await AsyncStorage.setItem('Userid', JSON.stringify(loginData.email));
-
-          // Set email in Redux store
-          // dispatch(setEmail(loginData.email));
-          // Navigate to Dashboard
-          navigation.navigate('Dashboard', { userId: res[0].Userid })
-          //navigation.navigate('Dashboard',  { isLoggedIn: true })
-          // console.log(res[0].Userid);
+          navigation.navigate('Dashboard', { userId: res[0].Userid }) 
+          // console.log('userId=>>', res[0].Userid);
         } else {
-          //showAlert('This is an alert message.');
           alert('Invalid user and Password')
         }
       },
@@ -255,7 +247,6 @@ const getStyles = (theme) =>
       marginBottom: 20,
     },
   });
-
   
 
 export default Login;

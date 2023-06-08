@@ -9,27 +9,21 @@ import {
   Image,
   Button,
 } from 'react-native';
-
 import TrackPlayer, { useProgress } from 'react-native-track-player';
 import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSelector } from 'react-redux';
 import * as Progress from 'react-native-progress';
 import RNFS from 'react-native-fs';
-// import {  } from 'react-native-audio-toolkit';
-// import { AudioCon } from '@react-native-community/audio-toolkit';
 import LottieView from "lottie-react-native";
-import { SearchComponent, CustomText, Separator, CustomLoader, FooterDetails, SocialIcons } from '../custom/component';
+import { SearchComponent, CustomText, Separator, FooterDetails, SocialIcons } from '../custom/component';
 import { COLORS, SIZES, TEXTS } from '../constants/theme';
 import * as String from '../constants/strings';
-import { API, API_ALLRELEASE, releaseUrl, url } from '../api/apiServers';
-import icons from '../constants/icons';
-import { playTrack, pauseTrack, getTrackInfo } from '../custom/AudioPlayer';
-import { handleSearch } from '../utils/helpers';
+import { API, API_ALLRELEASE, releaseUrl } from '../api/apiServers';
+import { pauseTrack, getTrackInfo } from '../custom/AudioPlayer';
 import { ThemeContext } from '../utils/theme-context';
 import Screen from '../custom/Screen';
-
-
+import icons from '../constants/icons';
 
 
 const playbackData = [
@@ -47,15 +41,14 @@ const playbtn = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'
 const pause = 'https://cdn-icons-png.flaticon.com/512/1214/1214679.png'
 
 // Main screen
-const Dashboard = ({ navigation }) => {
+const Dashboard = ({ route, navigation }) => {
 
-  // console.log('render Dashboard')
-
-  // console.log(topReleasesData);
 
   const { theme } = useContext(ThemeContext);
   const styles = getStyles(theme);
 
+  const { userId } = route?.params || {};
+  // console.log('userId:', userId);
 
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
@@ -74,7 +67,10 @@ const Dashboard = ({ navigation }) => {
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [isImageAvail, setImageAvail] = useState(null)
   const [imageSource, setImageSource] = useState(null);
+  const [userid, setUserid] = useState(null);
+  // console.log('user=>', userid)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // console.log('Login=>', isLoggedIn);
   const [progress, setProgress] = useState(0);
 
   //Redux - get
@@ -188,19 +184,37 @@ const Dashboard = ({ navigation }) => {
 
   // user login 
 
-  useEffect(() => {
-    retrieveLogin()
-  }, []);
 
-  const retrieveLogin = async () => {
-    try {
-      const logindata = await AsyncStorage.getItem('Userid')
-      //console.log('log data =>', logindata);
-      setIsLoggedIn(logindata)
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
+  const removeData = async () => {
+    await AsyncStorage.removeItem('Userid')
+  }
+
+  //const value = await AsyncStorage.getItem('Userid');
+
+
+
+
+
+  useEffect(() => {
+    // console.log('use effect running.')
+
+    const retrieveLogin = async () => {
+      try {
+        const value = await AsyncStorage.getItem('Userid');
+        // console.log('value=>>', value)
+        if (value !== null) {
+          setUserid(value);
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.log('Error retrieving login status:', error);
+      }
+    };
+    retrieveLogin();
+
+  }, [userId]);
+
 
   useEffect(() => {
     if (filteredData) {
@@ -263,8 +277,6 @@ const Dashboard = ({ navigation }) => {
     }
   };
 
-
-
   // console.log('topRelease =>>', topRelease)
 
   // SEARCHING..  
@@ -281,20 +293,20 @@ const Dashboard = ({ navigation }) => {
       }
     } else {
       const firstLetter = searchQuery.trim()[0].toLowerCase();
-  
+
       const filterItems = (items, key) => {
         return items.filter((item) => {
           const itemData = item[key].trim().toLowerCase() ?? '';
           return itemData[0] === firstLetter && itemData.includes(searchQuery.trim().toLowerCase());
         }) ?? [];
       };
-  
+
       const dashfilter = filterItems(filteredData, 'Release_ReleaseTitle');
-  
+
       let topReleaseList = [];
       let topSongsList = [];
       let topArtistList = [];
-  
+
       if (titles === 'Music Releases!') {
         topReleaseList = filterItems(topRelease, 'Release_ReleaseTitle');
       } else if (titles === 'Top Artists') {
@@ -302,19 +314,19 @@ const Dashboard = ({ navigation }) => {
       } else if (titles === 'Top Songs!' && isLoggedIn) {
         topSongsList = filterItems(topSongsData, 'Track_Artist');
       }
-  
+
       const addIndexToItems = (items, originalItems) => {
         return items.map((item) => {
           const index = originalItems.findIndex((el) => el.id === item.id);
           return { ...item, index };
         }) ?? [];
       };
-  
+
       const filteredDataWithIndex = addIndexToItems(dashfilter, data);
       const topReleaseListWithIndex = addIndexToItems(topReleaseList, topRelease);
       const topSongsListWithIndex = addIndexToItems(topSongsList, topSongsData);
       const topArtistListWithIndex = addIndexToItems(topArtistList, topRelease);
-  
+
       if (
         filteredDataWithIndex.length > 0 ||
         topReleaseListWithIndex.length > 0 ||
@@ -571,7 +583,7 @@ const Dashboard = ({ navigation }) => {
 
             {/* BUY NOW */}
             {isLoggedIn && !titles && (
-              <TouchableOpacity          
+              <TouchableOpacity
                 onPress={() => navigation.navigate('Home', {
                   Release_Id: item.Release_Id,
                   Release_Artwork: item.Release_Artwork,
@@ -610,9 +622,8 @@ const Dashboard = ({ navigation }) => {
       <React.Fragment>
         <View style={styles.card}>
 
-          {/* <TouchableOpacity onPress={() => navigation.navigate('Dummy')}>
-            <Text onPress={() => WebBrowser.openBrowserAsync("https://pinballmap.com")}
-            style={{alignSelf: 'center', paddingTop: 10}}>Dummy</Text>
+          {/* <TouchableOpacity onPress={removeData}>
+            <Text>Remove</Text>
           </TouchableOpacity> */}
 
           <View style={{ margin: SIZES.padding * 2 }}>
@@ -650,7 +661,7 @@ const Dashboard = ({ navigation }) => {
             <LottieView
               source={require('../assets/loader-animation.json')}
               autoPlay loop
-              
+
             />
           ) : titles == 'Music Releases!' ? (
             <FlatList
@@ -820,7 +831,6 @@ const Dashboard = ({ navigation }) => {
                         </TouchableOpacity>
                       </View>
 
-
                       <View>
                         {/* Release_PrimaryArtist */}
                         <Text
@@ -849,7 +859,6 @@ const Dashboard = ({ navigation }) => {
               contentContainerStyle={{ paddingHorizontal: SIZES.padding * 3, marginBottom: SIZES.padding * 2 }}
             />
           )}
-
         </View>
       </React.Fragment>
     )
@@ -972,7 +981,7 @@ const getStyles = (theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      
+
     },
     subContainer: {
       flexDirection: 'row',
